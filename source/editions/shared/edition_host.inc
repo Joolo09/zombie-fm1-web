@@ -13,6 +13,7 @@ static void ed_checks(void){uint32_t t,p;int old;
 }
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
  if(!strcmp(cmd,"editioncheck")){ed_checks();return 1;}
+ if(!strcmp(cmd,"splashpreview")){app_splash();return 1;}
  if(!strcmp(cmd,"drumtest")){uint32_t t;system_set(6,0);app_panic();z_init();for(t=0;t<6;t++)z_clear_track(t);z_song.selected=5;z_song.section=Z_SEQ;z_song.subpage=0;z_song.step_edit=0;z_step_set(5,0,36,100,127,80);return 1;}
  if(!strcmp(cmd,"rolltest")){ed_roll();return 1;}
  if(!strcmp(cmd,"en")){z_song.language=1;redraw_at=0;return 1;}
@@ -23,7 +24,7 @@ int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const
  if(!strcmp(cmd,"midiready")){uint32_t k;system_set(6,2);z_song.selected=0;for(k=0;k<4;k++)daw_values[0][k]=64;daw_values[0][4]=95;daw_values[0][5]=64;return 1;}
  if(!strcmp(cmd,"gatepad")){z_sampler.pad[0].mode=1;return 1;}
  if(!strcmp(cmd,"dawshow")){uint32_t j;const char *s="AFTERGLOW RACK";system_set(6,2);daw_seen=plat_ms();daw_host=2;daw_playing=1;daw_bpm=132;for(j=0;s[j];j++)daw_name[j]=s[j];daw_name[j]=0;return 1;}
- if(!strcmp(cmd,"defaults")){system_set(6,0);app_panic();z_init();midi_local=1;z_song.section=Z_HOME;z_song.subpage=0;redraw_at=0;return 1;}
+ if(!strcmp(cmd,"defaults")){system_set(6,0);app_panic();z_init();panel_reset();midi_local=1;z_song.section=Z_HOME;z_song.subpage=0;redraw_at=0;return 1;}
  return 0;
 }
 int app_expect(const char *what,int *got){
@@ -40,5 +41,13 @@ int app_expect(const char *what,int *got){
  else if(!strcmp(what,"recording"))*got=z_song.recording;
  else if(!strcmp(what,"subpage"))*got=z_song.subpage;
  else if(!strcmp(what,"section"))*got=z_song.section;
+ else if(!strcmp(what,"bpm"))*got=z_song.bpm;
+ else if(!strcmp(what,"daw_bpm"))*got=daw_bpm;
+ else if(!strcmp(what,"layer"))*got=active_layer;
+ else if(!strcmp(what,"locked"))*got=layer_locked;
+ else if(!strcmp(what,"bank"))*got=z_song.step_bank;
+ else if(!strcmp(what,"octave"))*got=z_song.octave;
+ else if(!strcmp(what,"effect"))*got=z_live_state();
+ else if(!strcmp(what,"drum_choice"))*got=drum_choice;
  else return 0;return 1;
 }

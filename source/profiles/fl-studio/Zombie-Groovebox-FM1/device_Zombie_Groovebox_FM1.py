@@ -3,9 +3,9 @@
 """Original MIT companion for Zombie Groovebox 0.8.x. Notes/macros use FL's normal MIDI path.
 
 ALGO selects the first six channels in the current Channel Rack group.
-SELECT controls the selected channel's volume; PRESET controls its pan.
+SELECT controls BPM (Groovebox 0.8.2+); PRESET controls pan.
 K1..K4: CC74/71/73/72, left unhandled for FL MIDI Learn/Multilink.
-Channel 16 CC110/114/115 is reserved for selection and absolute transport.
+Channel 16 CC110/114/115/116 is reserved for selection, transport and relative BPM.
 No MIDI notes are echoed back to FM-1. No project/files are changed by OnInit.
 """
 import time
@@ -14,6 +14,7 @@ import device
 import mixer
 import transport
 import plugins
+import midi
 
 # None: FL MIDI Learn / Multilink. Or four explicit plugin parameter indices.
 MACRO_PARAMETER_INDICES = None
@@ -108,6 +109,12 @@ def OnMidiMsg(event):
     elif ch == 15 and cc == 115:
         if (value >= 64) != bool(transport.isRecording()):
             transport.record()
+        event.handled = True
+    elif ch == 15 and cc == 116:
+        delta = value - 64
+        if delta:
+            transport.globalTransport(midi.FPT_TempoJog, delta * 10,
+                                      getattr(event, 'pmeflags', midi.PME_System))
         event.handled = True
     elif ch == 15 and cc == 110:
         if value < min(6, channels.channelCount()):

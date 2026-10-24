@@ -14,7 +14,7 @@ from _Framework.InputControlElement import MIDI_CC_TYPE
 from .settings import MACRO_PARAMETER_INDICES, RECORD_TARGET
 
 MACRO_CCS = (74, 71, 73, 72)
-CONTROL_CCS = (110, 114, 115)
+CONTROL_CCS = (110, 114, 115, 116)
 
 
 def pack7(data):
@@ -154,6 +154,8 @@ class ZombieCoreFM1(ControlSurface):
                 wanted = value >= 64
                 if wanted != bool(song.is_playing):
                     song.start_playing() if wanted else song.stop_playing()
+            elif cc == 116:
+                song.tempo = max(30.0, min(300.0, song.tempo + value - 64))
             elif cc == 115:
                 wanted = value >= 64
                 if RECORD_TARGET == 'session':

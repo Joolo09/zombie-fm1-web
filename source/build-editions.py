@@ -5,8 +5,8 @@ import argparse, ast, hashlib, json, os, re, shutil, subprocess, sys
 FIX=Path(__file__).resolve().parent
 ROOT=FIX.parent
 ED=FIX/'editions'
-OUT=FIX/'output/editions-0.8.1'
-VERSION='0.8.1'
+OUT=FIX/'output/editions-0.8.2'
+VERSION='0.8.2'
 PLATFORM=FIX/'platform-081'
 PY=sys.executable
 ENV=dict(os.environ,PYTHONUTF8='1',JIELI_TOOLCHAIN=os.environ.get('JIELI_TOOLCHAIN',str(ROOT/'.tooling/jieli-win/C$/JL/pi32')),AC79_SDK=os.environ.get('AC79_SDK',str(ROOT/'.tooling/ac79-sdk')),X0X_FONTSET='terminus',CC=os.environ.get('CC',str(ROOT/'tools/host-cc.cmd') if (ROOT/'tools/host-cc.cmd').exists() else 'cc'),ZIG_GLOBAL_CACHE_DIR=str(ROOT/'.tooling/zig-global'),ZIG_LOCAL_CACHE_DIR=str(ROOT/'.tooling/zig-local'))

@@ -5,9 +5,11 @@
 #include "output.h"
 #include "system.h"
 static void midi_mode_changed(uint32_t mode);
-static void edition_note(uint32_t note,uint32_t velocity,uint32_t on);
+static void edition_note(uint32_t track,uint32_t note,uint32_t velocity,uint32_t on);
 #include "system.c"
 #include "z_cyr.h"
+#include "z_logo240.h"
+static uint8_t drum_choice=36;
 static uint32_t panel_keys_before,held_buttons,redraw_at;
 static uint8_t key_action[27],held_raw[27],held_local[27],held_channels[27];
 static uint8_t midi_local,daw_playing,daw_recording,daw_values[6][6];
@@ -45,14 +47,14 @@ static void wr32(uint8_t *p,uint32_t x){uint32_t i;for(i=0;i<4;i++)p[i]=(uint8_t
 static void note_packet(uint32_t t,uint32_t note,uint32_t vel,uint32_t on){if(on&&(z_get(t,Z_MUTE)||(z_solo_state()&&z_solo_state()!=t+1)))return;uint32_t status=(on?0x90:0x80)|(z_get(t,Z_CHANNEL)-1);plat_midi_out((on?9:8)|status<<8|note<<16|vel<<24);}
 static void seq_out(uint32_t t,uint32_t n,uint32_t v,uint32_t ms){uint32_t i;if(z_sys.midi_mode)return;if(n==128){for(i=0;i<128;i++)if(off_deadline[t][i]&&(!v||off_arp[t][i])){note_packet(t,i,0,0);off_deadline[t][i]=0;}if(!v){uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(120u<<16));}return;}off_arp[t][n]=ms>>31;ms&=0x7fffffffu;if(off_deadline[t][n])note_packet(t,n,0,0);note_packet(t,n,v,1);off_deadline[t][n]=plat_ms()+ms+1;}
 static void all_off(void){uint32_t t,n;for(t=0;t<27;t++)if(key_action[t]==1){if(held_raw[t])raw_note(held_channels[t],held_notes[t],0,0);key_action[t]=held_local[t]=0;}for(t=0;t<6;t++)for(n=0;n<128;n++)if(off_deadline[t][n]){note_packet(t,n,0,0);off_deadline[t][n]=0;}for(t=0;t<6;t++){uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(64u<<16));plat_midi_out(11|((0xb0|ch)<<8)|(123u<<16));for(n=0;n<16;n++)editor_notes[t][n]=0;}}
-static void midi_mode_changed(uint32_t mode){app_panic();midi_local=mode==0;daw_playing=daw_recording=0;daw_seen=0;daw_host=0;daw_name[0]=0;}
+static void midi_mode_changed(uint32_t mode){app_panic();midi_local=mode==0;daw_bpm=z_song.bpm;daw_playing=daw_recording=0;daw_seen=0;daw_host=0;daw_name[0]=0;}
 static void midi_receive(void){uint32_t pkt;int port;while(plat_midi_in(&pkt,&port)){
  uint32_t status=(pkt>>8)&255,n=(pkt>>16)&127,v=(pkt>>24)&127,t;
  if(status>=0xf8){if(z_sys.midi_mode!=2)z_clock(status);continue;}
  if(status==0xf2){if(z_sys.midi_mode!=2)z_songpos(n|(v<<7));continue;}
  for(t=0;t<6;t++)if((status&15)+1==(uint32_t)z_get(t,Z_CHANNEL)){
   if(z_sys.midi_mode==2){if((status&0xf0)==0xb0){uint32_t k;for(k=0;k<4;k++)if(n==daw_cc[k])daw_values[t][k]=v;if(n==7)daw_values[t][4]=v;else if(n==10)daw_values[t][5]=v;else if(n==120||n==123)z_alloff(t);}continue;}
-  if((status&0xf0)==0x90){edition_note(n,v,v!=0);z_key(t,n,v,v!=0);}
+  if((status&0xf0)==0x90){edition_note(t,n,v,v!=0);z_key(t,n,v,v!=0);}
   else if((status&0xf0)==0x80)z_key(t,n,0,0);
   else if((status&0xf0)==0xb0){if(n==123||n==120)z_alloff(t);else if(n==121){z_bend(t,8192);z_sustain(t,0);}else if(n==122&&z_sys.midi_mode==0)midi_local=v>=64;else if(n==73)z_set(t,Z_ATTACK,v);else if(n==72)z_set(t,Z_RELEASE,v);else if(n==64)z_sustain(t,v>=64);else if(n==74)z_set(t,Z_CUTOFF,v);else if(n==71)z_set(t,Z_RESONANCE,v);else if(n==1)z_set(t,Z_FM,v);else if(n==7)z_set(t,Z_LEVEL,v);else if(n==10)z_set(t,Z_PAN,(int)v-64);}
   else if((status&0xf0)==0xe0)z_bend(t,n|(v<<7));
@@ -116,7 +118,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  if(cmd==1){const char *id=Z_PROTOCOL_ID;while(id[count]){out[count]=(uint8_t)id[count];count++;}}
  else if(cmd==2){for(j=0;j<sizeof z_song;j++)raw_reply[j+1]=((const uint8_t *)&z_song)[j];plat_unlock(f);reply(seq,cmd,0,raw_reply+1,sizeof z_song);return 1;}
  else if(cmd==3&&n==4&&a[0]<6&&a[1]<Z_PARAMS){int v=z_set(a[0],a[1],(int16_t)(a[2]|a[3]<<8));out[0]=(uint8_t)v;out[1]=(uint8_t)(v>>8);count=2;}
- else if(cmd==4&&n==4&&a[0]<6&&a[1]<128&&a[2]<128){edition_note(a[1],a[2],a[3]);z_key(a[0],a[1],a[2],a[3]);if(!z_song.arp_mode[a[0]]||!a[3])note_packet(a[0],a[1],a[2],a[3]&&a[2]);if(a[3]&&a[2])editor_notes[a[0]][a[1]/8]|=1u<<(a[1]&7);else editor_notes[a[0]][a[1]/8]&=(uint8_t)~(1u<<(a[1]&7));}
+ else if(cmd==4&&n==4&&a[0]<6&&a[1]<128&&a[2]<128){edition_note(a[0],a[1],a[2],a[3]);z_key(a[0],a[1],a[2],a[3]);if(!z_song.arp_mode[a[0]]||!a[3])note_packet(a[0],a[1],a[2],a[3]&&a[2]);if(a[3]&&a[2])editor_notes[a[0]][a[1]/8]|=1u<<(a[1]&7);else editor_notes[a[0]][a[1]/8]&=(uint8_t)~(1u<<(a[1]&7));}
  else if(cmd==5&&n==1){all_off();z_transport(a[0]);}
  else if(cmd==6&&n==6&&a[0]<6&&a[1]<64)z_step_set(a[0],a[1],a[2],a[3],a[4],a[5]);
  else if(cmd==7&&n==2&&a[0]<6&&a[1]<Z_PRESETS){z_preset(a[0],a[1]);}
@@ -168,7 +170,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  else if(cmd==41&&n==0&&upload_slot==253){if(upload_at!=sizeof z_sampler||crc32(z_transfer(),upload_at)!=upload_crc||!z_sampler_valid((const z_sampler_state *)z_transfer()))status=3;else{app_panic();z_sampler=*(const z_sampler_state *)z_transfer();z_sampler.tracks=Z_SAMPLER_EDITION?63:0;z_touch();}upload_slot=255;}
 
  else if(cmd==32&&n>=7&&n<=54&&a[0]<=1&&a[1]<=1&&(a[4]<6||a[4]==255)&&a[5]<=127&&a[6]<=127&&system_text(a+7,n-7)){
-  uint32_t bpm=a[2]|a[3]<<8;if(bpm<30||bpm>300)status=1;else{daw_playing=a[0];daw_recording=a[1];daw_seen=plat_ms();for(j=7;j<n;j++)daw_name[j-7]=(char)a[j];daw_name[n-7]=0;if(z_sys.midi_mode==2){daw_bpm=(uint16_t)bpm;if(a[4]<6&&z_song.selected!=a[4]){z_song.selected=a[4];z_touch();}if(plat_ms()-daw_touch_at>300){daw_values[z_song.selected][4]=a[5];daw_values[z_song.selected][5]=a[6];}}}
+  uint32_t bpm=a[2]|a[3]<<8;if(bpm<30||bpm>300)status=1;else{daw_playing=a[0];daw_recording=a[1];daw_seen=plat_ms();for(j=7;j<n;j++)daw_name[j-7]=(char)a[j];daw_name[n-7]=0;if(z_sys.midi_mode==2){if(plat_ms()-daw_touch_at>300)daw_bpm=(uint16_t)bpm;if(a[4]<6&&z_song.selected!=a[4]){z_song.selected=a[4];z_touch();}if(plat_ms()-daw_touch_at>300){daw_values[z_song.selected][4]=a[5];daw_values[z_song.selected][5]=a[6];}}}
  }
  else if(cmd==29&&n==2){if(!system_set(a[0],a[1]))status=1;}
  else if(cmd==30&&n>=1&&a[0]<2){char *dst=a[0]?z_sys.bio:z_sys.name;uint32_t cap=a[0]?64:32;if(n-1>=cap||!system_text(a+1,n-1))status=1;else{system_dirty=1;for(j=1;j<n;j++)dst[j-1]=(char)a[j];dst[n-1]=0;}}

@@ -1,7 +1,23 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63000801",
+  "current": "FM-1_63000802",
   "releases": [
+    {
+      "product": "FM-1_63000802",
+      "version": "0.8.2",
+      "label": {
+        "ru": "Groovebox 0.8.2 · SELECT=BPM / Зомби",
+        "en": "Groovebox 0.8.2 · SELECT=BPM / Zombie"
+      },
+      "notes": {
+        "ru": "SELECT всегда BPM, память страниц, быстрые удержания и LOCK через HOME. Драм-шаги сохраняют остальные удары. Возвращена заставка «Зомби ФМ-1». Для BPM в FL/Ableton обнови скрипты до 0.8.2. Проверено программно, аппаратный тест ожидается.",
+        "en": "SELECT always BPM, page memory, faster holds and HOME layer lock. Drum step edits preserve other hits. Zombie FM-1 splash restored. Update DAW scripts to 0.8.2 for BPM in FL/Ableton. Software-tested; hardware confirmation pending."
+      },
+      "bytes": 610100,
+      "sha256": "9547dd8a94b6a2bd797cd8d908b5ea6fc77a89c29d1fa67ce3a822e355da5909",
+      "file": "downloads/zombie-groovebox-0.8.2.fwsc",
+      "editor": "webapp/groovebox/"
+    },
     {
       "product": "FM-1_63000801",
       "version": "0.8.1",
@@ -16,7 +32,7 @@
       "bytes": 610100,
       "sha256": "dbcee5eb623061c425277cc7a0cd118c40b67be92c52eb18509081e1b9e07dae",
       "file": "downloads/zombie-groovebox-0.8.1.fwsc",
-      "editor": "webapp/groovebox/"
+      "editor": "webapp/groovebox-081/"
     },
     {
       "product": "FM-1_63000800",

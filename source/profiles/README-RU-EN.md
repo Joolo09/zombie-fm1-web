@@ -1,4 +1,4 @@
-# Zombie Groovebox / Sampler · DAW profiles 0.8.0
+# Zombie Groovebox / Sampler · DAW profiles 0.8.2
 
 Два отдельных профиля для FL Studio и два для Ableton Live 11/12 (Python 3).
 Выбирай профиль установленной прошивки: Groovebox или Sampler. Скрипты
@@ -20,7 +20,7 @@ Standalone → DAW Synth / Local OFF → DAW Controller → Standalone.
    выбери DAW Synth, MIDI Out Port 20, каналы 1–6. Для секвенсора FM-1 с его
    собственным звуком и MIDI-выходом оставь Standalone.
 
-ALGO выбирает первые шесть каналов Channel Rack. SELECT — громкость, PRESET —
+ALGO выбирает первые шесть каналов Channel Rack. SELECT — BPM в Groovebox 0.8.2+, громкость в Sampler / старом Groovebox, PRESET —
 панорама. K1–K4 отправляют CC74/71/73/72, по умолчанию доступны для Link to
 controller / Multilink. Для точного автоматического назначения укажи четыре
 индекса параметров в `MACRO_PARAMETER_INDICES` внутри `device_*.py`; значение
@@ -48,7 +48,7 @@ PLAY запускает/останавливает FL, REC управляет з
 
 K1–K4 управляют макросами 1–4 выбранного Rack (индексы 1–4, индекс 0 — Device On).
 Настрой `MACRO_PARAMETER_INDICES` в settings.py под обычный инструмент.
-SELECT — громкость, PRESET — панорама выбранной дорожки. ALGO — первые
+SELECT — BPM в Groovebox 0.8.2+, громкость в Sampler / старом Groovebox, PRESET — панорама выбранной дорожки. ALGO — первые
 шесть MIDI/Audio tracks Live. PLAY — транспорт, REC — Arrangement Record;
 для Session Record измени RECORD_TARGET на "session".
 Для синхронизации секвенсора включи Sync у MIDI Output FM-1, USB / TRS Clock
@@ -92,7 +92,7 @@ number for Input and Output. In Live enable Input Track/Remote and Output
 Remote; enable Output Sync only when you want to send MIDI clock.
 HOME + SEL cycles Standalone → DAW Synth → DAW Controller for this session.
 Each boot restores Standalone. K1–K4: CC74/71/73/72; ALGO: tracks/channels 1–6;
-SELECT: volume; PRESET: pan. PLAY/REC control the DAW. FL defaults to MIDI Learn;
+SELECT: BPM on Groovebox 0.8.2+, volume on Sampler / older Groovebox; PRESET: pan. PLAY/REC control the DAW. FL defaults to MIDI Learn;
 optional explicit plugin parameter indices are in the device script. Live
 defaults to Rack Macros 1–4, configurable in settings.py. Record/monitor the
 track yourself; scripts do not arm tracks or echo notes automatically.
@@ -110,3 +110,10 @@ DAW APIs: actual FL/Live sessions and physical FM-1 are not tested here.
 Application / scripts: MIT. Official installation/API references:
 https://www.image-line.com/fl-studio-learning-content/fl-studio-online-manual/html/midi_scripting.htm
 https://help.ableton.com/hc/en-us/articles/209072009-Installing-third-party-remote-scripts
+
+
+Groovebox 0.8.2+: SELECT -> relative BPM, channel 16 CC116 (65=+1, 63=-1).
+GLO page 2 K3 -> volume, K4 -> pan. New scripts remain compatible with older
+CC7 volume messages. Sampler 0.8.0 control mapping is unchanged.
+FL uses documented FPT_TempoJog (10 units per BPM); Live uses Song.tempo.
+Actual DAW / hardware sessions have not been tested. See Groovebox-0.8.2-controls.md.

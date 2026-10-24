@@ -35,3 +35,10 @@ Groovebox 0.8.1: five synth tracks + synthesized GM drum kit on track six.
 Native/web drum grid, 16 sounds, hat choke. Successful OTA now uses a full
 P33 chip reset. Hardware confirmation pending. Details: downloads/Groovebox-0.8.1-RU.md.
 Source: downloads/groovebox-source-0.8.1.zip. Sampler remains 0.8.0.
+
+
+Groovebox 0.8.2: SELECT always BPM, remembered pages, 180ms holds, HOME layer
+lock, SEQ bank shortcuts and additive kit step toggles. Original Zombie FM-1
+240x240 splash restored. New matching DAW profiles map relative tempo CC116.
+Details: downloads/Groovebox-0.8.2-RU.md. Physical hardware unverified.
+Source: downloads/groovebox-source-0.8.2.zip. Sampler stays 0.8.0.
