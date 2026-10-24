@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT — original browser installer UI. */
-import {Updater, FM1_PORT} from './vendor/fm1ota.js?v=lab4';
+import {Updater} from './vendor/fm1ota.js?v=lab5';
 import {checkPackage} from './package-check.js';
 
 
@@ -10,6 +10,16 @@ const text={
 };
 Object.assign(text.ru,{"headline": "USB под наблюдением.", "intro": "Отдельный тестовый сайт Zombie Lab для FM-1. Установи диагностику, проверь USB и память, сохрани отчёт.", "installTitle": "Установить тестовую Lab", "releaseLabel": "Прошивка", "browserHelp": "Chrome или Edge на компьютере, USB-кабель с передачей данных. Перед установкой закрой DAW и другие MIDI-вкладки.", "notice": "Lab временно заменит музыкальную прошивку FM-1. Сохрани проекты и исходные WAV. Во время записи не отключай USB.", "done": "Пакет установлен, версия подтверждена. Открой выбранный режим.", "source": "Исходники Lab и лицензии", "preview": "На устройстве будет диагностика, без синтезатора. USB-host и диски эта версия не проверяет."});
 Object.assign(text.en,{"headline": "USB under observation.", "intro": "A separate Zombie Lab test site for FM-1. Install diagnostics, check USB and memory, save a report.", "installTitle": "Install test Lab", "releaseLabel": "Firmware", "browserHelp": "Desktop Chrome or Edge, with a USB data cable. Close your DAW and other MIDI tabs before installation.", "notice": "Lab temporarily replaces the music firmware on FM-1. Export projects and keep source WAV files. Do not disconnect USB while writing.", "done": "Package installed and version confirmed. Open the selected mode.", "source": "Lab source and licenses", "preview": "The device will run diagnostics without synthesis. This version does not test USB host or drives."});
+Object.assign(text.ru,{
+ finding:'Ищу FM-1 по ответу устройства, независимо от названия порта…',
+ notfound:'FM-1 не ответил на запрос идентификатора. Подключи его к ПК обычным USB-кабелем. Если запускал USB-host — перезапусти FM-1. Закрой DAW и другие MIDI-вкладки. Текущая прошивка должна поддерживать протокол обновления FM-1.',
+ multiple:'Ответили несколько FM-1 или обнаружены несколько MIDI-маршрутов. Оставь один FM-1 и отключи MIDI-петли; затем повтори поиск.'
+});
+Object.assign(text.en,{
+ finding:'Looking for the FM-1 identity reply, regardless of port names…',
+ notfound:'No FM-1 identity reply. Connect it directly to the PC using a USB data cable. Restart FM-1 if USB-host was used. Close DAWs and other MIDI tabs. The current firmware must support the FM-1 update protocol.',
+ multiple:'Multiple FM-1 devices or MIDI routes replied. Keep one FM-1 and remove MIDI loopbacks, then search again.'
+});
 let lang='ru';try{lang=localStorage.getItem('zlab-language')||'ru';}catch{}if(!text[lang])lang='ru';
 let manifest, release, checked, access, detected, active=false, loading=false, generation=0;
 let message='checking', failure='', deviceText='', phase='package';
@@ -57,22 +67,18 @@ async function withDeviceLock(fn){
  if(!navigator.locks)return fn();
  return navigator.locks.request('zombie-fm1-installer',{ifAvailable:true},lock=>{if(!lock)throw Object.assign(Error('Installer busy'),{code:'busy'});return fn();});
 }
-function ensureSingle(){
- const candidates=[...access.inputs.values()].filter(p=>p.state!=='disconnected'&&FM1_PORT.test(p.name||''));
- if(candidates.length>1)throw Object.assign(Error('Multiple update candidates'),{code:'multiple'});
-}
 async function detect(){
  if(active||!checked||!supported())return;active=true;clearDevice();say('finding');
  try{await withDeviceLock(async()=>{
   if(!access){access=await navigator.requestMIDIAccess({sysex:true});access.addEventListener('statechange',()=>{if(!active&&detected&&(!access.inputs.has(detected.inputId)||access.inputs.get(detected.inputId).state==='disconnected')){clearDevice();say('ready');}});}
-  ensureSingle();const up=new Updater(access,log);const dev=await up.find();if(!dev)throw Object.assign(Error('No FM-1 response'),{code:'notfound'});
+  const up=new Updater(access,log);const dev=await up.find();if(!dev)throw Object.assign(Error('No FM-1 response'),{code:'notfound'});
   try{if(!['FM-1','ota-FM-1'].includes(dev.id.model))throw Object.assign(Error(dev.id.text),{code:'model'});detected={inputId:dev.link.input.id};deviceText=dev.id.text+' / '+dev.name;log('DEVICE '+dev.id.text);say('found');}finally{await dev.link.close();}
  });}catch(e){showError(e);}finally{active=false;render();}
 }
 async function install(){
  if(active||!checked||!detected)return;active=true;$('progress').value=0;say('start');let wake;
  try{await withDeviceLock(async()=>{
-  ensureSingle();try{wake=await navigator.wakeLock?.request('screen');}catch{}
+  try{wake=await navigator.wakeLock?.request('screen');}catch{}
   const up=new Updater(access,log);let lastPhase='';
   await up.install(checked.image,checked.product,(key,count,address)=>{
    if(key!==lastPhase){log(key+(typeof count==='string'?' '+count:''));lastPhase=key;}

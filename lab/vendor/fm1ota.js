@@ -9,8 +9,7 @@
 // Zombie Core changes: verify resumed installs after reboot, release ports,
 // check loader model, report byte progress, allow injectable sleeps in tests.
 
-// Lab web 1.1: recognize the Hortator USB MIDI name; no protocol changes.
-export const FM1_PORT = /fm-?1|felucca|hortator|ota|composite|sinco|usb-midi/i;
+// Lab web 1.4: identify endpoints by their protocol reply, never by port names.
 
 const HS_QUERY = [0xF0, 0x00, 0x32, 0x45, 0x00, 0x00, 0x00, 0x40, 0x7F, 0xF7];
 const UPGRADE = [0xF0, 0x22, 0x24, 0x35, 0x7F, 0xF7];
@@ -154,23 +153,71 @@ export class Updater {
     this.access = access;
     this.log = log || (() => {});
     this.sleep = options.sleep || sleep;
+    this.discoveryWaitMs = options.discoveryWaitMs ?? 1000;
   }
 
-  // every in/out pair with the same port name that answers the handshake
+  // One identity-only query per output, listening on every available input.
+  // MIDIPort.id identifies a browser endpoint, not USB VID/PID or a device model.
+  // Names are display text only. No upgrade command is sent during discovery.
   async find(filter) {
-    const outs = [...this.access.outputs.values()];
-    for (const input of this.access.inputs.values()) {
-      if (input.state === "disconnected") continue;
-      if (!FM1_PORT.test(input.name || "")) continue;   // never probe other gear
-      const output = outs.find((o) => o.name === input.name) || (outs.length === 1 ? outs[0] : null);
-      if (!output || output.state === "disconnected" || !FM1_PORT.test(output.name || "")) continue;
-      try { await input.open(); await output.open(); } catch (_) { continue; }
-      const link = new Link(input, output);
-      const id = await handshake(link, 2);
-      if (id && (!filter || filter(id))) return { link, id, name: input.name };
-      await link.close();
+    const listeners = [], replies = new Map();
+    let currentOutput = null;
+    try {
+      for (const input of this.access.inputs.values()) {
+        if (input.state === "disconnected") continue;
+        const previous = input.onmidimessage, wasOpen = input.connection === "open";
+        try { await input.open(); } catch (_) { continue; }
+        listeners.push({input, previous, wasOpen});
+        input.onmidimessage = ev => {
+          const pkt = ev.data;
+          if (!currentOutput || pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return;
+          const id = parseIdentity(Array.from(pkt));
+          if (!id || !["FM-1", "ota-FM-1"].includes(id.model)) return;
+          const key = input.id;
+          const existing = replies.get(key);
+          // Multiple routes to one input are ambiguous too: never guess an output.
+          if (existing && (existing.output.id !== currentOutput.id || existing.id.text !== id.text)) existing.ambiguous = true;
+          else if (!existing) replies.set(key, {input, output: currentOutput, id});
+        };
+      }
+      if (!listeners.length) return null;
+      for (const output of this.access.outputs.values()) {
+        if (output.state === "disconnected") continue;
+        const wasOpen = output.connection === "open";
+        try {
+          await output.open(); currentOutput = output;
+          for (let attempt = 0; attempt < 2; attempt++) {
+            try { output.send(HS_QUERY); } catch (_) { break; }
+            await this.sleep(this.discoveryWaitMs);
+            if ([...replies.values()].some(r => r.output.id === output.id)) break;
+          }
+        } catch (_) {
+          this.log('MIDI output unavailable: ' + (output.name || output.id));
+        } finally {
+          currentOutput = null;
+          if (!wasOpen) await output.close().catch(() => {});
+        }
+      }
+    } finally {
+      for (const {input, previous, wasOpen} of listeners) {
+        input.onmidimessage = previous;
+        if (!wasOpen) await input.close().catch(() => {});
+      }
     }
-    return null;
+    const candidates = [...replies.values()];
+    if (candidates.length > 1 || candidates.some(r => r.ambiguous))
+      throw fail("multiple", "Multiple FM-1 identity replies or MIDI routes; disconnect extra devices/routes");
+    const dev = candidates[0];
+    if (!dev || (filter && !filter(dev.id))) return null;
+    if (dev.input.state === "disconnected" || dev.output.state === "disconnected") return null;
+    try { await dev.input.open(); await dev.output.open(); }
+    catch (e) { await Promise.allSettled([dev.input.close(), dev.output.close()]); throw e; }
+    const link = new Link(dev.input, dev.output);
+    // Confirm the selected route again before handing it to the updater.
+    const confirmed = await handshake(link, 2);
+    if (!confirmed || confirmed.text !== dev.id.text) { await link.close(); return null; }
+    this.log('IDENTITY ' + confirmed.text + ' / MIDI route confirmed');
+    return {link, id: confirmed, name: dev.input.name || dev.input.id};
   }
 
   async waitFor(filter, ms) {
