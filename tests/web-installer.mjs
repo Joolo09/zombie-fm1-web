@@ -16,8 +16,8 @@ function identity(text){const u=Array(34).fill(0);u[1]=89;u[2]=17;u.splice(6,tex
 function request(addr,len){const u=[0,89,48,8,0,0,0,addr&255,(addr>>>8)&255,(addr>>>16)&255,(addr>>>24)&255,len&255,(len>>8)&255,(len>>16)&255];u.push(~u.slice(6).reduce((a,b)=>a+b,0)&255);return frame(u);}
 
 class VirtualFM1 {
- constructor({resume=false,mismatch=false,wrongLoader=false,badRequest=false,disconnect=false}={}){
-  this.options={mismatch,wrongLoader,badRequest,disconnect};this.access={inputs:new Map(),outputs:new Map()};this.upgrades=0;this.blocks=0;this.closed=0;this.stage=resume?'write':'verify';this.switchTo(resume?(wrongLoader?'ota-Other_1':'ota-FM-1_1'):'FM-1_61000703');
+ constructor({resume=false,mismatch=false,wrongLoader=false,badRequest=false,disconnect=false,appReady=true}={}){
+  this.options={mismatch,wrongLoader,badRequest,disconnect,appReady};this.access={inputs:new Map(),outputs:new Map()};this.upgrades=0;this.blocks=0;this.closed=0;this.stage=resume?'write':'verify';this.switchTo(resume?(wrongLoader?'ota-Other_1':'ota-FM-1_1'):'FM-1_61000703');
  }
  switchTo(id){
   for(const p of [...this.access.inputs.values(),...this.access.outputs.values()])p.state='disconnected';
@@ -29,6 +29,11 @@ class VirtualFM1 {
  emit(input,bytes){queueMicrotask(()=>input.onmidimessage?.({data:Uint8Array.from(bytes)}));}
  send(input,output,bytes){
   if(output.state==='disconnected')throw Error('USB lost');
+  if(bytes[1]===0x7D){
+   assert.equal(this.stage,'done');assert.equal(bytes[5],20);
+   if(this.options.appReady){const data=[0,4,...Array(22).fill(0)],reply=[240,125,90,67,bytes[4],84];for(let i=0;i<data.length;i+=7)reply.push(0,...data.slice(i,i+7));reply.push(247);this.emit(input,reply);}
+   return;
+  }
   if(bytes.length===10&&bytes[1]===0&&bytes[2]===50&&bytes[7]===64){this.emit(input,identity(this.id));return;}
   if(bytes[1]===34){
    this.upgrades++;this.at=0;
@@ -61,6 +66,11 @@ await test('normal install serves exact full image and verifies reboot identity'
 await test('loader recovery verifies restarted identity before success',async()=>{
  const device=new VirtualFM1({resume:true}),steps=[];assert.equal(await device.updater().install(checked.image,meta.product,k=>steps.push(k)),meta.product);assert.equal(device.upgrades,1);assert.deepEqual(steps.filter(k=>k!=='write'),['loader','reboot','done']);
 });
+await test('identity without a running application cannot report done',async()=>{
+ const device=new VirtualFM1({resume:true,appReady:false}),steps=[];
+ await assert.rejects(device.updater().install(checked.image,meta.product,k=>steps.push(k)),{code:'appnotready'});
+ assert(!steps.includes('done'));assert(device.closed>=4);
+});
 await test('normal and recovery mismatch never report done',async()=>{
  for(const resume of [false,true]){const device=new VirtualFM1({resume,mismatch:true}),steps=[];await assert.rejects(device.updater().install(checked.image,meta.product,k=>steps.push(k)),{code:'mismatch'});assert(!steps.includes('done'));}
 });
@@ -71,6 +81,13 @@ await test('public resume path also checks the new version',async()=>{
 await test('wrong loader model is rejected before UPGRADE',async()=>{const device=new VirtualFM1({resume:true,wrongLoader:true});await assert.rejects(device.updater().install(checked.image,meta.product),{code:'model'});assert.equal(device.upgrades,0);});
 await test('out-of-range read request releases ports without success',async()=>{const device=new VirtualFM1({resume:true,badRequest:true});await assert.rejects(device.updater().install(checked.image,meta.product),{code:'badreq'});assert(device.closed>=2);});
 await test('USB loss cannot report success',async()=>{const device=new VirtualFM1({resume:true,disconnect:true}),steps=[];await assert.rejects(device.updater().install(checked.image,meta.product,k=>steps.push(k)),{code:'lost'});assert(!steps.includes('done'));});
+await test('failed final acknowledgement never reports a completed transfer',async()=>{
+ for(const addr of [0xE0000000,0xF0000000]){
+  const link={read:async()=>request(addr,0),send:()=>false};
+  const result=await new Updater({}).serve(link,checked.image,addr,1000);
+  assert.equal(result.finished,false);assert.equal(result.lost,true);
+ }
+});
 await test('unrelated MIDI outputs are never probed',async()=>{
  let sent=0;const access={inputs:new Map([['x',{name:'FM-1',state:'connected'}]]),outputs:new Map([['x',{name:'Other Synth',state:'connected',send(){sent++;}}]])};assert.equal(await new Updater(access).find(),null);assert.equal(sent,0);
 });

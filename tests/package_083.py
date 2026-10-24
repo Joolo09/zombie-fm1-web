@@ -25,7 +25,7 @@ manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\
 # Replace only edited files and add the build wrapper, test and release notes.
 updates = ['source/editions/shared/panel.c', 'source/editions/shared/edition_ui.inc',
            'source/editions/shared/edition_host.inc', 'source/build-groovebox-083.py',
-           'tests/test_save_led.py', 'tests/package_083.py', 'downloads/Groovebox-0.8.3-RU.md']
+           'tests/test_save_led.py', 'tests/test_loader_reset.py', 'tests/package_083.py', 'downloads/Groovebox-0.8.3-RU.md']
 with ZipFile(root / 'downloads/groovebox-source-0.8.2.zip') as old:
     with ZipFile(root / 'downloads/groovebox-source-0.8.3.zip', 'w', ZIP_DEFLATED) as new:
         for item in old.infolist():
