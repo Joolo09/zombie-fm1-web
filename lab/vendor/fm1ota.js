@@ -9,6 +9,9 @@
 // Zombie Core changes: verify resumed installs after reboot, release ports,
 // check loader model, report byte progress, allow injectable sleeps in tests.
 
+// Lab web 1.1: recognize the Hortator USB MIDI name; no protocol changes.
+export const FM1_PORT = /fm-?1|felucca|hortator|ota|composite|sinco|usb-midi/i;
+
 const HS_QUERY = [0xF0, 0x00, 0x32, 0x45, 0x00, 0x00, 0x00, 0x40, 0x7F, 0xF7];
 const UPGRADE = [0xF0, 0x22, 0x24, 0x35, 0x7F, 0xF7];
 const MAXDATA = 512;
@@ -158,9 +161,9 @@ export class Updater {
     const outs = [...this.access.outputs.values()];
     for (const input of this.access.inputs.values()) {
       if (input.state === "disconnected") continue;
-      if (!/fm-?1|felucca|ota|composite|sinco|usb-midi/i.test(input.name || "")) continue;   // never probe other gear
+      if (!FM1_PORT.test(input.name || "")) continue;   // never probe other gear
       const output = outs.find((o) => o.name === input.name) || (outs.length === 1 ? outs[0] : null);
-      if (!output || output.state === "disconnected" || !/fm-?1|felucca|ota|composite|sinco|usb-midi/i.test(output.name || "")) continue;
+      if (!output || output.state === "disconnected" || !FM1_PORT.test(output.name || "")) continue;
       try { await input.open(); await output.open(); } catch (_) { continue; }
       const link = new Link(input, output);
       const id = await handshake(link, 2);

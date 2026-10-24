@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT — original browser installer UI. */
-import {Updater} from './vendor/fm1ota.js';
+import {Updater, FM1_PORT} from './vendor/fm1ota.js?v=lab2';
 import {checkPackage} from './package-check.js';
 
 
@@ -46,7 +46,7 @@ async function withDeviceLock(fn){
  return navigator.locks.request('zombie-fm1-installer',{ifAvailable:true},lock=>{if(!lock)throw Object.assign(Error('Installer busy'),{code:'busy'});return fn();});
 }
 function ensureSingle(){
- const candidates=[...access.inputs.values()].filter(p=>p.state!=='disconnected'&&/fm-?1|felucca|ota|composite|sinco|usb-midi/i.test(p.name||''));
+ const candidates=[...access.inputs.values()].filter(p=>p.state!=='disconnected'&&FM1_PORT.test(p.name||''));
  if(candidates.length>1)throw Object.assign(Error('Multiple update candidates'),{code:'multiple'});
 }
 async function detect(){
