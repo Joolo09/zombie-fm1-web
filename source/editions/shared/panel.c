@@ -299,7 +299,8 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
  if(z_song.octave>0)lights|=1u<<B_OCTUP;if(z_song.octave<0)lights|=1u<<B_OCTDN;
  if(z_sys.midi_mode!=2&&z_song.arp_mode[z_song.selected])lights|=1u<<B_ARP;
  if(z_playing())lights|=1u<<B_PLAY;if(z_song.recording&&now/250%2)lights|=1u<<B_REC;
- if(saved_revision!=z_revision()||system_dirty)lights|=1u<<B_SAVE;
+ /* SAVE is a button pulse, not a latched dirty-state lamp. Editing K1-K4
+  * must not look like a stuck SAVE button; dirty state stays in the UI/protocol. */
  if(z_sys.midi_mode==2){lights&=~((1u<<B_PLAY)|(1u<<B_REC));if(daw_playing)lights|=1u<<B_PLAY;if(daw_recording&&now/250%2)lights|=1u<<B_REC;}
  plat_glow(z_sys.glow);plat_play_red(z_sys.midi_mode==2?daw_recording:z_song.recording);plat_leds(lights,z_sys.glow==2?((1u<<27)-1):keys);
 }

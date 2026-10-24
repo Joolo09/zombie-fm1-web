@@ -21,6 +21,7 @@ static void ui_prepare(void){uint32_t key=z_song.section|(z_song.subpage<<4)|((a
 }
 static void ui_header(const char *title,const char *subtitle){char b[16];uint16_t color=C_HI;
  cv_begin(240,34,UI_BG);cv_rect(0,0,240,2,color);z_text_clip(8,5,&FONT_XS,title,UI_TEXT,150);z_text_clip(8,19,&FONT_XS,subtitle,z_song.recording?RGB(255,111,145):UI_MUTED,150);
+ if(saved_revision!=z_revision()||system_dirty)cv_text(162,5,&FONT_XS,"*",color);
  number(z_sys.midi_mode==2?daw_bpm:z_song.bpm,b);cv_text(201-text_w(&FONT_M,b)/2,1,&FONT_M,b,UI_TEXT);cv_text(201-text_w(&FONT_XS,"BPM")/2,23,&FONT_XS,"BPM",UI_MUTED);cv_blit(0,0);
 }
 static void ui_tracks(void){uint32_t i;char b[4];cv_begin(240,24,UI_BG);
