@@ -111,6 +111,23 @@
       "bytes": 610108,
       "sha256": "b8bc4d5d7e6b34a8a6572856d990a8bb9344f94baae87cd7d5adaf7ce795231e",
       "file": "downloads/Return-to-Core-0.7.1.fwsc"
+    },
+    {
+      "product": "FM-1_63000900",
+      "version": "0.9.0",
+      "label": {
+        "ru": "Groovebox 0.9.0 BETA · Hortator в дорожке 6",
+        "en": "Groovebox 0.9.0 BETA · Hortator on track 6"
+      },
+      "notes": {
+        "ru": "Тестовая сборка: 8 драм-партий Hortator внутри дорожки 6; пять синтезаторов сохранены. Проверено в симуляторе и браузере, на физическом FM-1 НЕ проверено. Драм-дилей использует 8-битное компандирование; SAMPLE-kit ZOMBIE. Сохрани прежний проект перед проверкой.",
+        "en": "Experimental: 8 Hortator drum lanes inside track 6; five synths preserved. Simulator/browser tested; physical FM-1 NOT tested. Drum delay uses 8-bit companding; original ZOMBIE sample kit. Back up the previous project before testing."
+      },
+      "bytes": 610100,
+      "sha256": "96d62df4009455de817252e89e1f284eb1754068550d91ad6df0edc37e5d8240",
+      "file": "downloads/zombie-groovebox-0.9.0.fwsc",
+      "editor": "webapp/groovebox-090/",
+      "source": "downloads/groovebox-source-0.9.0.zip"
     }
   ]
 }

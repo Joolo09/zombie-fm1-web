@@ -4,6 +4,7 @@
  * two-operator FM, phase distortion, percussion and linear PCM sampler.
  * Tables are generated from mathematical definitions by tools/build-core.py. */
 #include "dsp.h"
+#include "drum_suite.h"
 #include "z_tables.h"
 #if Z_SAMPLER_EDITION
 #include "z_samples.h"
@@ -30,7 +31,7 @@ typedef struct { float phase,phase2,env,lp1,lp2,velocity,age,pos,inc; uint32_t s
                  uint8_t track,note,stage,active,released,arp,pad,drum;float drum_decay;z_pad settings;uint32_t sample_start,sample_end; } voice;
 static voice voices[Z_VOICES];
 static Z_POOL float delay_l[8192],delay_r[8192],comb_a[1499],comb_b[1877];
-static Z_POOL uint8_t transfer[Z_SLOT_BYTES];
+static Z_POOL uint8_t transfer[Z_SAMPLER_EDITION?Z_SLOT_BYTES:4096u];
 #ifdef Z_WASM
 static Z_POOL int16_t preview_pcm[4][Z_PCM_MAX];
 #endif
@@ -188,10 +189,15 @@ void z_init(void) {
  for(i=0;i<4;i++)z_sample(10+i,z_drum_pcm[i],z_drum_n[i],11025);
 #endif
  sampler_init();z_sampler.tracks=Z_SAMPLER_EDITION?63:0;z_reset_audio();edition_defaults();
+#if !Z_SAMPLER_EDITION
+ h_init();h_tempo(z_song.bpm);h_legacy_begin(z_get(5,Z_LENGTH));for(i=0;i<64;i++){h_legacy_step(i,z_song.track[5].steps[i].note,z_song.track[5].steps[i].velocity);for(t=0;t<3;t++)if(z_song.chord[5][i][t])h_legacy_step(i,z_song.chord[5][i][t]-1,z_song.track[5].steps[i].velocity);}
+#endif
+
 }
 void z_note(uint32_t t,uint32_t note,uint32_t vel,uint32_t on) {
  uint32_t i,best=0,oldest=0xffffffffu;voice *v;
  if(t>=Z_TRACKS||note>127)return;
+ if(z_drum_track(t))return; /* The nested drum suite owns track six's voices. */
  if(!on||!vel){if(z_drum_track(t))return;for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&voices[i].note==note){voices[i].released=1;if(!sustain[t]&&(voices[i].pad==255||voices[i].settings.mode))voices[i].stage=3;}return;}
  for(i=0;i<Z_VOICES;i++) { if(!voices[i].active){best=i;break;} if(voices[i].stamp<oldest){oldest=voices[i].stamp;best=i;} }
  v=&voices[best];
@@ -294,7 +300,11 @@ static void seq_step(void) {
   }
  }
 }
-void z_transport(uint32_t on) { if(!on){z_record(0);z_reset_audio();solo_track=0;}playing=!!on;pos=63;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
+void z_transport(uint32_t on) { if(!on){z_record(0);z_reset_audio();solo_track=0;}
+#if !Z_SAMPLER_EDITION
+ h_transport(on);
+#endif
+ playing=!!on;pos=63;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
 uint32_t z_external(uint32_t on) {external_clock=!!on;if(z_song.reserved!=(uint8_t)external_clock){z_song.reserved=(uint8_t)external_clock;z_touch();}return external_clock;}
 void z_clock(uint32_t status) {
  if(!external_clock)return;
@@ -407,6 +417,13 @@ void z_render(float *out,uint32_t n) {
   {float yl=l-dc_xl+0.99715f*dc_yl,yr=r-dc_xr+0.99715f*dc_yr;dc_xl=l;dc_xr=r;dc_yl=yl;dc_yr=yr;
    out[2*frame]=clampf(yl,-0.98f,0.98f);out[2*frame+1]=clampf(yr,-0.98f,0.98f);}
  }
+#if !Z_SAMPLER_EDITION
+ {float drums[512];h_tempo(z_song.bpm);h_render(drums,n);
+  float level=z_get(5,Z_LEVEL)/127.0f,pan=(z_get(5,Z_PAN)+64)/127.0f;
+  if(z_get(5,Z_MUTE)||(z_solo_state()&&z_solo_state()!=6))level=0;
+  for(uint32_t i=0;i<n;i++){out[i*2]+=drums[i*2]*level*(1-pan);out[i*2+1]+=drums[i*2+1]*level*pan;}}
+#endif
+
 }
 uint32_t z_position(void){return pos;}
 uint32_t z_playing(void){return playing;}
@@ -415,5 +432,5 @@ float *z_buffer(void){return render_buffer;}
 uint8_t *z_transfer(void){return transfer;}
 uint32_t z_snapshot(void){return (uint32_t)(uintptr_t)&z_song;}
 #ifdef Z_WASM
-void z_preview_sample(uint32_t slot,uint32_t length,uint32_t rate){uint32_t i;if(slot>=4||length>Z_PCM_MAX)return;for(i=0;i<length;i++)preview_pcm[slot][i]=(int16_t)(transfer[2*i]|transfer[2*i+1]<<8);z_sample(6+slot,preview_pcm[slot],length,rate);}
+void z_preview_sample(uint32_t slot,uint32_t length,uint32_t rate){uint32_t i;if(!Z_SAMPLER_EDITION)return;if(slot>=4||length>Z_PCM_MAX)return;for(i=0;i<length;i++)preview_pcm[slot][i]=(int16_t)(transfer[2*i]|transfer[2*i+1]<<8);z_sample(6+slot,preview_pcm[slot],length,rate);}
 #endif

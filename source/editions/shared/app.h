@@ -2,6 +2,7 @@
 #pragma once
 #include <stdint.h>
 #include "edition.h"
+#define APP_CANVAS_PX (240u * (Z_SAMPLER_EDITION?144u:124u))
 #define APP_SECOND_CORE
 #include "plat.h"
 #define APP_NAME Z_EDITION_TITLE

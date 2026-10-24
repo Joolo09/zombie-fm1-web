@@ -46,10 +46,11 @@ ble = false
 usb_audio_in = true
 usb_audio_out = false
 second_core = true
-o2 = ["dsp.c", "output.c"]
+o2 = ["dsp.c", "output.c", "drum_suite.c"]
+size_units = ["drum_suite.c"]
 words = "words.tsv"
 tagline = "Independent {kind}, animated 240x240 display and DAW MIDI"
-licence = "MIT / MPL-2.0 platform"
+licence = "{'MIT / MPL-2.0 platform' if sample else 'GPL-3.0-only combined work; MIT synth, MPL-2.0 platform'}"
 ''',encoding='utf-8')
     gen=app/'build/gen';gen.mkdir(parents=True,exist_ok=True)
     for p in (ED/'assets').glob('z_*.h'):
@@ -181,22 +182,24 @@ expect midi_mode 0
     path=OUT/f'{kind}-test.txt';path.write_text(s,encoding='utf-8');return path
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--host-only',action='store_true');parser.add_argument('--firmware-only',action='store_true');parser.add_argument('--kind',choices=['groovebox','sampler']);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--host-only',action='store_true');parser.add_argument('--firmware-only',action='store_true');parser.add_argument('--wasm-only',action='store_true');parser.add_argument('--kind',choices=['groovebox','sampler']);args=parser.parse_args()
     OUT.mkdir(parents=True,exist_ok=True)
     for kind in ([args.kind] if args.kind else ['groovebox','sampler']):
         app,names=prepare(kind)
-        if not args.firmware_only:
+        if not args.firmware_only and not args.wasm_only:
             run([PY,'-X','utf8',PLATFORM/'tools/build.py',app,'--host','--release',VERSION],kind+'-host-build.log')
             shots=OUT/kind;shots.mkdir(exist_ok=True)
             run([app/f'build/host/zombie-{kind}_host',script(kind),shots],kind+'-host-tests.log')
         if args.host_only:continue
-        run([PY,'-X','utf8',PLATFORM/'tools/build.py',app,'--release',VERSION],kind+'-device-build.log')
-        fw=app/f'build/zombie-{kind}-{VERSION}.fwsc';shutil.copy2(fw,OUT/fw.name)
+        fw=app/f'build/zombie-{kind}-{VERSION}.fwsc'
+        if not args.wasm_only:
+            run([PY,'-X','utf8',PLATFORM/'tools/build.py',app,'--release',VERSION],kind+'-device-build.log')
+            shutil.copy2(fw,OUT/fw.name)
         exports=json.loads((ED/'assets/wasm-exports.json').read_text())
         wasm=OUT/f'{kind}.wasm'
-        run([os.environ.get('ZIG',str(ROOT/'.tooling/zig-windows-x86_64-0.13.0/zig.exe')),'cc','-target','wasm32-freestanding','-O2','-ffp-contract=off','-ffreestanding','-nostdlib','-DZ_WASM','-I'+str(app/'build/gen'),app/'dsp.c',app/'output.c','-Wl,--no-entry','-Wl,--export-memory',*['-Wl,--export=z_'+n for n in exports],'-o',wasm],kind+'-wasm-build.log')
+        run([os.environ.get('ZIG',str(ROOT/'.tooling/zig-windows-x86_64-0.13.0/zig.exe')),'cc','-target','wasm32-freestanding','-O2','-ffp-contract=off','-ffreestanding','-nostdlib','-DZ_WASM','-I'+str(app/'build/gen'),app/'dsp.c',app/'output.c',app/'drum_suite.c','-Wl,--no-entry','-Wl,--export-memory',*['-Wl,--export=z_'+n for n in exports],*(['-Wl,--export='+n for n in ['h_init','h_remote_release','h_models','h_presets','h_frame','h_flash','h_flash_dirty','h_ui_tick','h_button','h_key','h_knob','h_save','h_bpm','h_requested_playing','h_time','h_remote','h_set','h_get','h_set_global','h_set_step','h_load_preset','h_hit','h_pack','h_unpack']] if kind=='groovebox' else []),'-o',wasm],kind+'-wasm-build.log')
         (OUT/f'{kind}-presets.json').write_text(json.dumps(names),encoding='utf-8')
-        (OUT/(fw.name+'.sha256')).write_text(hashlib.sha256(fw.read_bytes()).hexdigest()+'  '+fw.name+'\n',encoding='utf-8')
+        if fw.exists():(OUT/(fw.name+'.sha256')).write_text(hashlib.sha256(fw.read_bytes()).hexdigest()+'  '+fw.name+'\n',encoding='utf-8')
     print('Edition builds ready; no physical FM-1 flashed.',flush=True)
 
 if __name__=='__main__':main()

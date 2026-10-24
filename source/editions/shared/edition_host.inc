@@ -11,7 +11,27 @@ static void ed_checks(void){uint32_t t,p;int old;
  else{ed_check(z_sample_frames(0)==0,"groovebox does not carry Minecraft PCM");ed_check(z_sampler_enable(0,1)==-1&&z_sampler.tracks==0,"groovebox cannot enable hidden sampler");}
  system_set(6,2);ed_check(system_save()==0,"DAW settings saved in simulated flash");app_init();ed_check(z_sys.midi_mode==0&&midi_local,"saved controller mode cannot mute startup");
 }
+#if !Z_SAMPLER_EDITION
+static int h_wire(uint8_t cmd,const uint8_t *data,uint32_t n){uint8_t wire[245]={0x7d,0x5a,0x43,1,0};uint32_t at=5;wire[4]=cmd;for(uint32_t i=0;i<n;){uint32_t hi=at++;wire[hi]=0;for(uint32_t k=0;k<7&&i<n;k++,i++){wire[hi]|=(data[i]>>7)<<k;wire[at++]=data[i]&127;}}ed_check(app_sysex(wire,at),"drum SysEx recognized");return raw_reply[0];}
+static void h_protocol_check(void){
+ z_project before=z_song;uint8_t bytes[3288],payload[194],begin[4];
+ ed_check(h_wire(44,(uint8_t[]){0,1,7,0},4)==0,"drum parameter command");
+ ed_check(h_wire(44,(uint8_t[]){8,1,7,0},4)!=0,"invalid drum lane rejected");
+ ed_check(h_wire(45,(uint8_t[]){0,63,1,1,56,3,12},7)==0,"last step, condition and ratchet command");
+ ed_check(h_wire(45,(uint8_t[]){0,64,1,1,56,3,12},7)!=0,"step outside pattern rejected");
+ ed_check(h_wire(43,0,0)==0,"independent drum snapshot command");memcpy(bytes,raw_reply+1,3288);
+ wr32(begin,crc32(bytes,3288));ed_check(h_wire(47,begin,4)==0,"begin drum project transfer");
+ ed_check(h_wire(48,0,0)!=0,"incomplete drum project transfer rejected");
+ ed_check(h_wire(47,begin,4)==0,"restart drum transfer");
+ for(uint32_t i=0;i<3288;i+=192){uint32_t n=3288-i;if(n>192)n=192;payload[0]=(uint8_t)i;payload[1]=(uint8_t)(i>>8);memcpy(payload+2,bytes+i,n);ed_check(h_wire(17,payload,n+2)==0,"drum transfer chunk");}
+ ed_check(h_wire(48,0,0)==0,"validated drum project committed");
+ ed_check(!memcmp(before.track,z_song.track,5*sizeof(z_song.track[0])),"drum commands preserve five synth tracks");
+}
+#endif
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
+ #if !Z_SAMPLER_EDITION
+ if(!strcmp(cmd,"hortatorcheck")){h_protocol_check();int rc=h_host_check();printf("Hortator check stage: %d\n",rc);ed_check(rc==0,"ratchets, probability, Grids, motion, CPU caps, user presets, four projects and song");return 1;}
+#endif
  if(!strcmp(cmd,"editioncheck")){ed_checks();return 1;}
  if(!strcmp(cmd,"splashpreview")){app_splash();return 1;}
  if(!strcmp(cmd,"drumtest")){uint32_t t;system_set(6,0);app_panic();z_init();for(t=0;t<6;t++)z_clear_track(t);z_song.selected=5;z_song.section=Z_SEQ;z_song.subpage=0;z_song.step_edit=0;z_step_set(5,0,36,100,127,80);return 1;}
