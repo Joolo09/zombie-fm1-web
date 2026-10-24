@@ -1,28 +1,31 @@
-# Zombie Core · FM-1 Web Studio
+# Zombie FM-1 · Groovebox / Sampler 0.8.0
 
-Веб-редактор Afterglow и установка Zombie Core по USB MIDI, RU / EN.
-Сайт: https://joolo09.github.io/zombie-fm1-web/
+Site / installer: https://joolo09.github.io/zombie-fm1-web/
 
-Открой сайт в Chrome / Edge на компьютере. Для знакомства нажми «Открыть
-студию». Для установки подключи один FM-1 USB-кабелем с передачей данных,
-закрой DAW и другие MIDI-вкладки, нажми «Найти FM-1», затем «Установить».
-Запрос MIDI требует разрешения SysEx. Загрузка страницы ничего не прошивает.
-Установщик проверяет размер, SHA-256 и идентификатор файла до MIDI-доступа.
-После обычной установки и повторной записи из загрузчика проверяется
-идентификатор перезапущенного устройства. USB не отключать во время записи.
-После обрыва повтори установку той же версии; поблочного продолжения нет.
+Two dedicated firmware packages. Groovebox: six synthesis tracks, 64 original
+presets, native/web four-note piano roll and starter groove. Sampler: 32 pads,
+four user PCM slots, chopping, reverse, choke groups and one-shot/gate/loop.
+Both boot Standalone with local sound; HOME + SEL cycles Standalone → DAW Synth
+→ DAW Controller for the current session. Never automatically flashes a device.
 
-Включение Pages: Settings → Pages → Deploy from a branch → main → / (root).
-Все пути относительные, сайт работает и в подкаталоге репозитория.
-Локальный просмотр: `python -m http.server 8080 --bind 127.0.0.1`.
-Тесты без железа: `npm test`. Физическое устройство этими тестами не прошивается.
+Original 240x240 RGB565 device UI: track colors, output meter, page transitions,
+fading pad hits, moving sequencer playhead. English and Russian labels.
+Displayed previews are from the host simulator, not physical hardware photos.
 
-Прошивка 0.7.4 и возврат на 0.7.1 включены без изменения опубликованных байтов.
-Web-версия 1.0 добавляет установку через браузер; номер прошивки не меняет.
-Прошивка 0.7.4 проверена сборкой/host/WASM. Пользователь подтвердил динамик
-в 0.7.2; веб-обновление на физическом FM-1 разработчиком не проверялось.
-Редактор и сэмплы не отправляют пользовательское аудио на сервер.
+Find FM-1, then Install in Chrome/Edge with MIDI SysEx. Back up projects/WAVs
+and close the DAW / other MIDI tabs first. Firmware updates are validated with
+size, SHA-256 and package identity; success requires the restarted identity.
 
-Код приложения/синтеза и редактора — MIT; платформа и транспорт — MPL-2.0.
-Исходники, notices и provenance: [архив](downloads/firmware-source-0.7.4.zip),
-[компоненты](licenses/THIRD-PARTY.txt). Звуки Minecraft — Mojang/Microsoft.
+Dedicated FL Studio and Ableton Live 11/12 Python 3 profiles are in
+source/profiles/ and downloads/Zombie-FM1-DAW-Profiles-0.8.0.zip. Read the included
+RU/EN guide for installation, pad note maps and manual MIDI Learn in FL.
+
+Both firmware binaries compile; host, actual WASM audio and stub DAW API tests
+pass. Physical FM-1 flashing/display and actual FL/Live sessions are not verified
+by the developer. Older 0.7.4 / 0.7.1 downloads remain available.
+
+Editable new firmware source: source/editions/. Complete matching platform,
+generators/assets and profiles: downloads/editions-source-0.8.0.zip.
+Application/DSP/UI/profiles: MIT. Hardware/boot/update platform: MPL-2.0.
+Minecraft audio in Sampler: Mojang/Microsoft, provenance in source archive.
+GitHub Pages: main, / (root), HTTPS. Paths support a repository subdirectory.

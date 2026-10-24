@@ -1,0 +1,12 @@
+name = "zombie-sampler"
+id_prefix = "FM-1_64"
+usb_manufacturer = "Zombie Core"
+usb_product = "Zombie Sampler FM-1"
+ble = false
+usb_audio_in = true
+usb_audio_out = false
+second_core = true
+o2 = ["dsp.c", "output.c"]
+words = "words.tsv"
+tagline = "Independent sampler, animated 240x240 display and DAW MIDI"
+licence = "MIT / MPL-2.0 platform"

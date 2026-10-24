@@ -1,0 +1,821 @@
+[
+ [
+  "Pulse Engine",
+  {
+   "wave": 1,
+   "mix": 72,
+   "detune": 17,
+   "cutoff": 82,
+   "resonance": 30,
+   "attack": 1,
+   "decay": 44,
+   "sustain": 72,
+   "release": 24,
+   "drive": 20,
+   "reverb": 12
+  }
+ ],
+ [
+  "Square Lead",
+  {
+   "wave": 2,
+   "cutoff": 94,
+   "resonance": 63,
+   "drive": 30
+  }
+ ],
+ [
+  "Dusk Pad",
+  {
+   "attack": 75,
+   "release": 90,
+   "detune": 55,
+   "reverb": 70,
+   "cutoff": 76
+  }
+ ],
+ [
+  "Glass Keys",
+  {
+   "model": 1,
+   "ratio": 2,
+   "fm": 60,
+   "sustain": 0,
+   "decay": 80,
+   "reverb": 45
+  }
+ ],
+ [
+  "Bell Tower",
+  {
+   "model": 1,
+   "ratio": 5,
+   "fm": 85,
+   "sustain": 0,
+   "decay": 95,
+   "reverb": 65
+  }
+ ],
+ [
+  "FM Bass",
+  {
+   "model": 1,
+   "ratio": 1,
+   "fm": 35,
+   "cutoff": 70,
+   "drive": 38
+  }
+ ],
+ [
+  "Acid Phase",
+  {
+   "model": 2,
+   "fm": 90,
+   "cutoff": 98,
+   "resonance": 50
+  }
+ ],
+ [
+  "Spectral Pad",
+  {
+   "model": 3,
+   "mix": 90,
+   "attack": 50,
+   "release": 75,
+   "lfoDepth": 65,
+   "reverb": 80
+  }
+ ],
+ [
+  "Deep Kick",
+  {
+   "model": 5,
+   "decay": 52,
+   "sustain": 0,
+   "fm": 90,
+   "cutoff": 127
+  }
+ ],
+ [
+  "Dust Snare",
+  {
+   "model": 6,
+   "decay": 37,
+   "sustain": 0,
+   "cutoff": 120
+  }
+ ],
+ [
+  "Metal Hat",
+  {
+   "model": 7,
+   "decay": 14,
+   "sustain": 0,
+   "cutoff": 127
+  }
+ ],
+ [
+  "Night Wind",
+  {
+   "model": 4,
+   "decay": 80,
+   "sustain": 20,
+   "lfoDepth": 100,
+   "reverb": 90
+  }
+ ],
+ [
+  "Night Stab",
+  {
+   "model": 0,
+   "wave": 2,
+   "cutoff": 78,
+   "resonance": 43,
+   "attack": 0,
+   "decay": 30,
+   "sustain": 0,
+   "release": 14,
+   "drive": 24,
+   "delay": 24
+  }
+ ],
+ [
+  "Rave Organ",
+  {
+   "model": 1,
+   "fm": 44,
+   "ratio": 2,
+   "cutoff": 98,
+   "attack": 0,
+   "decay": 40,
+   "sustain": 85,
+   "release": 16,
+   "drive": 18
+  }
+ ],
+ [
+  "Pixel Lead",
+  {
+   "model": 3,
+   "wave": 3,
+   "mix": 110,
+   "drive": 40,
+   "delay": 60
+  }
+ ],
+ [
+  "Ghost Pad",
+  {
+   "model": 2,
+   "attack": 95,
+   "release": 110,
+   "reverb": 100,
+   "lfoDepth": 80
+  }
+ ],
+ [
+  "Night Sub",
+  {
+   "wave": 0,
+   "mix": 5,
+   "detune": 2,
+   "cutoff": 75,
+   "attack": 0,
+   "decay": 34,
+   "sustain": 70,
+   "release": 10,
+   "transpose": -12,
+   "drive": 18,
+   "reverb": 0
+  }
+ ],
+ [
+  "Rubber Roller",
+  {
+   "wave": 2,
+   "detune": 4,
+   "cutoff": 68,
+   "resonance": 75,
+   "attack": 0,
+   "decay": 26,
+   "sustain": 40,
+   "release": 12,
+   "drive": 35,
+   "transpose": -12,
+   "reverb": 0
+  }
+ ],
+ [
+  "Reese Engine",
+  {
+   "wave": 1,
+   "mix": 98,
+   "detune": 66,
+   "cutoff": 72,
+   "resonance": 36,
+   "attack": 1,
+   "decay": 45,
+   "sustain": 90,
+   "release": 17,
+   "drive": 52,
+   "transpose": -12,
+   "reverb": 6
+  }
+ ],
+ [
+  "Hollow Bass",
+  {
+   "model": 2,
+   "fm": 26,
+   "cutoff": 52,
+   "sustain": 110,
+   "release": 22,
+   "transpose": -12
+  }
+ ],
+ [
+  "Iron FM Bass",
+  {
+   "model": 1,
+   "ratio": 1,
+   "fm": 83,
+   "cutoff": 80,
+   "attack": 0,
+   "decay": 30,
+   "sustain": 44,
+   "release": 10,
+   "drive": 42,
+   "transpose": -12,
+   "reverb": 0
+  }
+ ],
+ [
+  "Warm Triangle",
+  {
+   "wave": 3,
+   "mix": 12,
+   "detune": 12,
+   "cutoff": 88,
+   "attack": 5,
+   "sustain": 110,
+   "release": 28,
+   "transpose": -12
+  }
+ ],
+ [
+  "Reso Pluck",
+  {
+   "wave": 2,
+   "cutoff": 70,
+   "resonance": 114,
+   "attack": 0,
+   "decay": 26,
+   "sustain": 0,
+   "release": 20,
+   "delay": 42
+  }
+ ],
+ [
+  "Reese Pulse",
+  {
+   "wave": 2,
+   "mix": 127,
+   "detune": 110,
+   "cutoff": 66,
+   "drive": 48,
+   "lfoRate": 12,
+   "lfoDepth": 28,
+   "transpose": -12
+  }
+ ],
+ [
+  "Neon Pluck",
+  {
+   "wave": 2,
+   "mix": 30,
+   "detune": 12,
+   "cutoff": 103,
+   "attack": 0,
+   "decay": 38,
+   "sustain": 0,
+   "release": 20,
+   "delay": 28,
+   "reverb": 18
+  }
+ ],
+ [
+  "Warehouse Lead",
+  {
+   "wave": 1,
+   "detune": 30,
+   "cutoff": 112,
+   "attack": 1,
+   "decay": 45,
+   "sustain": 84,
+   "release": 20,
+   "drive": 32,
+   "delay": 20,
+   "reverb": 12
+  }
+ ],
+ [
+  "Vowel Phase",
+  {
+   "model": 2,
+   "fm": 112,
+   "cutoff": 88,
+   "resonance": 80,
+   "lfoDepth": 55,
+   "lfoRate": 21,
+   "delay": 30
+  }
+ ],
+ [
+  "Laser Voltage",
+  {
+   "model": 1,
+   "ratio": 5,
+   "fm": 98,
+   "cutoff": 111,
+   "attack": 0,
+   "decay": 24,
+   "sustain": 0,
+   "release": 10,
+   "drive": 24,
+   "delay": 36
+  }
+ ],
+ [
+  "Glass Whistle",
+  {
+   "model": 3,
+   "mix": 16,
+   "attack": 9,
+   "sustain": 112,
+   "release": 31,
+   "reverb": 52,
+   "transpose": 12
+  }
+ ],
+ [
+  "Neon Edge",
+  {
+   "model": 3,
+   "mix": 127,
+   "drive": 90,
+   "cutoff": 120,
+   "release": 15,
+   "delay": 70,
+   "reverb": 20
+  }
+ ],
+ [
+  "Sync Teeth",
+  {
+   "model": 2,
+   "fm": 14,
+   "cutoff": 116,
+   "resonance": 60,
+   "drive": 74,
+   "delay": 20
+  }
+ ],
+ [
+  "Soft Flute",
+  {
+   "wave": 0,
+   "mix": 25,
+   "detune": 4,
+   "attack": 18,
+   "sustain": 110,
+   "release": 44,
+   "reverb": 48
+  }
+ ],
+ [
+  "Afterglow Chords",
+  {
+   "wave": 1,
+   "mix": 98,
+   "detune": 48,
+   "cutoff": 79,
+   "attack": 12,
+   "decay": 55,
+   "sustain": 72,
+   "release": 42,
+   "reverb": 44,
+   "delay": 12
+  }
+ ],
+ [
+  "Frozen Choir",
+  {
+   "model": 3,
+   "mix": 100,
+   "attack": 104,
+   "release": 111,
+   "cutoff": 88,
+   "lfoRate": 8,
+   "lfoDepth": 57,
+   "reverb": 100
+  }
+ ],
+ [
+  "Orbit Cloud",
+  {
+   "model": 1,
+   "ratio": 3,
+   "fm": 18,
+   "attack": 95,
+   "decay": 100,
+   "sustain": 95,
+   "release": 98,
+   "delay": 47,
+   "reverb": 83
+  }
+ ],
+ [
+  "Tape Organ",
+  {
+   "model": 3,
+   "mix": 57,
+   "attack": 7,
+   "sustain": 127,
+   "release": 35,
+   "cutoff": 80,
+   "drive": 17,
+   "reverb": 52
+  }
+ ],
+ [
+  "Phase Fog",
+  {
+   "model": 2,
+   "fm": 53,
+   "attack": 112,
+   "release": 115,
+   "cutoff": 56,
+   "lfoRate": 3,
+   "lfoDepth": 95,
+   "reverb": 120
+  }
+ ],
+ [
+  "Pulse Horizon",
+  {
+   "wave": 2,
+   "mix": 120,
+   "detune": 110,
+   "attack": 85,
+   "release": 103,
+   "cutoff": 75,
+   "delay": 38,
+   "reverb": 88
+  }
+ ],
+ [
+  "Thin Ice",
+  {
+   "model": 1,
+   "ratio": 8,
+   "fm": 11,
+   "attack": 80,
+   "sustain": 100,
+   "release": 93,
+   "cutoff": 118,
+   "reverb": 110
+  }
+ ],
+ [
+  "Dust Halo",
+  {
+   "model": 4,
+   "attack": 100,
+   "decay": 100,
+   "sustain": 70,
+   "release": 112,
+   "cutoff": 28,
+   "lfoRate": 5,
+   "lfoDepth": 110,
+   "reverb": 120
+  }
+ ],
+ [
+  "FM Tines",
+  {
+   "model": 1,
+   "ratio": 1,
+   "fm": 72,
+   "attack": 0,
+   "decay": 71,
+   "sustain": 12,
+   "release": 55,
+   "cutoff": 110,
+   "reverb": 54
+  }
+ ],
+ [
+  "Toy Piano",
+  {
+   "model": 1,
+   "ratio": 4,
+   "fm": 40,
+   "attack": 0,
+   "decay": 48,
+   "sustain": 0,
+   "release": 33,
+   "reverb": 29
+  }
+ ],
+ [
+  "Music Box",
+  {
+   "model": 1,
+   "ratio": 9,
+   "fm": 60,
+   "attack": 0,
+   "decay": 80,
+   "sustain": 0,
+   "release": 60,
+   "reverb": 80,
+   "transpose": 12
+  }
+ ],
+ [
+  "Wooden Pluck",
+  {
+   "model": 2,
+   "fm": 38,
+   "attack": 0,
+   "decay": 34,
+   "sustain": 0,
+   "release": 22,
+   "cutoff": 73,
+   "reverb": 35
+  }
+ ],
+ [
+  "Copper Mallet",
+  {
+   "model": 1,
+   "ratio": 6,
+   "fm": 104,
+   "attack": 0,
+   "decay": 62,
+   "sustain": 0,
+   "release": 41,
+   "cutoff": 96,
+   "reverb": 60
+  }
+ ],
+ [
+  "Harp Drops",
+  {
+   "model": 3,
+   "mix": 25,
+   "attack": 0,
+   "decay": 55,
+   "sustain": 0,
+   "release": 52,
+   "delay": 58,
+   "reverb": 58
+  }
+ ],
+ [
+  "Muted Clav",
+  {
+   "wave": 2,
+   "mix": 15,
+   "cutoff": 59,
+   "resonance": 67,
+   "attack": 0,
+   "decay": 18,
+   "sustain": 0,
+   "release": 9,
+   "drive": 40
+  }
+ ],
+ [
+  "Cathedral",
+  {
+   "model": 3,
+   "mix": 84,
+   "attack": 14,
+   "sustain": 127,
+   "release": 72,
+   "cutoff": 100,
+   "reverb": 120,
+   "transpose": -12
+  }
+ ],
+ [
+  "Knock Kick",
+  {
+   "model": 5,
+   "cutoff": 127,
+   "attack": 0,
+   "decay": 34,
+   "sustain": 0,
+   "release": 10,
+   "fm": 100,
+   "drive": 22,
+   "reverb": 0
+  }
+ ],
+ [
+  "Club Sub Kick",
+  {
+   "model": 5,
+   "cutoff": 112,
+   "attack": 0,
+   "decay": 66,
+   "sustain": 0,
+   "release": 12,
+   "fm": 54,
+   "drive": 32,
+   "reverb": 0
+  }
+ ],
+ [
+  "Punch Kick",
+  {
+   "model": 5,
+   "fm": 127,
+   "decay": 37,
+   "sustain": 0,
+   "release": 8,
+   "cutoff": 127,
+   "drive": 90,
+   "reverb": 0
+  }
+ ],
+ [
+  "Crack Snare",
+  {
+   "model": 6,
+   "cutoff": 118,
+   "attack": 0,
+   "decay": 39,
+   "sustain": 0,
+   "release": 16,
+   "drive": 36,
+   "reverb": 8
+  }
+ ],
+ [
+  "Crushed Snare",
+  {
+   "model": 6,
+   "decay": 28,
+   "sustain": 0,
+   "release": 10,
+   "cutoff": 127,
+   "drive": 120,
+   "reverb": 12
+  }
+ ],
+ [
+  "Air Open Hat",
+  {
+   "model": 7,
+   "cutoff": 124,
+   "attack": 0,
+   "decay": 88,
+   "sustain": 0,
+   "release": 52,
+   "reverb": 16
+  }
+ ],
+ [
+  "Crisp Closed Hat",
+  {
+   "model": 7,
+   "cutoff": 121,
+   "attack": 0,
+   "decay": 20,
+   "sustain": 0,
+   "release": 12,
+   "reverb": 2
+  }
+ ],
+ [
+  "Noise Hit",
+  {
+   "model": 4,
+   "attack": 0,
+   "decay": 20,
+   "sustain": 0,
+   "release": 4,
+   "cutoff": 102,
+   "drive": 60,
+   "delay": 50
+  }
+ ],
+ [
+  "Dust Chord",
+  {
+   "model": 0,
+   "wave": 2,
+   "cutoff": 64,
+   "attack": 0,
+   "decay": 48,
+   "sustain": 18,
+   "release": 22,
+   "drive": 24,
+   "reverb": 36
+  }
+ ],
+ [
+  "Warehouse Pluck",
+  {
+   "model": 2,
+   "fm": 60,
+   "cutoff": 88,
+   "attack": 0,
+   "decay": 32,
+   "sustain": 0,
+   "release": 14,
+   "delay": 24
+  }
+ ],
+ [
+  "Blue Glass",
+  {
+   "model": 1,
+   "fm": 54,
+   "ratio": 3,
+   "cutoff": 108,
+   "attack": 0,
+   "decay": 62,
+   "sustain": 0,
+   "release": 35,
+   "reverb": 42
+  }
+ ],
+ [
+  "Glitch Brass",
+  {
+   "model": 3,
+   "mix": 88,
+   "cutoff": 94,
+   "attack": 2,
+   "decay": 29,
+   "sustain": 48,
+   "release": 18,
+   "drive": 45
+  }
+ ],
+ [
+  "Low Tide Bass",
+  {
+   "model": 2,
+   "fm": 30,
+   "cutoff": 70,
+   "attack": 0,
+   "decay": 33,
+   "sustain": 68,
+   "release": 12,
+   "transpose": -12
+  }
+ ],
+ [
+  "Dawn Keys",
+  {
+   "model": 1,
+   "fm": 30,
+   "ratio": 2,
+   "cutoff": 105,
+   "attack": 1,
+   "decay": 68,
+   "sustain": 22,
+   "release": 40,
+   "reverb": 38
+  }
+ ],
+ [
+  "Broken Radio",
+  {
+   "model": 4,
+   "cutoff": 55,
+   "resonance": 120,
+   "lfoRate": 90,
+   "lfoDepth": 127,
+   "drive": 120,
+   "reverb": 25
+  }
+ ],
+ [
+  "Star Beacon",
+  {
+   "model": 1,
+   "ratio": 13,
+   "fm": 42,
+   "attack": 0,
+   "decay": 106,
+   "sustain": 0,
+   "release": 65,
+   "delay": 85,
+   "reverb": 90
+  }
+ ]
+]

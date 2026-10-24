@@ -1,13 +1,45 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_61000704",
+  "current": "FM-1_63000800",
   "releases": [
+    {
+      "product": "FM-1_63000800",
+      "version": "0.8.0",
+      "label": {
+        "ru": "Groovebox 0.8.0 · отдельная прошивка",
+        "en": "Groovebox 0.8.0 · dedicated firmware"
+      },
+      "notes": {
+        "ru": "Синтез, 64 пресета, пианоролл и стартовый грув. Standalone при запуске. Новая сборка: проверена в симуляторе, на железе пока нет.",
+        "en": "Synthesis, 64 presets, piano roll and starter groove. Standalone at startup. New build: simulator-tested, not hardware-verified."
+      },
+      "bytes": 610108,
+      "sha256": "4cef993f42ae73b47bed80f8aa15a34d65ddc1d0b746b3e1668d6053cdfb98af",
+      "file": "downloads/zombie-groovebox-0.8.0.fwsc",
+      "editor": "webapp/groovebox/"
+    },
+    {
+      "product": "FM-1_64000800",
+      "version": "0.8.0",
+      "label": {
+        "ru": "Sampler 0.8.0 · отдельная прошивка",
+        "en": "Sampler 0.8.0 · dedicated firmware"
+      },
+      "notes": {
+        "ru": "32 пэда, свои WAV, CHOP, reverse, GATE / LOOP. Standalone при запуске. Новая сборка: проверена в симуляторе, на железе пока нет.",
+        "en": "32 pads, user WAVs, CHOP, reverse, GATE / LOOP. Standalone at startup. New build: simulator-tested, not hardware-verified."
+      },
+      "bytes": 610108,
+      "sha256": "d1f15450be7de13dd449be1d8c43e811ad33b2fbb7c0070aab9fe379c2603248",
+      "file": "downloads/zombie-sampler-0.8.0.fwsc",
+      "editor": "webapp/sampler/"
+    },
     {
       "product": "FM-1_61000704",
       "version": "0.7.4",
       "label": {
-        "ru": "Zombie Core 0.7.4 · текущая",
-        "en": "Zombie Core 0.7.4 · current"
+        "ru": "Core 0.7.4 · прежняя сборка",
+        "en": "Core 0.7.4 · previous build"
       },
       "notes": {
         "ru": "Standalone при каждом запуске. KNOB 2 — фильтр. Обновлённые Closed / Open Hat.",

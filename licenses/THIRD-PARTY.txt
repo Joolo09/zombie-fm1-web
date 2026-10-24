@@ -12,3 +12,6 @@ Additional component notices are included with that source.
 Minecraft sound effects: Mojang/Microsoft. Audio provenance and original asset
 URLs / SHA-1 hashes are in audio-provenance/ inside the source archive.
 M-VAVE and FM-1 are trademarks of their respective owners.
+
+Groovebox/Sampler 0.8.0 matching source: ../downloads/editions-source-0.8.0.zip.
+Original application, piano roll, display animations and DAW profiles: MIT.

@@ -20,7 +20,7 @@ function render(){
  $('device').textContent=deviceText||tr('noDevice');$('device').classList.toggle('connected',!!detected);
  $('detect').disabled=active||loading||!checked||!supported();$('install').disabled=active||loading||!checked||!detected;
  $('release').disabled=active||loading||!manifest;$('release-note').textContent=release?.notes?.[lang]||'';
- if(release)$('package-badge').textContent=release.version;
+ if(release){$('package-badge').textContent=release.version;for(const a of document.querySelectorAll('a[data-t=editor],a[data-t=tryEditor]'))a.href=release.editor||'webapp/editor/';}
  for(const option of $('release').options){const item=manifest?.releases.find(r=>r.product===option.value);if(item)option.textContent=item.label[lang];}
  const stages=['package','device','write','done'];stages.forEach((s,i)=>{const el=$('step-'+s);el.classList.toggle('complete',i<stages.indexOf(phase)||message==='done');if(s===phase)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
  document.querySelector('.install-card').setAttribute('aria-busy',String(active));
@@ -32,7 +32,7 @@ function clearDevice(){detected=null;deviceText='';}
 async function loadRelease(){
  const token=++generation;checked=null;clearDevice();loading=true;phase='package';$('progress').value=0;say('checking');
  try{
-  release=manifest.releases.find(r=>r.product===$('release').value);if(!release)throw Error('Unknown release');
+  release=manifest.releases.find(r=>r.product===$('release').value);if(!release)throw Error('Unknown release');render();
   const response=await fetch(release.file,{cache:'no-store'});if(!response.ok)throw Object.assign(Error('Package HTTP '+response.status),{code:'loadfail'});
   const next=await checkPackage(new Uint8Array(await response.arrayBuffer()),release);if(token!==generation)return;
   checked=next;$('checksum').textContent='SHA-256 '+release.sha256;$('firmware-download').href=release.file;
