@@ -1,7 +1,23 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_62000100",
+  "current": "FM-1_62000200",
   "releases": [
+    {
+      "product": "FM-1_62000200",
+      "version": "0.2.0",
+      "bytes": 610108,
+      "sha256": "d4340fffc96f70463aad97723a53bb8b251239264a8fd25bb359f492a3e337a4",
+      "file": "downloads/zombie-lab-host-0.2.0.fwsc",
+      "editor": "host/",
+      "label": {
+        "ru": "Zombie Lab Host 0.2.0 · тест USB-host",
+        "en": "Zombie Lab Host 0.2.0 · USB host probe"
+      },
+      "notes": {
+        "ru": "Экспериментальная проба USB0: только GET_DESCRIPTOR. После установки отключи ПК, подключи USB-мышь через переходник, нажми GLO и удерживай PLAY 2 секунды. Питание 5 В не измеряется; диски не монтируются. Физическая проверка этой версии ещё не проведена.",
+        "en": "Experimental USB0 GET_DESCRIPTOR probe. Unplug the PC, connect a USB mouse using an adapter, press GLO and hold PLAY for 2 seconds. No VBUS voltage measurement or disk support. Not yet tested on physical FM-1."
+      }
+    },
     {
       "product": "FM-1_62000100",
       "version": "0.1.0",

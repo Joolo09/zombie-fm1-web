@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT — original browser installer UI. */
-import {Updater, FM1_PORT} from './vendor/fm1ota.js?v=lab2';
+import {Updater, FM1_PORT} from './vendor/fm1ota.js?v=lab3';
 import {checkPackage} from './package-check.js';
 
 
@@ -22,7 +22,13 @@ function render(){
  $('device').textContent=deviceText||tr('noDevice');$('device').classList.toggle('connected',!!detected);
  $('detect').disabled=active||loading||!checked||!supported();$('install').disabled=active||loading||!checked||!detected;
  $('release').disabled=active||loading||!manifest;$('release-note').textContent=release?.notes?.[lang]||'';
- if(release){$('package-badge').textContent=release.version;if(release.product!=='FM-1_62000100'){$('install-heading').textContent=lang==='ru'?'Вернуть Groovebox 0.8.2':'Restore Groovebox 0.8.2';$('install').textContent=lang==='ru'?'Вернуть Groovebox':'Restore Groovebox';document.querySelector('[data-t=notice]').textContent=lang==='ru'?'Будет установлена музыкальная прошивка Groovebox 0.8.2. Сначала скачай отчёт Lab. Не отключай USB во время записи.':'Groovebox 0.8.2 music firmware will be installed. Download your Lab report first. Keep USB connected while writing.';}for(const a of document.querySelectorAll('[data-release-editor]')){a.href=release.editor;a.textContent=release.product==='FM-1_62000100'?(lang==='ru'?'Открыть диагностику →':'Open diagnostics →'):(lang==='ru'?'Открыть Groovebox →':'Open Groovebox →');}}
+ if(release){$('package-badge').textContent=release.version;if(release.product==='FM-1_63000802'){$('install-heading').textContent=lang==='ru'?'Вернуть Groovebox 0.8.2':'Restore Groovebox 0.8.2';$('install').textContent=lang==='ru'?'Вернуть Groovebox':'Restore Groovebox';document.querySelector('[data-t=notice]').textContent=lang==='ru'?'Будет установлена музыкальная прошивка Groovebox 0.8.2. Сначала скачай отчёт Lab. Не отключай USB во время записи.':'Groovebox 0.8.2 music firmware will be installed. Download your Lab report first. Keep USB connected while writing.';}for(const a of document.querySelectorAll('[data-release-editor]')){a.href=release.editor;a.textContent=release.product.startsWith('FM-1_62')?(lang==='ru'?'Открыть диагностику →':'Open diagnostics →'):(lang==='ru'?'Открыть Groovebox →':'Open Groovebox →');}}
+ if(release?.product==='FM-1_62000200'){
+  document.querySelector('[data-t=headline]').textContent=lang==='ru'?'Проверяем USB-host.':'Probe USB host.';
+  document.querySelector('[data-t=preview]').textContent=lang==='ru'?'Отдельная экспериментальная прошивка: USB-дескриптор, без файловых операций. Без тестера напряжение остаётся неизвестным.':'A separate experimental firmware: USB descriptor only, no file operations. Without a meter the connector voltage remains unknown.';
+  $('install-heading').textContent=lang==='ru'?'Установить Lab Host 0.2.0':'Install Lab Host 0.2.0';
+ }
+ const sourceLink=document.querySelector('a[data-t=source]');if(sourceLink)sourceLink.href=release?.product==='FM-1_62000200'?'downloads/Zombie-Lab-Host-0.2.0-Source.zip':'downloads/Zombie-Lab-Source.zip';
  for(const option of $('release').options){const item=manifest?.releases.find(r=>r.product===option.value);if(item)option.textContent=item.label[lang];}
  const stages=['package','device','write','done'];stages.forEach((s,i)=>{const el=$('step-'+s);el.classList.toggle('complete',i<stages.indexOf(phase)||message==='done');if(s===phase)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
  document.querySelector('.install-card').setAttribute('aria-busy',String(active));
