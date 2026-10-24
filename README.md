@@ -49,3 +49,19 @@ lock, SEQ bank shortcuts and additive kit step toggles. Original Zombie FM-1
 240x240 splash restored. New matching DAW profiles map relative tempo CC116.
 Details: downloads/Groovebox-0.8.2-RU.md. Physical hardware unverified.
 Source: downloads/groovebox-source-0.8.2.zip. Sampler stays 0.8.0.
+
+
+## Groovebox 0.9.0 beta: nested Hortator drums
+
+Track 6 contains eight Hortator drum lanes with its actual DSP, native UI,
+sequencer, modulation, effects, motion and song functions. Tracks 1–5 keep their
+existing synth audio and panel. Physical selection: ALGO for the outer track,
+SEL + PRESET for the inner drum. Experimental editor: `webapp/groovebox-090/`.
+
+This beta has simulator/WASM/protocol checks; physical FM-1 timing, controls,
+storage and updates remain unverified. 0.8.3 remains the default.
+[Russian release notes](downloads/Groovebox-0.9.0-RU.md) ·
+[features, adaptations, source/licensing and tests](source/drum-suite/README.md).
+The combined 0.9.0 firmware/WASM is GPL-3.0-only; standalone original Zombie
+source retains its MIT notices. The complete matching source archive is
+`downloads/groovebox-source-0.9.0.zip`.

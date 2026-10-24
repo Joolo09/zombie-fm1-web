@@ -22,7 +22,7 @@ function render(){
  $('device').textContent=deviceText||tr('noDevice');$('device').classList.toggle('connected',!!detected);
  $('detect').disabled=active||loading||!checked||!supported();$('install').disabled=active||loading||!checked||!detected;
  $('release').disabled=active||loading||!manifest;$('release-note').textContent=release?.notes?.[lang]||'';
- if(release){$('package-badge').textContent=release.version;for(const a of document.querySelectorAll('a[data-t=editor],a[data-t=tryEditor]'))a.href=release.editor||'webapp/editor/';}
+ if(release){$('package-badge').textContent=release.version;const sourceLink=document.querySelector('a[data-t=source]');if(sourceLink)sourceLink.href=release.source||'downloads/groovebox-source-0.8.3.zip';for(const a of document.querySelectorAll('a[data-t=editor],a[data-t=tryEditor]'))a.href=release.editor||'webapp/editor/';}
  for(const option of $('release').options){const item=manifest?.releases.find(r=>r.product===option.value);if(item)option.textContent=item.label[lang];}
  const stages=['package','device','write','done'];stages.forEach((s,i)=>{const el=$('step-'+s);el.classList.toggle('complete',i<stages.indexOf(phase)||message==='done');if(s===phase)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
  document.querySelector('.install-card').setAttribute('aria-busy',String(active));

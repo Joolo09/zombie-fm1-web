@@ -1,0 +1,11 @@
+#hortator-suite{margin:20px 0;padding:22px;border:1px solid #f26a90;background:#111c29}
+.h-layout{display:grid;grid-template-columns:minmax(240px,360px) 1fr;gap:24px;align-items:start}
+#h-screen{width:100%;height:auto;image-rendering:pixelated;border:10px solid #080e18;border-radius:8px;box-sizing:border-box}
+#h-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#h-knobs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}
+.h-knob{padding:10px 5px;text-align:center;background:#182b3d;border-radius:8px}
+.h-knob span{display:block;font:11px monospace;min-height:28px}.h-knob button{padding:5px 12px;margin:2px}
+#h-keys{display:flex;gap:3px;margin-top:20px;min-height:100px}#h-keys button{flex:1;min-width:0;padding:4px;font-size:11px;border-radius:3px}
+#h-keys .h-white{background:#dce5ed;color:#17222e}#h-keys .h-black{background:#080e18;color:#a8b4c4;max-height:66px}#h-keys .held,#h-buttons .held{background:#f26a90;color:#101820}
+body[data-hortator="true"] #sound,body[data-hortator="true"] #sequence,body[data-hortator="true"] #live,body[data-hortator="true"] #keyboard{display:none!important}
+@media(max-width:760px){.h-layout{grid-template-columns:1fr}#h-screen{max-width:360px;margin:auto}#h-buttons{grid-template-columns:repeat(4,1fr)}#hortator-suite{padding:14px}#h-keys{min-height:85px}#h-knobs{grid-template-columns:repeat(3,1fr)}}
