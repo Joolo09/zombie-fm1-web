@@ -1,7 +1,23 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63000802",
+  "current": "FM-1_63000803",
   "releases": [
+    {
+      "product": "FM-1_63000803",
+      "version": "0.8.3",
+      "label": {
+        "ru": "Groovebox 0.8.3 · исправление SAVE",
+        "en": "Groovebox 0.8.3 · SAVE LED fix"
+      },
+      "notes": {
+        "ru": "SAVE больше не горит постоянно после поворота K2. Несохранённые изменения: * на экране. Управление и DAW-профили 0.8.2 сохранены. Проверено в симуляторе; аппаратный тест ожидается.",
+        "en": "SAVE no longer stays brightly lit after turning K2. Unsaved edits use an on-screen *. Controls and DAW profiles remain compatible with 0.8.2. Simulator tested; hardware confirmation pending."
+      },
+      "bytes": 610100,
+      "sha256": "3fe120e1bbecf1bde66679aee392677311236b2413c2bbff01ed25c025e54349",
+      "file": "downloads/zombie-groovebox-0.8.3.fwsc",
+      "editor": "webapp/groovebox/"
+    },
     {
       "product": "FM-1_63000802",
       "version": "0.8.2",

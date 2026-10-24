@@ -1,5 +1,12 @@
 # Zombie FM-1 · Groovebox / Sampler 0.8.0
 
+Groovebox 0.8.3 fixes the SAVE LED staying lit after K2 edits. Unsaved edits
+use an on-screen `*`; SAVE still saves and pulses when pressed. Controls,
+project format and DAW profiles remain compatible with 0.8.2. Sampler stays
+0.8.0. [Release notes](downloads/Groovebox-0.8.3-RU.md).
+The installer also checks the running application's status after its USB identity
+returns, so an identity-only safe-mode response cannot report installation success.
+
 Site / installer: https://joolo09.github.io/zombie-fm1-web/
 
 Two dedicated firmware packages. Groovebox: six synthesis tracks, 64 original

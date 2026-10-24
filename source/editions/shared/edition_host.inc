@@ -28,7 +28,8 @@ int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const
  return 0;
 }
 int app_expect(const char *what,int *got){
- if(!strcmp(what,"midi_mode"))*got=z_sys.midi_mode;
+ if(!strcmp(what,"dirty"))*got=saved_revision!=z_revision()||system_dirty;
+ else if(!strcmp(what,"midi_mode"))*got=z_sys.midi_mode;
  else if(!strcmp(what,"model"))*got=z_get(z_song.selected,Z_MODEL);
  else if(!strcmp(what,"voices"))*got=z_voice_count();
  else if(!strcmp(what,"step_edit"))*got=z_song.step_edit;

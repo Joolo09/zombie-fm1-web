@@ -146,6 +146,26 @@ async function query(link, cmd, payload = []) {
   return null;
 }
 
+// A boot/safe-mode USB identity alone does not prove the application is running.
+// Zombie Core's empty status request uses its own high-bit-mask SysEx framing.
+async function applicationReady(link) {
+  link.drain();
+  if (!link.send([0xF0, 0x7D, 0x5A, 0x43, 0x3E, 20, 0xF7])) return false;
+  const end = Date.now() + 3000;
+  while (Date.now() < end) {
+    const p = await link.read(end - Date.now());
+    if (!p) break;
+    if (p[0] !== 0xF0 || p.at(-1) !== 0xF7 || p[1] !== 0x7D || p[2] !== 0x5A || p[3] !== 0x43 || p[4] !== 0x3E || p[5] !== (20 | 64)) continue;
+    const data = [];
+    for (let i = 6; i < p.length - 1;) {
+      const hi = p[i++];
+      for (let j = 0; j < 7 && i < p.length - 1; j++) data.push(p[i++] | ((hi >> j & 1) << 7));
+    }
+    if (data.length >= 24 && data[0] === 0 && data[1] >= 2 && data[2] <= 1 && data[10] < 6) return true;
+  }
+  return false;
+}
+
 export class Updater {
   constructor(access, log, options = {}) {
     this.access = access;
@@ -195,7 +215,9 @@ export class Updater {
       if (!r) continue;
       last = Date.now();
       if (r.addr === 0xE0000000 || r.addr === 0xF0000000) {
-        link.send(response(r.addr, [...new TextEncoder().encode("success"), 0]));
+        if (!link.send(response(r.addr, [...new TextEncoder().encode("success"), 0]))) {
+          return { served, finished: false, lost: true };
+        }
         if (r.addr === finishAddr) return { served, finished: true };
         continue;
       }
@@ -245,8 +267,12 @@ export class Updater {
     await this.sleep(3000);
     const back = await this.waitFor((id) => !IS_OTA(id), 40000);
     if (!back) throw fail("noreturn", "the device did not come back: power-cycle it");
-    await back.link.close();
-    if (back.id.text !== product) throw fail("mismatch", `installed, but the device reports ${back.id.text}`, back.id.text);
+    try {
+      if (back.id.text !== product) throw fail("mismatch", `installed, but the device reports ${back.id.text}`, back.id.text);
+      if (/^FM-1_(?:61|63|64)\d{6}$/.test(product) && !await applicationReady(back.link)) {
+        throw fail("appnotready", "Firmware identity returned, but the Zombie application did not answer its status request");
+      }
+    } finally { await back.link.close(); }
     step("done", back.id.text);
     return back.id.text;
   }
