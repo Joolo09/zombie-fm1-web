@@ -1,0 +1,14 @@
+Zombie Core application, DSP, editor and installer UI: MIT. See ../LICENSE.
+FM-1 hardware platform and update transport: Mozilla Public License 2.0.
+fm1ota.js / fm1pkg.js: Copyright (C) 2026 Charles Vestal; Copyright (C) 2026
+Leo Kuroshita (@kurogedelic), Hugelton Instruments.
+Upstream: https://github.com/charlesvestal/fm1-base
+Upstream snapshot: b16c177a9086be955cd3e418383f2fd92c6d658b
+Zombie Core transport changes: resumed-update reboot/version verification,
+MIDI port cleanup, loader model validation, byte progress, injectable test sleeps.
+Source of these modified files: ../vendor/fm1ota.js and ../vendor/fm1pkg.js.
+Complete firmware/platform source: ../downloads/firmware-source-0.7.4.zip.
+Additional component notices are included with that source.
+Minecraft sound effects: Mojang/Microsoft. Audio provenance and original asset
+URLs / SHA-1 hashes are in audio-provenance/ inside the source archive.
+M-VAVE and FM-1 are trademarks of their respective owners.

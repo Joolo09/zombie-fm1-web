@@ -1,0 +1,1 @@
+{"type":"module","scripts":{"test":"node tests/web-installer.mjs"}}

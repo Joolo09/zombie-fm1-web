@@ -1,0 +1,36 @@
+{
+  "format": "zombie-web/1",
+  "current": "FM-1_61000704",
+  "releases": [
+    {
+      "product": "FM-1_61000704",
+      "version": "0.7.4",
+      "label": {
+        "ru": "Zombie Core 0.7.4 · текущая",
+        "en": "Zombie Core 0.7.4 · current"
+      },
+      "notes": {
+        "ru": "Standalone при каждом запуске. KNOB 2 — фильтр. Обновлённые Closed / Open Hat.",
+        "en": "Standalone at every startup. KNOB 2 controls cutoff. Updated Closed / Open Hat."
+      },
+      "bytes": 610108,
+      "sha256": "6201f815845bfb91e59fffc349b519330c122700a88aff6d766b30a635d9ed07",
+      "file": "downloads/zombie-core-0.7.4.fwsc"
+    },
+    {
+      "product": "FM-1_61000701",
+      "version": "0.7.1",
+      "label": {
+        "ru": "Zombie Core 0.7.1 · возврат",
+        "en": "Zombie Core 0.7.1 · rollback"
+      },
+      "notes": {
+        "ru": "Возврат к прежней сборке. Старые настройки и режим запуска могут отличаться.",
+        "en": "Return to the earlier build. Settings and startup mode may differ."
+      },
+      "bytes": 610108,
+      "sha256": "b8bc4d5d7e6b34a8a6572856d990a8bb9344f94baae87cd7d5adaf7ce795231e",
+      "file": "downloads/Return-to-Core-0.7.1.fwsc"
+    }
+  ]
+}

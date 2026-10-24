@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Zombie Core для M-VAVE FM-1: веб-редактор звука и установка прошивки по USB MIDI.">
+<title>Zombie Core · FM-1 Web Installer</title>
+<link rel="stylesheet" href="webapp/editor/style.css"><link rel="stylesheet" href="webapp/editor/interface.css?v=afterglow1"><link rel="stylesheet" href="installer.css">
+</head>
+<body data-theme="afterglow">
+<header><a class="brand" href="./" aria-label="Zombie Core"><span class="sigil">Z</span><div><strong>ZOMBIE CORE</strong><small>FM-1 / WEB STUDIO</small></div></a><div class="top-controls"><a class="editor-link" href="webapp/editor/" data-t="editor">Открыть редактор ↗</a><select id="language" aria-label="Язык / Language"><option value="ru">Русский</option><option value="en">English</option></select></div></header>
+<main>
+<div class="install-layout">
+<section class="install-intro"><p class="eyebrow">AFTERGLOW / USB MIDI</p><h1 data-t="headline">Твой FM-1.<br>Твой звук.</h1><p class="lead" data-t="intro">Редактируй звук и устанавливай Zombie Core прямо из браузера. По обычному USB-кабелю.</p><a class="button-link primary" href="webapp/editor/" data-t="tryEditor">Открыть студию →</a><p class="muted" data-t="preview">Для знакомства устройство не нужно: синтезатор работает и в браузере.</p><div class="features"><span>6 TRACKS</span><span>64 PRESETS</span><span>32 PADS</span><span>RU / EN</span></div><div class="signal-art" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></section>
+<section class="card install-card" aria-labelledby="install-heading"><div class="row"><p class="eyebrow">FIRMWARE / USB</p><span id="package-badge" class="pill">0.7.4</span></div><h2 id="install-heading" data-t="installTitle">Установить в FM-1</h2><p class="muted" data-t="browserHelp">Открой в Chrome или Edge на компьютере. Подключи FM-1 кабелем с передачей данных и закрой FL Studio, Ableton и другие вкладки редактора.</p>
+<label for="release"><span data-t="releaseLabel">Версия прошивки</span></label><select id="release" disabled aria-label="Версия / Release"></select>
+<p id="release-note" class="muted"></p>
+<ol class="install-steps"><li id="step-package" aria-current="step"><span>01</span><strong data-t="stepPackage">Проверка файла</strong></li><li id="step-device"><span>02</span><strong data-t="stepDevice">Подключение FM-1</strong></li><li id="step-write"><span>03</span><strong data-t="stepWrite">Установка</strong></li><li id="step-done"><span>04</span><strong data-t="stepDone">Перезапуск</strong></li></ol>
+<p id="device" class="device-label" data-t="noDevice">Устройство не подключено</p><div class="install-actions"><button id="detect" disabled data-t="detect">Найти FM-1</button><button id="install" class="accent" disabled data-t="install">Установить</button></div>
+<label class="progress-label" for="progress" data-t="progress">Ход установки</label><progress id="progress" max="100" value="0"></progress><div id="status" role="status" aria-live="polite"></div><p id="error" role="alert" hidden></p>
+<p class="muted install-notice" data-t="notice">Установка заменит прошивку FM-1. Сначала сохрани проекты и исходные WAV. Во время записи не отключай USB и не закрывай страницу.</p>
+<details><summary data-t="details">Файл и журнал</summary><p><a id="firmware-download" download data-t="download">Скачать .fwsc</a></p><code id="checksum"></code><pre id="log"></pre></details>
+</section></div>
+<section class="bottom-notes"><article><h2 data-t="resumeTitle">Если USB оборвался</h2><p class="muted" data-t="resumeHelp">Подключи FM-1 снова, выбери ту же версию и нажми «Найти FM-1», затем «Установить». Если загрузчик доступен, запись начнётся заново, а результат проверится после перезапуска.</p></article><article><h2 data-t="localTitle">Звук остаётся у тебя</h2><p class="muted" data-t="privacy">Сэмплы и настройки передаются по USB прямо между браузером и FM-1. Для прослушивания без устройства открой студию и включи звук ПК.</p><a href="downloads/firmware-source-0.7.4.zip" download data-t="source">Исходники прошивки и лицензии</a> · <a href="https://github.com/Joolo09/zombie-fm1-web" target="_blank" rel="noopener">GitHub ↗</a></article></section>
+<footer><span>ZOMBIE CORE / WEB 1.0 · CORE 0.7.4</span><a href="licenses/THIRD-PARTY.txt" data-t="licenses">Лицензии и авторство</a></footer>
+</main><script type="module" src="installer.js"></script></body></html>
