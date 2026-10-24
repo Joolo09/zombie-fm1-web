@@ -57,7 +57,7 @@ static int panel_setting(uint32_t id,uint32_t value){
 static const char *label(uint32_t id){if(id<Z_PARAMS)return z_song.language?z_desc[id].name:param_ru[id];return z_song.language?special_en[id-Z_PARAMS]:special_ru[id-Z_PARAMS];}
 static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;int value=0;z_step *step=&z_song.track[t].steps[z_song.step_edit];
  if(id<Z_PARAMS){value=z_get(t,id);
-  if(id==Z_MODEL)return z_models[value];
+  if(id==Z_MODEL)return z_drum_track(t)?"DRUM KIT":z_models[value];
   if(id==Z_WAVE){static const char *const ru[]={"СИНУС","ПИЛА","ИМПУЛЬС","ТРЕУГОЛЬНИК"},*const en[]={"SINE","SAW","PULSE","TRIANGLE"};return z_song.language?en[value]:ru[value];}
   if(id==Z_MUTE)return value?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
   if(id==Z_SAMPLE){static const char *const name[]={"MC ZOMBIE","MC HURT","MC DEATH","MC CREEPER","MC BOOM","MC XP","USR1","USR2","USR3","USR4","ZC KICK","ZC SNARE","ZC HAT","ZC CLAP"};return name[value];}
@@ -82,7 +82,7 @@ static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;
   case U_FX_AMOUNT:value=z_song.fx_amount;break;
   case U_FX_RATE:{static const char *const rate[]={"1/4","1/8","1/16","1/32"};return rate[z_song.fx_rate];}
   case U_TRACK:value=t+1;break;
-  case U_PRESET:{if(z_song.preset[t]==255)return word("ИЗМЕНЕН","EDITED");value=z_song.preset[t]+1;break;}
+  case U_PRESET:{if(z_drum_track(t))return "DRUM KIT";if(z_song.preset[t]==255)return word("ИЗМЕНЕН","EDITED");value=z_song.preset[t]+1;break;}
   case U_OCT:value=z_song.octave;break;
   case U_BPM:value=z_song.bpm;break;
   case U_SWING:value=z_song.swing;break;
@@ -109,7 +109,7 @@ static void knob(uint32_t id,int delta){uint32_t t=z_song.selected;int value;z_s
   case U_PAD_GAIN:z_sampler_set(z_sampler.selected,4,clamp((int)z_sampler.pad[z_sampler.selected].gain+delta,0,127));break;
   case U_PAD_MODE:z_sampler_set(z_sampler.selected,6,clamp((int)z_sampler.pad[z_sampler.selected].mode+delta,0,2));break;
   case U_DURATION:z_checkpoint();z_song.duration[t][z_song.step_edit]=clamp((int)z_song.duration[t][z_song.step_edit]+delta,0,63);z_touch();break;
-  case U_CHORD1:case U_CHORD2:case U_CHORD3:{uint32_t at=id-U_CHORD1;int v=z_song.chord[t][z_song.step_edit][at];if(!v&&delta>0){static const uint8_t intervals[3]={4,7,12};v=s.note+intervals[at]+1;delta=0;}z_checkpoint();z_song.chord[t][z_song.step_edit][at]=clamp(v+delta,0,128);z_touch();break;}
+  case U_CHORD1:case U_CHORD2:case U_CHORD3:{uint32_t at=id-U_CHORD1;int v=z_song.chord[t][z_song.step_edit][at];if(z_drum_track(t)){int idx=v?(int)z_drum_index(v-1)+1:0;idx=clamp(idx+delta,0,16);v=idx?(int)z_drum_note(idx-1)+1:0;delta=0;}else if(!v&&delta>0){static const uint8_t intervals[3]={4,7,12};v=s.note+intervals[at]+1;delta=0;}z_checkpoint();z_song.chord[t][z_song.step_edit][at]=clamp(v+delta,0,128);z_touch();break;}
   case U_MIDI_MODE:system_set(6,clamp((int)z_sys.midi_mode+delta,0,2));break;
   case U_DAW_TRANSPORT:system_set(7,delta>0);break;
   case U_CORE:system_set(0,delta>0);break;
@@ -124,7 +124,7 @@ static void knob(uint32_t id,int delta){uint32_t t=z_song.selected;int value;z_s
   case U_FX_AMOUNT:panel_setting(12,clamp(z_song.fx_amount+delta,0,127));break;
   case U_FX_RATE:panel_setting(13,clamp(z_song.fx_rate+delta,0,3));break;
   case U_TRACK:panel_setting(7,(t+6+delta%6)%6);break;
-  case U_PRESET:value=z_song.preset[t];value=value==255?(delta>0?0:63):(value+64+delta%64)%64;z_preset(t,value);app_say(z_preset_name(value),0);break;
+  case U_PRESET:if(z_drum_track(t)){app_say(word("ДРАМ-КИТ: 16 ЗВУКОВ","DRUM KIT: 16 SOUNDS"),0);break;}value=z_song.preset[t];value=value==255?(delta>0?0:63):(value+64+delta%64)%64;z_preset(t,value);app_say(z_preset_name(value),0);break;
   case U_OCT:panel_setting(0,clamp(z_song.octave+delta,-3,3)+3);break;
   case U_BPM:z_tempo(clamp(z_song.bpm+delta,30,300),z_song.swing);break;
   case U_SWING:z_tempo(z_song.bpm,clamp(z_song.swing+delta,0,60));break;
@@ -137,7 +137,7 @@ static void knob(uint32_t id,int delta){uint32_t t=z_song.selected;int value;z_s
   case U_ARP_HOLD:z_arp_set(t,3,!z_song.arp_hold[t]);break;
   case U_STEP:panel_setting(5,clamp(z_song.step_edit+delta,0,63));break;
   default:
-   if(id==U_NOTE)s.note=(uint8_t)clamp(s.note+delta,0,127);
+   if(id==U_NOTE)s.note=(uint8_t)(z_drum_track(t)?z_drum_note(clamp((int)z_drum_index(s.note)+delta,0,15)):clamp(s.note+delta,0,127));
    else if(id==U_VELOCITY)s.velocity=(uint8_t)clamp(s.velocity+delta,0,127);
    else if(id==U_GATE)s.gate=(uint8_t)clamp(s.gate+delta,1,127);
    else if(id==U_CHANCE)s.chance=(uint8_t)clamp(s.chance+delta,0,127);
@@ -207,7 +207,7 @@ static void draw_layer(void){uint32_t j;char buf[24];
  if(active_layer==Z_HOME&&layer_page){
   for(j=0;j<8;j++){cv_begin(240,18,C_BLACK);if(j==0)z_text_clip(8,1,&FONT_S,z_sys.name,C_HI,224);else if(j==2||j==3){char line[64];uint32_t k=0,at=0,col=0;while(z_sys.bio[at]&&col<((j==2)?0:36)){at+=(uint8_t)z_sys.bio[at]>=0xc0?2:1;col++;}while(z_sys.bio[at]&&k<60&&col<((j==2)?36:72)){uint32_t bytes=(uint8_t)z_sys.bio[at]>=0xc0?2:1;while(bytes--)line[k++]=z_sys.bio[at++];col++;}line[k]=0;z_text_clip(8,1,&FONT_XS,line,C_WHITE,224);}
    else if(j==6)z_text(8,1,&FONT_XS,word("ИЗМЕНИ В ВЕБ-РЕДАКТОРЕ","EDIT IN WEB STUDIO"),C_GRAY);else if(j==7)cv_text(8,1,&FONT_XS,"PRESET: ABOUT DEVICE",C_GRAY);cv_blit(0,28+j*18);}
- }else if(active_layer==Z_HOME){static const char *const ru[]={"ZOMBIE FM-1","Zombie Core 0.8.0","6 ДОРОЖЕК / 8 ГОЛОСОВ","9 ДВИЖКОВ / 64 ПРЕСЕТА","44.1 kHz / USB MIDI","4 USR PCM / RU + EN","КЛ. 1: TAP / 2: ЯЗЫК","КЛ. 16: СБРОС НОТ"},*const en[]={"ZOMBIE FM-1","Zombie Core 0.8.0","6 TRACKS / 8 VOICES","9 ENGINES / 64 PRESETS","44.1 kHz / USB MIDI","4 USR PCM / RU + EN","KEY 1: TAP / 2: LANGUAGE","KEY 16: ALL NOTES OFF"};
+ }else if(active_layer==Z_HOME){static const char *const ru[]={"ZOMBIE FM-1","Zombie Core " Z_EDITION_VERSION,"6 ДОРОЖЕК / 8 ГОЛОСОВ","9 ДВИЖКОВ / 64 ПРЕСЕТА","44.1 kHz / USB MIDI","4 USR PCM / RU + EN","КЛ. 1: TAP / 2: ЯЗЫК","КЛ. 16: СБРОС НОТ"},*const en[]={"ZOMBIE FM-1","Zombie Core " Z_EDITION_VERSION,"6 TRACKS / 8 VOICES","9 ENGINES / 64 PRESETS","44.1 kHz / USB MIDI","4 USR PCM / RU + EN","KEY 1: TAP / 2: LANGUAGE","KEY 16: ALL NOTES OFF"};
   for(j=0;j<8;j++){cv_begin(240,18,C_BLACK);z_text(8,1,&FONT_XS,z_song.language?en[j]:ru[j],j<2?C_HI:C_GRAY);cv_blit(0,28+j*18);}
  }else for(j=0;j<4;j++){uint32_t k;cv_begin(240,36,C_BLACK);for(k=0;k<4;k++){uint32_t at=j*4+k;int lit=tile_lit(at);cv_rect(4+k*59,1,56,32,lit?C_HI:C_LINE);number(at+1,buf);cv_text(8+k*59,2,&FONT_XS,buf,lit?C_BLACK:C_GRAY);z_text_clip(8+k*59,17,&FONT_XS,tile_name(at,buf),lit?C_BLACK:C_WHITE,50);}cv_blit(0,28+j*36);}
  for(j=0;j<2;j++){uint32_t k;cv_begin(240,28,C_BLACK);for(k=0;k<2;k++){uint32_t id=layer_knob(j*2+k);z_text(6+k*120,0,&FONT_XS,id==U_REC_QUANT?word("КВАНТ. 1/16","QUANT. 1/16"):id==U_REC_MODE?word("РЕЖИМ ЗАПИСИ","REC MODE"):label(id),C_GRAY);z_text(6+k*120,13,&FONT_XS,value_text(id,buf),C_HI);}cv_blit(0,172+j*28);}
@@ -252,6 +252,7 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
      if(j==16){key_action[k]=2;for(j=0;j<11;j++)if(black[j]==k){sampler_black(j);break;}continue;}
      z_sampler.selected=z_sampler.bank*16+j;note=36+z_sampler.selected;held_notes[k]=(uint8_t)note;z_touch();
     }
+    if(z_drum_track(t)){static const uint8_t white[16]=PLAT_WHITE_KEYS;uint32_t j;for(j=0;j<16;j++)if(white[j]==k)break;if(j==16){key_action[k]=2;continue;}note=z_drum_note(j);held_notes[k]=(uint8_t)note;}
     uint32_t velocity=system_velocity(touch_vel(k));edition_note(note,velocity,1);key_action[k]=1;held_channels[k]=(uint8_t)(z_get(t,Z_CHANNEL)-1);held_local[k]=!z_sys.midi_mode&&midi_local;held_raw[k]=!held_local[k]||!z_song.arp_mode[t];if(held_local[k])z_key(t,note,velocity,1);if(held_raw[k]&&(z_sys.midi_mode==2||(!z_get(t,Z_MUTE)&&(!z_solo_state()||z_solo_state()==t+1))))raw_note(held_channels[k],note,velocity,1);}
   }
   if(!(keys&bit)&&(panel_keys_before&bit)&&key_action[k]>=3){if(active_layer>=0&&key_layer[k]==active_layer)layer_action(key_action[k]-3,0,now);key_action[k]=0;}

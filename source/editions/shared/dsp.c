@@ -27,7 +27,7 @@ const z_descriptor z_desc[Z_PARAMS]={
  {"gate",1,127,80},{"transpose",-24,24,0},{"probability",0,127,127}};
 z_project z_song;
 typedef struct { float phase,phase2,env,lp1,lp2,velocity,age,pos,inc; uint32_t stamp,gate;
-                 uint8_t track,note,stage,active,released,arp,pad;z_pad settings;uint32_t sample_start,sample_end; } voice;
+                 uint8_t track,note,stage,active,released,arp,pad,drum;float drum_decay;z_pad settings;uint32_t sample_start,sample_end; } voice;
 static voice voices[Z_VOICES];
 static Z_POOL float delay_l[8192],delay_r[8192],comb_a[1499],comb_b[1877];
 static Z_POOL uint8_t transfer[Z_SLOT_BYTES];
@@ -90,6 +90,7 @@ int z_pattern(uint32_t t,uint32_t action,uint32_t target){
   for(i=0;i<len-1;i++){uint32_t dst=action==2?i:len-1-i,src=action==2?i+1:len-2-i;z_song.track[t].steps[dst]=z_song.track[t].steps[src];z_song.duration[t][dst]=z_song.duration[t][src];for(j=0;j<3;j++)z_song.chord[t][dst][j]=z_song.chord[t][src][j];}
   first=action==2?len-1:0;z_song.track[t].steps[first]=step;z_song.duration[t][first]=duration;for(j=0;j<3;j++)z_song.chord[t][first][j]=chord[j];
  }
+ if(action==6&&z_drum_track(t))for(i=0;i<len;i++){z_step *s=&z_song.track[t].steps[i];s->note=i%4==0?36:i%8==7?46:42;s->velocity=i%4==0?112:i%2==0?80:0;if(i%4==0)z_song.chord[t][i][0]=43;if(i%8==4)z_song.chord[t][i][1]=39;}
  z_touch();return 0;
 }
 static float step_frames(void){return 661500.0f/z_song.bpm;}
@@ -114,6 +115,7 @@ void z_clear_track(uint32_t t){(void)z_pattern(t,0,0);}
 void z_apply_state(void){uint32_t t,n;
  for(t=0;t<6;t++){if(Z_SAMPLER_EDITION&&z_song.track[t].p[Z_MODEL]!=8){z_song.track[t].p[Z_MODEL]=8;z_song.track[t].p[Z_ATTACK]=0;z_song.track[t].p[Z_SUSTAIN]=127;z_song.track[t].p[Z_RELEASE]=8;z_song.preset[t]=255;}else if(!Z_SAMPLER_EDITION&&z_song.track[t].p[Z_MODEL]>7){z_song.track[t].p[Z_MODEL]=0;z_song.preset[t]=255;}}
  z_sampler.tracks=Z_SAMPLER_EDITION?63:0;
+ if(!Z_SAMPLER_EDITION){z_song.track[5].p[Z_MODEL]=7;z_song.preset[5]=255;}
  for(t=0;t<6;t++){if(applied_mode[t]!=z_song.arp_mode[t]){z_alloff(t);applied_mode[t]=z_song.arp_mode[t];}arp_count[t]=0;for(n=0;n<128;n++){
    if(!z_song.arp_hold[t]&&!(arp_physical[t][n/8]>>(n&7)&1))arp_notes[t][n]=0;
    if(arp_notes[t][n])arp_count[t]++;
@@ -134,6 +136,7 @@ static float osc(float p,float dt,int shape) {
  if(shape==2){float q=p+0.5f; if(q>=1)q-=1; return (p<0.5f?1:-1)+blep(p,dt)-blep(q,dt);}
  return 1-4*absf(p-0.5f);
 }
+#include "drums.inc"
 void z_set_midi_out(void (*cb)(uint32_t,uint32_t,uint32_t,uint32_t)) { midi_out=cb; }
 void z_touch(void) { if(++revision==0)revision=1; }
 uint32_t z_revision(void) { return revision; }
@@ -141,7 +144,7 @@ uint32_t z_state_size(void) { return sizeof z_song; }
 const char *z_preset_name(uint32_t p) { return p<Z_PRESETS?Z_PRESET_NAMES[p]:"EDITED"; }
 int z_set(uint32_t t,uint32_t p,int v) {
  if(t>=Z_TRACKS||p>=Z_PARAMS)return -9999;
- if(p==Z_MODEL)v=Z_SAMPLER_EDITION?8:(v>7?7:v);
+ if(p==Z_MODEL)v=Z_SAMPLER_EDITION?8:z_drum_track(t)?7:(v>7?7:v);
  if(v<z_desc[p].min)v=z_desc[p].min;if(v>z_desc[p].max)v=z_desc[p].max;
  if(z_song.track[t].p[p]!=v){if(p==Z_CHANNEL)z_alloff(t);z_song.track[t].p[p]=(int16_t)v;
   if(p==Z_MUTE&&v&&midi_out)midi_out(t,128,0,0);
@@ -160,6 +163,7 @@ void z_reset_audio(void) {
 void z_preset(uint32_t t,uint32_t preset) {
  uint32_t i;int16_t *p;int level,pan,channel,mute,len,gate,prob;
  if(t>=6||preset>=Z_PRESETS)return;p=z_song.track[t].p;
+ if(z_drum_track(t)){p[Z_MODEL]=7;p[Z_CUTOFF]=121;p[Z_RESONANCE]=8;p[Z_DRIVE]=16;p[Z_DELAY]=0;p[Z_REVERB]=6;z_song.preset[t]=255;z_touch();return;}
  level=p[Z_LEVEL];pan=p[Z_PAN];channel=p[Z_CHANNEL];mute=p[Z_MUTE];len=p[Z_LENGTH];gate=p[Z_GATE];prob=p[Z_PROBABILITY];
  for(i=0;i<Z_PARAMS;i++)p[i]=Z_PRESET_VALUES[preset][i];
  if(Z_SAMPLER_EDITION){p[Z_MODEL]=8;p[Z_ATTACK]=0;p[Z_SUSTAIN]=127;p[Z_RELEASE]=8;}
@@ -188,9 +192,12 @@ void z_init(void) {
 void z_note(uint32_t t,uint32_t note,uint32_t vel,uint32_t on) {
  uint32_t i,best=0,oldest=0xffffffffu;voice *v;
  if(t>=Z_TRACKS||note>127)return;
- if(!on||!vel){for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&voices[i].note==note){voices[i].released=1;if(!sustain[t]&&(voices[i].pad==255||voices[i].settings.mode))voices[i].stage=3;}return;}
+ if(!on||!vel){if(z_drum_track(t))return;for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&voices[i].note==note){voices[i].released=1;if(!sustain[t]&&(voices[i].pad==255||voices[i].settings.mode))voices[i].stage=3;}return;}
  for(i=0;i<Z_VOICES;i++) { if(!voices[i].active){best=i;break;} if(voices[i].stamp<oldest){oldest=voices[i].stamp;best=i;} }
  v=&voices[best];
+ if(z_drum_track(t)){uint32_t d=z_drum_index(note);if(d==2||d==3)for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&(voices[i].drum==2||voices[i].drum==3))voices[i].stage=4;
+  v->drum=(uint8_t)d;v->drum_decay=1.0f-6.90776f/(drum_ms[d]*44.1f);
+ }else v->drum=255;
  if(z_song.track[t].p[Z_MODEL]==8&&(z_sampler.tracks>>t&1)){
   uint32_t start,end,slot;z_pad pad;if(note<36||note>=68)return;pad=z_sampler.pad[note-36];slot=pad.source;
   if(!pcm[slot]||pcm_n[slot]<2)return;
@@ -330,16 +337,18 @@ void z_render(float *out,uint32_t n) {
    if(!v->active)continue;t=v->track;p=z_song.track[t].p;model=Z_SAMPLER_EDITION?8:p[Z_MODEL];
    /* A held one-shot must still end if its track changes to a synth preset. */
    if(v->pad!=255&&(model!=8||!(z_sampler.tracks>>t&1))){v->stage=4;model=8;}
-   if(v->gate&&--v->gate==0&&(v->pad==255||v->settings.mode))v->stage=3;
-   if(v->stage==0){v->env+=attack[t];if(v->env>=1){v->env=1;v->stage=1;}}
+   if(v->drum==255&&v->gate&&--v->gate==0&&(v->pad==255||v->settings.mode))v->stage=3;
+   if(v->drum!=255){if(v->stage==0){v->env=1;v->stage=1;}else v->env*=v->stage==4?0.97f:v->drum_decay;if(v->env<0.00008f){v->active=0;continue;}}
+   else if(v->stage==0){v->env+=attack[t];if(v->env>=1){v->env=1;v->stage=1;}}
    else if(v->stage==1){v->env+=(p[Z_SUSTAIN]/127.0f-v->env)*decay[t];if(absf(v->env-p[Z_SUSTAIN]/127.0f)<0.0001f)v->stage=2;}
    else if(v->stage==4){v->env*=0.985f;if(v->env<0.00008f){v->active=0;continue;}}
    else if(v->stage==3){v->env-=v->env*release[t];if(v->env<0.00008f){v->active=0;continue;}}
-   if(model==7&&v->stage==2&&!p[Z_SUSTAIN]){v->active=0;continue;}
+   if(v->drum==255&&model==7&&v->stage==2&&!p[Z_SUSTAIN]){v->active=0;continue;}
    note=(int)v->note+p[Z_TRANSPOSE];if(note<0)note=0;if(note>127)note=127;
    dt=z_frequency[note]/44100.0f*bend[t];dt2=dt*(1+p[Z_DETUNE]*0.00015f);e=v->env;
-   v->age+=1.0f/44100;v->phase+=dt;v->phase2+=dt2;if(v->phase>=1)v->phase-=1;if(v->phase2>=1)v->phase2-=1;
-   if(model==0)x=osc(v->phase,dt,p[Z_WAVE])*(1-p[Z_MIX]/254.0f)+osc(v->phase2,dt2,p[Z_WAVE])*p[Z_MIX]/254.0f;
+   v->age+=1.0f/44100;if(v->drum==255){v->phase+=dt;v->phase2+=dt2;if(v->phase>=1)v->phase-=1;if(v->phase2>=1)v->phase2-=1;}
+   if(v->drum!=255)x=drum_signal(v);
+   else if(model==0)x=osc(v->phase,dt,p[Z_WAVE])*(1-p[Z_MIX]/254.0f)+osc(v->phase2,dt2,p[Z_WAVE])*p[Z_MIX]/254.0f;
    else if(model==1)x=sine(v->phase+sine(v->phase*p[Z_RATIO])*p[Z_FM]/45.0f*e);
    else if(model==2){float pivot=0.08f+p[Z_FM]/151.0f;float ph=v->phase<pivot?v->phase*0.5f/pivot:0.5f+(v->phase-pivot)*0.5f/(1-pivot);x=sine(ph);}
    else if(model==3){float m=clampf(p[Z_MIX]/127.0f+lfo[t]*0.3f,0,1);x=sine(v->phase)*(1-m)+0.5f*(sine(v->phase*3)+sine(v->phase*5))*m;}

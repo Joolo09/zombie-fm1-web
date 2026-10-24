@@ -1,7 +1,23 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63000800",
+  "current": "FM-1_63000801",
   "releases": [
+    {
+      "product": "FM-1_63000801",
+      "version": "0.8.1",
+      "label": {
+        "ru": "Groovebox 0.8.1 · 5 синтов + драм-кит",
+        "en": "Groovebox 0.8.1 · 5 synths + drum kit"
+      },
+      "notes": {
+        "ru": "Дорожка 6: 16 синтезированных ударных, барабанная сетка и GM MIDI. Полный сброс чипа после установки; результат нужно проверить на FM-1. Сохрани старый проект: шестая дорожка теперь играет драм-китом.",
+        "en": "Track 6: 16 synthesized drums, drum grid and GM MIDI. Full chip reset after install; physical FM-1 confirmation pending. Back up your old project: track six now plays the drum kit."
+      },
+      "bytes": 610100,
+      "sha256": "dbcee5eb623061c425277cc7a0cd118c40b67be92c52eb18509081e1b9e07dae",
+      "file": "downloads/zombie-groovebox-0.8.1.fwsc",
+      "editor": "webapp/groovebox/"
+    },
     {
       "product": "FM-1_63000800",
       "version": "0.8.0",
@@ -16,7 +32,7 @@
       "bytes": 610108,
       "sha256": "4cef993f42ae73b47bed80f8aa15a34d65ddc1d0b746b3e1668d6053cdfb98af",
       "file": "downloads/zombie-groovebox-0.8.0.fwsc",
-      "editor": "webapp/groovebox/"
+      "editor": "webapp/groovebox-080/"
     },
     {
       "product": "FM-1_64000800",

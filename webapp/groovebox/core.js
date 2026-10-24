@@ -55,7 +55,7 @@ export class Link {
   this.version=new TextDecoder().decode(await this.command(1));
   const version=/^ZCORE\/1\/0\.([3-8])\.(0|[1-9]\d*)(?:\/(groovebox|sampler))?$/.exec(this.version);
   if(!version||!Number.isSafeInteger(Number(version[2])))throw Error('Requires Zombie Core protocol 1, firmware 0.3.x–0.8.x');
-  const minor=Number(version[1]),patch=Number(version[2]);this.edition=version[3]||'core';if(this.edition!==EDITION)throw Error('Open the '+this.edition+' editor for this firmware.');
+  const minor=Number(version[1]),patch=Number(version[2]);this.edition=version[3]||'core';if(minor===8&&patch<1)throw Error('Groovebox 0.8.0: use webapp/groovebox-080/ editor.');if(this.edition!==EDITION)throw Error('Open the '+this.edition+' editor for this firmware.');
   this.sampler=minor>=7&&this.edition!=='groovebox';this.daw=minor>=6;this.system=minor>=5;this.polish=minor>4||minor===4&&patch>=1;this.live=minor>=4;this.modern=minor>3||patch>=1;this.connected=true;this.lastRevision=-1;
   return await this.readState();
  }catch(e){this.close();throw e;}}

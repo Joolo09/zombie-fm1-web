@@ -5,8 +5,9 @@ import argparse, ast, hashlib, json, os, re, shutil, subprocess, sys
 FIX=Path(__file__).resolve().parent
 ROOT=FIX.parent
 ED=FIX/'editions'
-OUT=FIX/'output/editions-0.8.0'
-VERSION='0.8.0'
+OUT=FIX/'output/editions-0.8.1'
+VERSION='0.8.1'
+PLATFORM=FIX/'platform-081'
 PY=sys.executable
 ENV=dict(os.environ,PYTHONUTF8='1',JIELI_TOOLCHAIN=os.environ.get('JIELI_TOOLCHAIN',str(ROOT/'.tooling/jieli-win/C$/JL/pi32')),AC79_SDK=os.environ.get('AC79_SDK',str(ROOT/'.tooling/ac79-sdk')),X0X_FONTSET='terminus',CC=os.environ.get('CC',str(ROOT/'tools/host-cc.cmd') if (ROOT/'tools/host-cc.cmd').exists() else 'cc'),ZIG_GLOBAL_CACHE_DIR=str(ROOT/'.tooling/zig-global'),ZIG_LOCAL_CACHE_DIR=str(ROOT/'.tooling/zig-local'))
 
@@ -36,7 +37,7 @@ def prepare(kind):
     for p in (ED/'shared').iterdir():
         if p.is_file():shutil.copy2(p,app/p.name)
     title='ZOMBIE SAMPLER' if sample else 'ZOMBIE GROOVEBOX'
-    (app/'edition.h').write_text(f'#pragma once\n#define Z_SAMPLER_EDITION {int(sample)}\n#define Z_EDITION_TITLE "{title}"\n#define Z_PROTOCOL_ID "ZCORE/1/0.8.0/{kind}"\n',encoding='utf-8')
+    (app/'edition.h').write_text(f'#pragma once\n#define Z_SAMPLER_EDITION {int(sample)}\n#define Z_EDITION_VERSION "{VERSION}"\n#define Z_EDITION_TITLE "{title}"\n#define Z_PROTOCOL_ID "ZCORE/1/{VERSION}/{kind}"\n',encoding='utf-8')
     (app/'fm1.toml').write_text(f'''name = "zombie-{kind}"
 id_prefix = "FM-1_{64 if sample else 63}"
 usb_manufacturer = "Zombie Core"
@@ -185,12 +186,12 @@ def main():
     for kind in ([args.kind] if args.kind else ['groovebox','sampler']):
         app,names=prepare(kind)
         if not args.firmware_only:
-            run([PY,'-X','utf8',FIX/'platform/tools/build.py',app,'--host','--release',VERSION],kind+'-host-build.log')
+            run([PY,'-X','utf8',PLATFORM/'tools/build.py',app,'--host','--release',VERSION],kind+'-host-build.log')
             shots=OUT/kind;shots.mkdir(exist_ok=True)
             run([app/f'build/host/zombie-{kind}_host',script(kind),shots],kind+'-host-tests.log')
         if args.host_only:continue
-        run([PY,'-X','utf8',FIX/'platform/tools/build.py',app,'--release',VERSION],kind+'-device-build.log')
-        fw=app/f'build/zombie-{kind}-0.8.0.fwsc';shutil.copy2(fw,OUT/fw.name)
+        run([PY,'-X','utf8',PLATFORM/'tools/build.py',app,'--release',VERSION],kind+'-device-build.log')
+        fw=app/f'build/zombie-{kind}-{VERSION}.fwsc';shutil.copy2(fw,OUT/fw.name)
         exports=json.loads((ED/'assets/wasm-exports.json').read_text())
         wasm=OUT/f'{kind}.wasm'
         run([os.environ.get('ZIG',str(ROOT/'.tooling/zig-windows-x86_64-0.13.0/zig.exe')),'cc','-target','wasm32-freestanding','-O2','-ffp-contract=off','-ffreestanding','-nostdlib','-DZ_WASM','-I'+str(app/'build/gen'),app/'dsp.c',app/'output.c','-Wl,--no-entry','-Wl,--export-memory',*['-Wl,--export=z_'+n for n in exports],'-o',wasm],kind+'-wasm-build.log')

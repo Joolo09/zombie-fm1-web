@@ -3,6 +3,10 @@
 #include "model.h"
 #include "sampler.h"
 void z_init(void);
+uint32_t z_drum_track(uint32_t track);
+uint32_t z_drum_index(uint32_t note);
+uint32_t z_drum_note(uint32_t index);
+const char *z_drum_name(uint32_t note);
 void z_reset_audio(void);
 void z_note(uint32_t track,uint32_t note,uint32_t velocity,uint32_t on);
 void z_key(uint32_t track,uint32_t note,uint32_t velocity,uint32_t on);

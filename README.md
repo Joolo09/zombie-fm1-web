@@ -29,3 +29,9 @@ generators/assets and profiles: downloads/editions-source-0.8.0.zip.
 Application/DSP/UI/profiles: MIT. Hardware/boot/update platform: MPL-2.0.
 Minecraft audio in Sampler: Mojang/Microsoft, provenance in source archive.
 GitHub Pages: main, / (root), HTTPS. Paths support a repository subdirectory.
+
+
+Groovebox 0.8.1: five synth tracks + synthesized GM drum kit on track six.
+Native/web drum grid, 16 sounds, hat choke. Successful OTA now uses a full
+P33 chip reset. Hardware confirmation pending. Details: downloads/Groovebox-0.8.1-RU.md.
+Source: downloads/groovebox-source-0.8.1.zip. Sampler remains 0.8.0.

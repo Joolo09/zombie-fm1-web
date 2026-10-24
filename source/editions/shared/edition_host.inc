@@ -13,6 +13,7 @@ static void ed_checks(void){uint32_t t,p;int old;
 }
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
  if(!strcmp(cmd,"editioncheck")){ed_checks();return 1;}
+ if(!strcmp(cmd,"drumtest")){uint32_t t;system_set(6,0);app_panic();z_init();for(t=0;t<6;t++)z_clear_track(t);z_song.selected=5;z_song.section=Z_SEQ;z_song.subpage=0;z_song.step_edit=0;z_step_set(5,0,36,100,127,80);return 1;}
  if(!strcmp(cmd,"rolltest")){ed_roll();return 1;}
  if(!strcmp(cmd,"en")){z_song.language=1;redraw_at=0;return 1;}
  if(!strcmp(cmd,"ru")){z_song.language=0;redraw_at=0;return 1;}
