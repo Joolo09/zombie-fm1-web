@@ -14,3 +14,7 @@ use fake devices. Main website files and all firmware binaries are unchanged.
 Lab Host 0.2.0 is a separate experimental USB0 GET_DESCRIPTOR-only probe.
 Its reader is host/. Default release is 0.2.0; frozen 0.1.0 remains selectable.
 No disk/file operations, no VBUS voltage measurement. Physical hardware untested.
+
+0.3.0 Force is an UNTESTED experiment, test suites skipped at user request.
+Forced FS then LS reset/descriptor requests, no board VBUS power control.
+Prior releases are preserved. Results reader: force/.

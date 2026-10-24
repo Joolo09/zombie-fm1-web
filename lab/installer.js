@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT — original browser installer UI. */
-import {Updater, FM1_PORT} from './vendor/fm1ota.js?v=lab3';
+import {Updater, FM1_PORT} from './vendor/fm1ota.js?v=lab4';
 import {checkPackage} from './package-check.js';
 
 
@@ -29,6 +29,12 @@ function render(){
   $('install-heading').textContent=lang==='ru'?'Установить Lab Host 0.2.0':'Install Lab Host 0.2.0';
  }
  const sourceLink=document.querySelector('a[data-t=source]');if(sourceLink)sourceLink.href=release?.product==='FM-1_62000200'?'downloads/Zombie-Lab-Host-0.2.0-Source.zip':'downloads/Zombie-Lab-Source.zip';
+ if(release?.product==='FM-1_62000300'){
+  document.querySelector('[data-t=headline]').textContent=lang==='ru'?'Принудительный USB-host.':'Force USB host.';
+  document.querySelector('[data-t=preview]').textContent=lang==='ru'?'НЕПРОВЕРЕННАЯ сборка: без прогона тестов. Full Speed → Low Speed. Режим не создаёт выходное питание 5 В.':'UNTESTED build; test suites skipped. Full speed → low speed. Does not create connector 5V power.';
+  $('install-heading').textContent=lang==='ru'?'Установить Zombie Force 0.3.0':'Install Zombie Force 0.3.0';
+  const forceSource=document.querySelector('a[data-t=source]');if(forceSource)forceSource.href='downloads/Zombie-Lab-Force-0.3.0-Source.zip';
+ }
  for(const option of $('release').options){const item=manifest?.releases.find(r=>r.product===option.value);if(item)option.textContent=item.label[lang];}
  const stages=['package','device','write','done'];stages.forEach((s,i)=>{const el=$('step-'+s);el.classList.toggle('complete',i<stages.indexOf(phase)||message==='done');if(s===phase)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
  document.querySelector('.install-card').setAttribute('aria-busy',String(active));

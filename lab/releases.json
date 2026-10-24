@@ -1,7 +1,23 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_62000200",
+  "current": "FM-1_62000300",
   "releases": [
+    {
+      "product": "FM-1_62000300",
+      "version": "0.3.0",
+      "bytes": 610108,
+      "sha256": "a82221bc5606a38df26c151818ce309a1b1663ae672b763f8de9cebc732637b9",
+      "file": "downloads/zombie-lab-force-0.3.0.fwsc",
+      "editor": "force/",
+      "label": {
+        "ru": "Zombie Force 0.3.0 · принудительный USB-host",
+        "en": "Zombie Force 0.3.0 · forced USB host"
+      },
+      "notes": {
+        "ru": "НЕПРОВЕРЕННАЯ сборка без прогона тестов. Принудительный сброс и GET_DESCRIPTOR: Full Speed, затем Low Speed, без ожидания обнаружения. Отключи ПК, подключи периферию, нажми GLO и держи PLAY 2 секунды. Выходное питание 5 В не включается.",
+        "en": "UNTESTED build, test suites skipped. Forced reset and GET_DESCRIPTOR: full speed then low speed, without attach detection. Unplug PC, connect a peripheral, press GLO and hold PLAY for 2 seconds. No connector 5V power control."
+      }
+    },
     {
       "product": "FM-1_62000200",
       "version": "0.2.0",
