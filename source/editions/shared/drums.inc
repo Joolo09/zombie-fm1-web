@@ -9,8 +9,8 @@ uint32_t z_drum_index(uint32_t note){uint32_t i;for(i=0;i<16;i++)if(drum_notes[i
 uint32_t z_drum_note(uint32_t i){return drum_notes[i%16];}
 const char *z_drum_name(uint32_t note){return drum_names[z_drum_index(note)];}
 static float drum_signal(voice *v){
- uint32_t d=v->drum;float noise=((int32_t)(random32()>>9)-4194304)/4194304.0f,x;
- float dt=drum_hz[d]/44100.0f*bend[v->track];
+ uint32_t d=v->drum;float noise=((int32_t)(dm_random()>>9)-4194304)/4194304.0f,x;
+ float dt=drum_hz[d]/44100.0f*bend[v->track]*z_frequency[60+z_dm.sound[d].tune]/z_frequency[60];
  if(d==0)dt*=1+3.8f/(1+v->age*170);
  else if(d>=6&&d<=8)dt*=1+0.7f/(1+v->age*85);
  v->phase+=dt;v->phase2+=dt*1.483f;v->phase-=(int)v->phase;v->phase2-=(int)v->phase2;

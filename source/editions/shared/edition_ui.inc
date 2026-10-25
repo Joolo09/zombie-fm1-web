@@ -12,7 +12,7 @@ static uint32_t ui_view_key=0xffffffffu,ui_view_since,ui_pad_until[32],ui_wave_a
 static uint8_t ui_meter,ui_wave[96],ui_wave_source=255;
 static uint16_t ui_accent(void){return ui_colors[z_song.selected];}
 static uint16_t ui_blend(uint16_t a,uint16_t b,uint32_t amount){uint32_t r=((a>>11)*(127-amount)+(b>>11)*amount)/127,g=(((a>>5)&63)*(127-amount)+((b>>5)&63)*amount)/127,bl=((a&31)*(127-amount)+(b&31)*amount)/127;return (r<<11)|(g<<5)|bl;}
-static void edition_note(uint32_t track,uint32_t note,uint32_t velocity,uint32_t on){if(z_drum_track(track)&&on&&velocity)drum_choice=(uint8_t)z_drum_note(z_drum_index(note));if(Z_SAMPLER_EDITION&&on&&velocity&&note>=36&&note<68)ui_pad_until[note-36]=plat_ms()+180;}
+static void edition_note(uint32_t track,uint32_t note,uint32_t velocity,uint32_t on){if(z_drum_track(track)&&on&&velocity){z_dm_select(z_drum_index(note));drum_choice=(uint8_t)z_drum_note(z_dm.selected);}if(Z_SAMPLER_EDITION&&on&&velocity&&note>=36&&note<68)ui_pad_until[note-36]=plat_ms()+180;}
 static void ui_prepare(void){uint32_t key=z_song.section|(z_song.subpage<<4)|((active_layer+1)<<8)|(z_song.selected<<16)|(z_sys.midi_mode<<20),now=plat_ms();
  pal[0]=UI_GRID;pal[1]=RGB(62,82,103);pal[2]=UI_MUTED;pal[3]=ui_accent();pal[4]=Z_SAMPLER_EDITION?RGB(191,153,255):ui_accent();
  if(key!=ui_view_key){ui_view_key=key;ui_view_since=now;}
@@ -43,14 +43,15 @@ static void ui_draw_home(void){uint32_t t=z_song.selected,pg=z_song.subpage%page
  cv_begin(240,18,UI_BG);for(i=0;i<16;i++){uint32_t at=z_song.step_bank*16+i;cv_rect(8+i*14,4,10,8,z_song.track[t].steps[at].velocity?C_HI:UI_CARD);if(z_playing()&&at==z_position()%z_get(t,Z_LENGTH))cv_rect(8+i*14,1,10,2,UI_TEXT);}cv_blit(0,204);ui_footer(word("SELECT: ТЕМП  КНОПКА: СТР.","SELECT: BPM  BUTTON: PAGE"));
 }
 static void ui_roll_note(uint32_t at,uint32_t note,uint32_t base,uint32_t selected,uint32_t duration){int row=(int)note-(int)base,x=24+(int)(at%16)*13,w=duration?duration*13-2:10;if(row<0||row>12)return;if(x+w>232)w=232-x;cv_rect(x,2+(12-row)*8,w,6,at==selected?UI_TEXT:C_HI);if(at==selected)cv_rect(x,2+(12-row)*8,2,6,UI_BG);}
-static void ui_draw_drum_roll(void){uint32_t t=5,selected=z_song.step_edit,bank=selected/16,group=z_drum_index(drum_choice)/8,i,j;char b[24];
+static void ui_draw_drum_roll(void){uint32_t selected=z_song.step_edit,bank=selected/16,group=z_dm.selected/8,i,j;char b[24];
  ui_header(word("ДРАМ-КИТ / 6","DRUM KIT / 6"),z_song.recording?"REC / GM MIDI":"16 SOUNDS / WHITE KEYS");ui_tracks();
- cv_begin(240,20,UI_BG);z_text_clip(6,2,&FONT_XS,z_drum_name(drum_choice),C_HI,95);for(i=0;i<4;i++){cv_rect(137+i*23,2,19,14,i==bank?C_HI:UI_CARD);number(i+1,b);cv_text(143+i*23,3,&FONT_XS,b,i==bank?UI_BG:UI_MUTED);}cv_blit(0,58);
+ cv_begin(240,20,UI_BG);z_text_clip(6,2,&FONT_XS,z_drum_name(z_drum_note(z_dm.selected)),C_HI,95);for(i=0;i<4;i++){cv_rect(137+i*23,2,19,14,i==bank?C_HI:UI_CARD);number(i+1,b);cv_text(143+i*23,3,&FONT_XS,b,i==bank?UI_BG:UI_MUTED);}cv_blit(0,58);
  cv_begin(240,108,UI_BG);for(i=0;i<8;i++){z_text_clip(2,i*13+2,&FONT_XS,z_drum_name(z_drum_note(group*8+i)),UI_MUTED,68);cv_rect(72,i*13+12,163,1,UI_GRID);}
  for(i=0;i<=16;i++)cv_rect(72+i*10,0,1,105,i%4?UI_GRID:RGB(55,76,98));
- for(i=0;i<16;i++){uint32_t at=bank*16+i;z_step *s=&z_song.track[t].steps[at];if(!s->velocity)continue;for(j=0;j<4;j++){uint32_t n=j?z_song.chord[t][at][j-1]:s->note+1;if(n){uint32_t d=z_drum_index(n-1);if(d/8==group)cv_rect(74+i*10,2+(d%8)*13,7,9,at==selected?UI_TEXT:C_HI);}}}
- {uint32_t head=z_position()%z_get(t,Z_LENGTH);if(z_playing()&&head/16==bank)cv_rect(72+(head%16)*10,0,1,106,RGB(255,130,163));}cv_blit(0,78);
- cv_begin(240,36,UI_BG);for(i=0;i<4;i++){uint32_t id=pages[Z_SEQ][z_song.subpage%3][i];z_text_clip(6+i*58,2,&FONT_XS,label(id),UI_MUTED,54);z_text_clip(6+i*58,17,&FONT_XS,value_text(id,b),C_HI,54);}cv_blit(0,186);ui_footer(word("K2: ЗВУК  SEQ+OCT: БАНК","K2: SOUND  SEQ+OCT: BANK"));
+ for(i=0;i<16;i++){uint32_t at=bank*16+i;for(j=0;j<8;j++){uint32_t d=group*8+j;if(z_dm.step[d][at].velocity)cv_rect(74+i*10,2+j*13,7,9,at==selected&&d==z_dm.selected?UI_TEXT:C_HI);}}
+
+ {uint32_t head=z_dm_position(z_dm.selected);if(z_playing()&&head/16==bank)cv_rect(72+(head%16)*10,0,1,106,RGB(255,130,163));}cv_blit(0,78);
+ cv_begin(240,36,UI_BG);for(i=0;i<4;i++){z_text_clip(6+i*58,2,&FONT_XS,dm_label(i),UI_MUTED,54);number(dm_value(i),b);z_text_clip(6+i*58,17,&FONT_XS,b,C_HI,54);}cv_blit(0,186);ui_footer(word("K2: ЗВУК  SEQ+OCT: БАНК","K2: SOUND  SEQ+OCT: BANK"));
 }
 static void ui_draw_roll(void){if(z_drum_track(z_song.selected)){ui_draw_drum_roll();return;}uint32_t t=z_song.selected,selected=z_song.step_edit,bank=selected/16,base,i,j;char b[28],value[20];z_step *focus=&z_song.track[t].steps[selected];
  base=focus->note/12*12;base=base>3?base-3:0;if(base>115)base=115;

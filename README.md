@@ -1,5 +1,7 @@
 # Zombie FM-1 · Groovebox / Sampler 0.8.0
 
+Groovebox 0.10.0 beta corrects the earlier Hortator integration: original Zombie drum mechanics live only on track 6, with the five synth tracks unchanged. See [controls, migration and tests](source/ZOMBIE-DRUMS-100.md). The default remains 0.8.3; older 0.9.x downloads retain their earlier behavior.
+
 Groovebox 0.8.3 fixes the SAVE LED staying lit after K2 edits. Unsaved edits
 use an on-screen `*`; SAVE still saves and pulses when pressed. Controls,
 project format and DAW profiles remain compatible with 0.8.2. Sampler stays

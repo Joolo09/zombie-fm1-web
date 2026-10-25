@@ -1,0 +1,21 @@
+wait 100
+dmcheck
+wait 100
+expect dm_sound 15
+expect dm_length 57
+shot zombie-drum-track.png
+turn K2 -1
+expect dm_sound 14
+turn K4 3
+expect dm_ratchet 4
+tap SEQ
+turn K3 -5
+expect dm_length 27
+turn SELECT 3
+expect bpm 135
+tap SAVE
+wait 100
+reboot
+expect dm_sound 14
+expect dm_length 27
+expect dirty 0

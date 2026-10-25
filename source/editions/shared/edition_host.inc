@@ -11,30 +11,10 @@ static void ed_checks(void){uint32_t t,p;int old;
  else{ed_check(z_sample_frames(0)==0,"groovebox does not carry Minecraft PCM");ed_check(z_sampler_enable(0,1)==-1&&z_sampler.tracks==0,"groovebox cannot enable hidden sampler");}
  system_set(6,2);ed_check(system_save()==0,"DAW settings saved in simulated flash");app_init();ed_check(z_sys.midi_mode==0&&midi_local,"saved controller mode cannot mute startup");
 }
-#if !Z_SAMPLER_EDITION
-static int h_wire(uint8_t cmd,const uint8_t *data,uint32_t n){uint8_t wire[245]={0x7d,0x5a,0x43,1,0};uint32_t at=5;wire[4]=cmd;for(uint32_t i=0;i<n;){uint32_t hi=at++;wire[hi]=0;for(uint32_t k=0;k<7&&i<n;k++,i++){wire[hi]|=(data[i]>>7)<<k;wire[at++]=data[i]&127;}}ed_check(app_sysex(wire,at),"drum SysEx recognized");return raw_reply[0];}
-static void h_protocol_check(void){
- z_project before=z_song;uint8_t bytes[3288],payload[194],begin[4];
- ed_check(h_wire(44,(uint8_t[]){0,1,7,0},4)==0,"drum parameter command");
- ed_check(h_wire(44,(uint8_t[]){8,1,7,0},4)!=0,"invalid drum lane rejected");
- ed_check(h_wire(45,(uint8_t[]){0,63,1,1,56,3,12},7)==0,"last step, condition and ratchet command");
- ed_check(h_wire(45,(uint8_t[]){0,64,1,1,56,3,12},7)!=0,"step outside pattern rejected");
- ed_check(h_wire(46,(uint8_t[]){0,177,0},3)==0,"set imported project tempo");ed_check(h_wire(43,0,0)==0,"independent drum snapshot command");memcpy(bytes,raw_reply+1,3288);
- z_tempo(120,0);wr32(begin,crc32(bytes,3288));ed_check(h_wire(47,begin,4)==0,"begin drum project transfer");
- ed_check(h_wire(48,0,0)!=0,"incomplete drum project transfer rejected");
- ed_check(h_wire(47,begin,4)==0,"restart drum transfer");
- for(uint32_t i=0;i<3288;i+=192){uint32_t n=3288-i;if(n>192)n=192;payload[0]=(uint8_t)i;payload[1]=(uint8_t)(i>>8);memcpy(payload+2,bytes+i,n);ed_check(h_wire(17,payload,n+2)==0,"drum transfer chunk");}
- ed_check(h_wire(48,0,0)==0,"validated drum project committed");ed_check(z_song.bpm==177,"drum project import preserves tempo");
- ed_check(!memcmp(before.track,z_song.track,5*sizeof(z_song.track[0])),"drum commands preserve five synth tracks");
-}
-#endif
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
- #if !Z_SAMPLER_EDITION
- if(!strcmp(cmd,"auditcheck")){int rc=h_audit_check();printf("Audit check stage: %d\n",rc);ed_check(rc==0,"motion export, pending import, active save slot, fresh flash and remote key release");h_test_discard_write=1;ed_check(h_save()!=0,"SAVE reports a silent flash write/read-back failure");h_test_discard_write=0;z_song.selected=5;seq_out(0,60,100,1);off_deadline[0][60]=plat_ms();app_input_only();ed_check(!off_deadline[0][60],"synth MIDI note-offs run while drum panel is selected");return 1;}
- if(!strcmp(cmd,"hortatorcheck")){h_protocol_check();int rc=h_host_check();printf("Hortator check stage: %d\n",rc);ed_check(rc==0,"ratchets, probability, Grids, motion, CPU caps, user presets, four projects and song");return 1;}
-#endif
  if(!strcmp(cmd,"editioncheck")){ed_checks();return 1;}
  if(!strcmp(cmd,"splashpreview")){app_splash();return 1;}
+ if(!strcmp(cmd,"dmcheck")){if(Z_SAMPLER_EDITION)return 1;app_panic();z_init();z_song.selected=5;z_dm_step(15,63,111,77,4);z_dm_param(15,5,57);z_dm_param(15,2,-7);z_dm_select(15);ed_check(plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song)==0&&plat_store_save(OBJ_DRUM,&z_dm,sizeof z_dm)==0,"Zombie drum flash save");app_init();ed_check(z_dm.selected==15&&z_dm.sound[15].length==57&&z_dm.sound[15].tune==-7&&z_dm.step[15][63].ratchet==4&&z_dm.step[15][63].velocity==111,"Zombie drum project restored after reboot");ed_check(!z_playing()&&!z_song.recording,"drum project boot is stopped");z_song.selected=5;z_song.section=Z_SEQ;z_song.subpage=0;z_song.step_bank=3;z_song.step_edit=63;redraw_at=0;return 1;}
  if(!strcmp(cmd,"drumtest")){uint32_t t;system_set(6,0);app_panic();z_init();for(t=0;t<6;t++)z_clear_track(t);z_song.selected=5;z_song.section=Z_SEQ;z_song.subpage=0;z_song.step_edit=0;z_step_set(5,0,36,100,127,80);return 1;}
  if(!strcmp(cmd,"rolltest")){ed_roll();return 1;}
  if(!strcmp(cmd,"en")){z_song.language=1;redraw_at=0;return 1;}
@@ -50,10 +30,6 @@ int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const
 }
 int app_expect(const char *what,int *got){
  if(!strcmp(what,"dirty"))*got=saved_revision!=z_revision()||system_dirty;
-
-#if !Z_SAMPLER_EDITION
- else if(!strcmp(what,"drum_keys"))*got=h_host_keys_mode();
-#endif
  else if(!strcmp(what,"midi_mode"))*got=z_sys.midi_mode;
  else if(!strcmp(what,"model"))*got=z_get(z_song.selected,Z_MODEL);
  else if(!strcmp(what,"voices"))*got=z_voice_count();
@@ -74,6 +50,9 @@ int app_expect(const char *what,int *got){
  else if(!strcmp(what,"bank"))*got=z_song.step_bank;
  else if(!strcmp(what,"octave"))*got=z_song.octave;
  else if(!strcmp(what,"effect"))*got=z_live_state();
+ else if(!strcmp(what,"dm_ratchet"))*got=z_dm.step[z_dm.selected][z_song.step_edit].ratchet;
+ else if(!strcmp(what,"dm_sound"))*got=z_dm.selected;
+ else if(!strcmp(what,"dm_length"))*got=z_dm.sound[z_dm.selected].length;
  else if(!strcmp(what,"drum_choice"))*got=drum_choice;
  else return 0;return 1;
 }
