@@ -12,6 +12,13 @@ static void ed_checks(void){uint32_t t,p;int old;
  system_set(6,2);ed_check(system_save()==0,"DAW settings saved in simulated flash");app_init();ed_check(z_sys.midi_mode==0&&midi_local,"saved controller mode cannot mute startup");
 }
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
+ if(!strcmp(cmd,"edgecheck")){
+#ifdef APP_TOUCH_EDGE_POLL
+ touch_on(1);sense_init(1);touch_held=touch_pending_valid=0;sn_ev_r=sn_ev_w=0;sn_push(EV_ON,0,101,0);sn_push(EV_OFF,0,0,0);touch_poll();ed_check(touch_keys()&1,"fast tap press survives queued release");ed_check(touch_vel(0)==101,"queued tap preserves velocity");touch_poll();ed_check(!(touch_keys()&1),"fast tap release is delivered next poll");sn_push(EV_ON,0,90,0);touch_poll();sn_push(EV_ON,0,110,0);touch_poll();ed_check(!(touch_keys()&1),"same-key retrigger exposes release");touch_poll();ed_check((touch_keys()&1)&&touch_vel(0)==110,"same-key retrigger exposes new attack");touch_held=touch_pending_valid=0;sn_ev_r=sn_ev_w=0;sense_init((1u<<27)-1);for(uint32_t k=0;k<27;k++)sn_push(EV_ON,k,100,0);for(uint32_t k=0;k<27;k++)sn_push(EV_OFF,k,0,0);touch_poll();ed_check(touch_held==((1u<<27)-1),"whole chord press burst is preserved");touch_poll();ed_check(!touch_held,"whole chord release burst is preserved");touch_on(0);touch_on(1);
+#endif
+ return 1;}
+ if(!strcmp(cmd,"recsetup")){app_panic();z_init();panel_reset();z_song.selected=atoi(a);z_song.section=Z_SEQ;z_song.subpage=0;z_song.step_edit=z_song.step_bank=0;z_song.bpm=120;z_song.swing=0;z_song.rec_mode=1;z_song.rec_quant=0;for(uint32_t t=0;t<6;t++)z_erase(t,0,2);midi_local=1;system_set(6,0);redraw_at=0;return 1;}
+ if(!strcmp(cmd,"stepcursor")){z_song.step_edit=atoi(a);z_song.step_bank=z_song.step_edit/16;return 1;}
  if(!strcmp(cmd,"editioncheck")){ed_checks();return 1;}
  if(!strcmp(cmd,"splashpreview")){app_splash();return 1;}
  if(!strcmp(cmd,"dmcheck")){if(Z_SAMPLER_EDITION)return 1;app_panic();z_init();z_song.selected=5;z_dm_step(15,63,111,77,4);z_dm_param(15,5,57);z_dm_param(15,2,-7);z_dm_select(15);ed_check(plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song)==0&&plat_store_save(OBJ_DRUM,&z_dm,sizeof z_dm)==0,"Zombie drum flash save");app_init();ed_check(z_dm.selected==15&&z_dm.sound[15].length==57&&z_dm.sound[15].tune==-7&&z_dm.step[15][63].ratchet==4&&z_dm.step[15][63].velocity==111,"Zombie drum project restored after reboot");ed_check(!z_playing()&&!z_song.recording,"drum project boot is stopped");z_song.selected=5;z_song.section=Z_SEQ;z_song.subpage=0;z_song.step_bank=3;z_song.step_edit=63;redraw_at=0;return 1;}
@@ -53,6 +60,10 @@ int app_expect(const char *what,int *got){
  else if(!strcmp(what,"dm_ratchet"))*got=z_dm.step[z_dm.selected][z_song.step_edit].ratchet;
  else if(!strcmp(what,"dm_sound"))*got=z_dm.selected;
  else if(!strcmp(what,"dm_length"))*got=z_dm.sound[z_dm.selected].length;
+ else if(!strcmp(what,"gate"))*got=z_song.track[z_song.selected].steps[z_song.step_edit].gate;
+ else if(!strcmp(what,"dm_velocity"))*got=z_dm.step[z_dm.selected][z_song.step_edit].velocity;
+ else if(!strcmp(what,"part_hits")){*got=0;if(z_drum_track(z_song.selected)){for(uint32_t i=0;i<64;i++)*got+=z_dm.step[z_dm.selected][i].velocity!=0;}else for(uint32_t i=0;i<64;i++)*got+=z_song.track[z_song.selected].steps[i].velocity!=0;}
+ else if(!strcmp(what,"track_hits")){*got=0;for(uint32_t d=0;d<16;d++)for(uint32_t i=0;i<64;i++)*got+=z_dm.step[d][i].velocity!=0;}
  else if(!strcmp(what,"drum_choice"))*got=drum_choice;
  else return 0;return 1;
 }

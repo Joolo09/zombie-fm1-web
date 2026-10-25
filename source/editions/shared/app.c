@@ -153,7 +153,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
   else if(!snapshot_token||token!=snapshot_token)status=2;
   if(!status){wr32(out,snapshot_token);wr32(out+4,snapshot_revision);out[8]=(uint8_t)at;out[9]=(uint8_t)(at>>8);for(j=0;j<amount;j++)out[10+j]=state_cache[at+j];count=amount+10;}
  }
- else if(cmd==20&&n==0){out[0]=2;out[1]=(uint8_t)z_playing();out[2]=(uint8_t)z_position();out[3]=z_song.recording;out[4]=(uint8_t)(z_song.octave+3);out[5]=z_song.section;out[6]=z_song.subpage;out[7]=z_song.step_bank;out[8]=z_song.step_edit;out[9]=z_song.selected;out[10]=z_song.preset[z_song.selected];out[11]=saved_revision!=z_revision();wr32(out+12,z_revision());out[16]=(uint8_t)(active_layer+1);out[17]=(uint8_t)z_live_state();out[18]=(uint8_t)z_song.bpm;out[19]=(uint8_t)(z_song.bpm>>8);out[20]=(uint8_t)z_history_state();out[21]=(uint8_t)(z_history_state()>>8);out[22]=(uint8_t)z_solo_state();count=23;out[0]=4;if(!Z_SAMPLER_EDITION){for(j=0;j<16;j++)out[23+j]=(uint8_t)z_dm_position(j);count=39;out[0]=5;}}
+ else if(cmd==20&&n==0){out[0]=2;out[1]=(uint8_t)z_playing();out[2]=(uint8_t)z_position();out[3]=z_song.recording;out[4]=(uint8_t)(z_song.octave+3);out[5]=z_song.section;out[6]=z_song.subpage;out[7]=z_song.step_bank;out[8]=z_song.step_edit;out[9]=z_song.selected;out[10]=z_song.preset[z_song.selected];out[11]=saved_revision!=z_revision();wr32(out+12,z_revision());out[16]=(uint8_t)(active_layer+1);out[17]=(uint8_t)z_live_state();out[18]=(uint8_t)z_song.bpm;out[19]=(uint8_t)(z_song.bpm>>8);out[20]=(uint8_t)z_history_state();out[21]=(uint8_t)(z_history_state()>>8);out[22]=(uint8_t)z_solo_state();count=23;out[0]=4;if(!Z_SAMPLER_EDITION){for(j=0;j<16;j++)out[23+j]=(uint8_t)z_dm_position(j);wr32(out+39,z_position());count=43;out[0]=6;}}
  else if(cmd==21&&n==2){if(!panel_setting(a[0],a[1]))status=1;}
  else if(cmd==23&&n==1&&a[0]<=16){editor_effect=a[0];z_live(a[0]);}
  else if(cmd==25&&n==1&&a[0]<=1){out[0]=(uint8_t)z_history(a[0]);count=1;}
@@ -186,6 +186,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  else if(cmd==24&&n==10&&a[0]<6&&a[1]<64&&a[2]<=63&&a[3]<=128&&a[4]<=128&&a[5]<=128&&a[6]<=127&&a[7]<=127&&a[8]<=127&&a[9]>=1&&a[9]<=127){
   z_step_set(a[0],a[1],a[6],a[7],a[8],a[9]);z_song.duration[a[0]][a[1]]=a[2];for(j=0;j<3;j++)z_song.chord[a[0]][a[1]][j]=a[3+j];z_touch();
  }
+ else if(cmd==49&&n==3){if(z_erase(a[0],a[1],a[2]))status=1;}
  else if(cmd==22&&n==3){if(z_arp_set(a[0],a[1],a[2]))status=1;}
  else status=1;
  plat_unlock(f);reply(seq,cmd,status,out,count);return 1;

@@ -1,0 +1,74 @@
+wait 100
+edgecheck
+recsetup 0
+press REC
+expect recording 1
+wait 600
+expect recording 1
+expect layer -1
+key w0 down 100
+wait 50
+key w0 up
+wait 20
+expect step_edit 1
+release REC
+stepcursor 0
+expect gate 80
+expect duration 0
+expect part_hits 1
+press SEQ
+tap EDIT
+release SEQ
+expect recording 0
+expect part_hits 0
+press EDIT
+tap OCT-
+release EDIT
+expect part_hits 1
+press SEQ
+tap REC
+release SEQ
+expect recording 0
+expect part_hits 0
+press EDIT
+tap OCT-
+release EDIT
+expect part_hits 1
+recsetup 5
+press REC
+wait 600
+expect recording 1
+expect layer -1
+key w0 down 100
+wait 50
+key w0 up
+key w1 down 100
+wait 50
+key w1 up
+release REC
+expect step_edit 2
+expect track_hits 2
+press SEQ
+key b9 down 100
+wait 20
+key b9 up
+release SEQ
+expect recording 0
+expect track_hits 1
+press SEQ
+key b10 down 100
+wait 20
+key b10 up
+release SEQ
+expect track_hits 0
+press EDIT
+tap OCT-
+release EDIT
+expect track_hits 1
+wait 100
+shot recording-edit-controls.png
+
+press SEQ
+wait 500
+shot sequencer-clear-help.png
+release SEQ
