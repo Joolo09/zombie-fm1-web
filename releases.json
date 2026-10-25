@@ -128,6 +128,23 @@
       "file": "downloads/zombie-groovebox-0.9.0.fwsc",
       "editor": "webapp/groovebox-090/",
       "source": "downloads/groovebox-source-0.9.0.zip"
+    },
+    {
+      "product": "FM-1_63000901",
+      "version": "0.9.1",
+      "label": {
+        "ru": "Groovebox 0.9.1 BETA · исправления драмки и сохранения",
+        "en": "Groovebox 0.9.1 BETA · drum and persistence fixes"
+      },
+      "notes": {
+        "ru": "Исправления после аудита: SAVE/слоты, темп импорта, motion, зависшие MIDI-ноты/клавиши, SEL + PRESET, сохранение при перезапуске звука ПК и гонки редактора. Пять синтезаторов сохранены. На физическом FM-1 не проверено.",
+        "en": "Audit fixes: SAVE/slots, imported tempo, motion, stuck MIDI notes/keys, SEL + PRESET, persistence across PC audio restart and editor races. Five synths preserved. Not tested on physical FM-1."
+      },
+      "bytes": 610100,
+      "sha256": "4869be48452e46a988c1e3307944bc40bb14eeb497a2d9de4df7756be69c7aaf",
+      "file": "downloads/zombie-groovebox-0.9.1.fwsc",
+      "editor": "webapp/groovebox-090/",
+      "source": "downloads/groovebox-source-0.9.1.zip"
     }
   ]
 }

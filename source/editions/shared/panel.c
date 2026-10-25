@@ -253,27 +253,31 @@ static void select_tempo(int d){
  redraw_at=0;
 }
 #if !Z_SAMPLER_EDITION
-static uint8_t drum_focus;
+static uint8_t drum_focus,drum_sel_pending;
 static uint32_t drum_ignored_keys;
 static int drum_input(uint32_t keys,uint32_t buttons,uint32_t now){
- if(z_song.selected!=5||z_sys.midi_mode==2){if(drum_focus)h_unfocus();drum_focus=0;return 0;}
+ if(z_song.selected!=5||z_sys.midi_mode==2){if(drum_focus)h_unfocus();drum_focus=drum_sel_pending=0;return 0;}
  for(uint32_t k=0;k<27;k++)if(!(keys>>k&1)&&key_action[k]==1){
   if(held_local[k])z_key(held_tracks[k],held_notes[k],0,0);
   if(held_raw[k])raw_note(held_channels[k],held_notes[k],0,0);key_action[k]=0;
  }
  int d=plat_enc(EN_ALGO);
- if(d){h_unfocus();drum_focus=0;panel_setting(7,(z_song.selected+6+d%6)%6);panel_keys_before=keys;held_buttons=buttons;redraw_at=0;return 1;}
+ if(d){h_unfocus();drum_focus=drum_sel_pending=0;panel_setting(7,(z_song.selected+6+d%6)%6);panel_keys_before=keys;held_buttons=buttons;redraw_at=0;return 1;}
  if(!drum_focus){h_unfocus();drum_focus=1;drum_ignored_keys=panel_keys_before;}
  drum_ignored_keys&=keys;
  if((buttons>>B_HOME&1)&&(buttons>>B_SEL&1)&&((buttons^held_buttons)&((1u<<B_HOME)|(1u<<B_SEL)))){
-  system_set(6,(z_sys.midi_mode+1)%3);h_unfocus();drum_focus=0;panel_keys_before=keys;held_buttons=buttons;return 1;
+  system_set(6,(z_sys.midi_mode+1)%3);h_unfocus();drum_focus=drum_sel_pending=0;panel_keys_before=keys;held_buttons=buttons;return 1;
  }
+ if((buttons>>B_SEL&1)&&!(held_buttons>>B_SEL&1))drum_sel_pending=1;
  int32_t enc[7]={0};
  enc[EN_SELECT]=plat_enc(EN_SELECT);enc[EN_PRESET]=plat_enc(EN_PRESET);
  for(uint32_t k=0;k<4;k++)enc[EN_K1+k]=plat_enc(EN_K1+k);
- if((buttons>>B_SEL&1)&&enc[EN_PRESET]){h_select(enc[EN_PRESET]);enc[EN_PRESET]=0;}
+ if((buttons>>B_SEL&1)&&enc[EN_PRESET]){h_select(enc[EN_PRESET]);enc[EN_PRESET]=0;drum_sel_pending=2;}
  if((buttons>>B_SAVE&1)&&!(held_buttons>>B_SAVE&1)){save_requested=1;pulse_until[B_SAVE]=now+180;}
- h_input(buttons&~(1u<<B_SAVE),keys&~drum_ignored_keys,enc);
+ /* SEL tap toggles KEYS on release; SEL+PRESET only selects an inner drum. */
+ uint32_t forwarded=buttons&~((1u<<B_SAVE)|(1u<<B_SEL));
+ if(!(buttons>>B_SEL&1)&&drum_sel_pending){if(drum_sel_pending==1){int32_t zero[7]={0};h_input(forwarded|(1u<<B_SEL),keys&~drum_ignored_keys,zero);}drum_sel_pending=0;}
+ h_input(forwarded,keys&~drum_ignored_keys,enc);
  if(h_bpm()!=(uint32_t)z_song.bpm)z_tempo(h_bpm(),z_song.swing);
  if(h_requested_playing()!=(uint32_t)z_playing()){if(!h_requested_playing())all_off();z_transport(h_requested_playing());}
  uint32_t lights=h_leds();if((buttons>>B_SAVE&1)||(int32_t)(pulse_until[B_SAVE]-now)>0)lights|=1u<<B_SAVE;
@@ -289,6 +293,7 @@ static void editor_watchdog(uint32_t now){uint32_t t,k;
 #endif
 }
 static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),lights=0;int d;if(daw_seen&&now-daw_seen>=3500)daw_playing=daw_recording=0;touch_poll();keys=touch_keys();editor_watchdog(now);
+ for(t=0;t<6;t++)for(k=0;k<128;k++)if(off_deadline[t][k]&&(int32_t)(now-off_deadline[t][k])>=0){note_packet(t,k,0,0);off_deadline[t][k]=0;}
 #if !Z_SAMPLER_EDITION
  if(drum_input(keys,buttons,now))return;
 #endif
@@ -334,7 +339,6 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
  d=plat_enc(EN_SELECT);if(d)select_tempo(d);
  d=plat_enc(EN_PRESET);if(d&&active_layer>=0){uint32_t count=active_layer==Z_EDIT?3:page_count[active_layer<Z_SECTIONS?active_layer:0];layer_page=(uint8_t)(layer_page+count+d%(int)count)%count;}else if(d&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){panel_setting(3,(z_song.step_bank+4+d%4)%4);}else if(d&&sampler_open()){sampler_page=(sampler_page+3+d%3)%3;}else if(d&&z_sys.midi_mode==2){daw_touch_at=now;daw_values[t][5]=(uint8_t)clamp((int)daw_values[t][5]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,10,daw_values[t][5]);}else if(d)knob(U_PRESET,d);
  for(k=0;k<4;k++){d=plat_enc(EN_K1+k);if(d&&active_layer<0&&sampler_open()&&z_sys.midi_mode!=2)sampler_knob(k,d);else if(d&&active_layer<0&&z_sys.midi_mode==2&&z_song.section!=Z_GLO){daw_values[t][k]=(uint8_t)clamp((int)daw_values[t][k]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,daw_cc[k],daw_values[t][k]);}else if(d)knob(active_layer>=0?layer_knob(k):pages[z_song.section][z_song.subpage%page_count[z_song.section]][k],d);}
- for(t=0;t<6;t++)for(k=0;k<128;k++)if(off_deadline[t][k]&&(int32_t)(now-off_deadline[t][k])>=0){note_packet(t,k,0,0);off_deadline[t][k]=0;}
 
  panel_keys_before=keys;held_buttons=buttons;
  lights=buttons|(active_layer>=0?(1u<<(active_layer==Z_SECTIONS?B_REC:section_button[active_layer])):(1u<<section_button[z_sys.midi_mode==2&&z_song.section!=Z_GLO?Z_HOME:z_song.section]));

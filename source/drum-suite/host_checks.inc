@@ -19,3 +19,18 @@ int h_host_check(void){
  if(chain_prepare())return 14;h_test_blocks(1);if(!chain.running)return 15;h_test_blocks(1500);if(chain.running||song.playing)return 16;
  h_init();ui.menu=1;ui.menu_sel=MI_PANEL;menu_input(1u<<panel.btn[B_OCTUP]);ui.menu=0;return 0;
 }
+
+int h_audit_check(void){
+ h_test_pattern();int base=trk[0].p[P_E0];mo.s.count=1;mo.s.on=1;mo.s.ev[0]=(motion_event_t){0,0,P_E0,7};h_transport(1);h_test_blocks(1);
+ project_t packed;h_pack((uint8_t*)&packed);
+ if(packed.t[0].p[P_E0]!=base||trk[0].p[P_E0]!=7)return 101;
+ h_transport(1);if(h_unpack((const uint8_t*)&packed,sizeof packed)||h_requested_playing())return 102;
+ song.g[G_SLOT]=4;trk[0].p[P_E0]=6;if(h_save())return 103;h_init();
+ if(song.g[G_SLOT]!=4||trk[0].p[P_E0]!=6)return 104;
+ proj_slot[3].t[0].p[P_E0]=1;proj_slot[3].sum=proj_sum(&proj_slot[3]);h_init();
+ if(trk[0].p[P_E0]!=6)return 105;
+ h_remote(1,0,1);h_remote_release();if(fm1_in.notes)return 106;
+ return 0;
+}
+
+int h_host_keys_mode(void){return ui.keys;}

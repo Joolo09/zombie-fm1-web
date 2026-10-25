@@ -112,7 +112,7 @@ static int st_load(uint32_t obj, void *dst, uint32_t max)
     return (int)h.len;
 }
 
-static int st_save(uint32_t obj, const void *src, uint32_t len)
+static int st_save_impl(uint32_t obj, const void *src, uint32_t len)
 {
     uint32_t seq, base, off;
     int cur, rc;
@@ -149,3 +149,6 @@ static int st_save(uint32_t obj, const void *src, uint32_t len)
     }
     return 0;
 }
+
+/* Propagate read-back failures through remote SAVE, not only erase/program errors. */
+static int st_save(uint32_t obj,const void *src,uint32_t len){int rc=st_save_impl(obj,src,len);if(rc)h_store_error=1;return rc;}

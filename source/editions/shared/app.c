@@ -53,7 +53,14 @@ const uint8_t *h_platform_data(uint32_t off){return plat_data(off);}
 int h_platform_read(uint32_t off,void *dst,uint32_t n){const uint8_t *p=plat_data(off);if(!p)return -1;for(uint32_t i=0;i<n;i++)((uint8_t *)dst)[i]=p[i];return 0;}
 static int h_write_range(uint32_t off,uint32_t n){return off+n>=off&&((off>=0x97000u&&off+n<=0xD0000u)||(off>=0xD2000u&&off+n<=0xD8000u));}
 int h_platform_erase(uint32_t off){if(!h_write_range(off,4096))return -1;uint8_t before=flash_busy;flash_busy=1;int rc=plat_data_erase(off);flash_busy=before;return rc;}
-int h_platform_write(uint32_t off,const void *p,uint32_t n){if(!h_write_range(off,n))return -1;uint8_t before=flash_busy;flash_busy=1;int rc=plat_data_write(off,p,n);flash_busy=before;return rc;}
+#ifdef PLAT_HOST
+static uint8_t h_test_discard_write;
+#endif
+int h_platform_write(uint32_t off,const void *p,uint32_t n){if(!h_write_range(off,n))return -1;
+#ifdef PLAT_HOST
+ if(h_test_discard_write)return 0;
+#endif
+uint8_t before=flash_busy;flash_busy=1;int rc=plat_data_write(off,p,n);flash_busy=before;return rc;}
 void h_platform_midi(uint32_t p){plat_midi_out(p);}
 #endif
 
@@ -121,7 +128,11 @@ void app_say(const char *a,const char *b){uint32_t i;(void)b;for(i=0;i<95&&a&&a[
 #include "panel.c"
 
 void app_input_only(void){uint32_t f=plat_lock();input();plat_unlock(f);}
-void app_frame(void){app_input_only();system_service();if(save_requested){int rc;save_requested=0;app_panic();flash_busy=1;rc=plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song);if(!rc)rc=system_save();if(!rc)rc=plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler);flash_busy=0;
+void app_frame(void){app_input_only();system_service();
+#if !Z_SAMPLER_EDITION
+ h_service();
+#endif
+if(save_requested){int rc;save_requested=0;app_panic();flash_busy=1;rc=plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song);if(!rc)rc=system_save();if(!rc)rc=plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler);flash_busy=0;
 #if !Z_SAMPLER_EDITION
  if(!rc)rc=h_save();
 #endif
@@ -180,7 +191,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  else if(cmd==45&&n==7){if(h_set_step(a[0],a[1],a[2],a[3],a[4],a[5],(int8_t)a[6]))status=1;}
  else if(cmd==46&&n==3){if(h_set_global(a[0],(int16_t)(a[1]|a[2]<<8)))status=1;else if(h_bpm()!=(uint32_t)z_song.bpm)z_tempo(h_bpm(),z_song.swing);}
  else if(cmd==47&&n==4){app_panic();upload_slot=252;upload_size=3288;upload_at=0;upload_crc=rd32(a);}
- else if(cmd==48&&n==0&&upload_slot==252){if(upload_at!=upload_size||crc32(z_transfer(),upload_size)!=upload_crc||h_unpack(z_transfer(),upload_size))status=3;upload_slot=255;}
+ else if(cmd==48&&n==0&&upload_slot==252){if(upload_at!=upload_size||crc32(z_transfer(),upload_size)!=upload_crc||h_unpack(z_transfer(),upload_size))status=3;else z_tempo(h_bpm(),z_song.swing);upload_slot=255;}
 #endif
  else if(cmd==14&&n==0)upload_slot=255;
  else if(cmd==15&&n==0){for(k=0;k<4;k++){const uint8_t *p=plat_data(0xA0000u+k*0xC000u);wr32(out+8*k,p&&rd32(p)==0x3150435au?rd32(p+4):0);wr32(out+8*k+4,p?rd32(p+8):0);}count=32;}

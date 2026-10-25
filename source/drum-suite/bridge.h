@@ -17,6 +17,7 @@ void h_init(void);
 void h_render(float *,uint32_t);
 void h_input(uint32_t,uint32_t,const int32_t *);
 void h_draw(void);
+void h_service(void);
 void h_transport(uint32_t);
 void h_tempo(uint32_t);
 uint32_t h_bpm(void);
@@ -47,4 +48,6 @@ void h_remote_release(void);
 
 #ifdef PLAT_HOST
 int h_host_check(void);
+int h_audit_check(void);
+int h_host_keys_mode(void);
 #endif
