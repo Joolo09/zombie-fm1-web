@@ -2,6 +2,7 @@
 #pragma once
 #include "model.h"
 #include "sampler.h"
+#include "drum_machine.h"
 void z_init(void);
 uint32_t z_drum_track(uint32_t track);
 uint32_t z_drum_index(uint32_t note);

@@ -145,6 +145,23 @@
       "file": "downloads/zombie-groovebox-0.9.1.fwsc",
       "editor": "webapp/groovebox-090/",
       "source": "downloads/groovebox-source-0.9.1.zip"
+    },
+    {
+      "product": "FM-1_63001000",
+      "version": "0.10.0",
+      "label": {
+        "ru": "Groovebox 0.10.0 BETA · своя драмка в дорожке 6",
+        "en": "Groovebox 0.10.0 BETA · Zombie drums on track 6"
+      },
+      "notes": {
+        "ru": "Исправление концепции: драм-механика внутри Zombie, без переноса прошивки Hortator. 16 партий, отдельная длина, дробь, вероятность и настройки каждого звука. Пять синтезаторов и общее управление сохранены. Старые GM-шаги 0.8.x переносятся; киты Hortator 0.9.x не конвертируются. Проверено в симуляторе; физический FM-1 ещё не проверен.",
+        "en": "Corrected scope: original Zombie drum mechanics on track 6, without the Hortator firmware. 16 parts, per-part lengths, rolls, probability and sound controls. Five synth tracks and shared controls retained. Migrates 0.8.x GM steps; 0.9.x Hortator kits are not converted. Simulator tested; physical FM-1 not yet tested."
+      },
+      "bytes": 610100,
+      "sha256": "7a7923fa1c9d198fe08d639747316f9136d710af4bcb1c79f5117558ec168449",
+      "file": "downloads/zombie-groovebox-0.10.0.fwsc",
+      "editor": "webapp/groovebox-100/",
+      "source": "downloads/groovebox-source-0.10.0.zip"
     }
   ]
 }

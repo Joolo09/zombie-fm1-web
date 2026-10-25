@@ -2,7 +2,6 @@
 #pragma once
 #include <stdint.h>
 #include "edition.h"
-#define APP_CANVAS_PX (240u * (Z_SAMPLER_EDITION?144u:124u))
 #define APP_SECOND_CORE
 #include "plat.h"
 #define APP_NAME Z_EDITION_TITLE
@@ -11,9 +10,9 @@
 #define APP_TOUCH
 #define APP_SYSEX
 #define APP_SPLASH
-enum {OBJ_SETTINGS,OBJ_PANEL,OBJ_BLE,OBJ_SYSTEM,OBJ_SAMPLER,OBJ_NOBJ};
+enum {OBJ_SETTINGS,OBJ_PANEL,OBJ_BLE,OBJ_SYSTEM,OBJ_SAMPLER,OBJ_DRUM,OBJ_NOBJ};
 /* Own project at D8000; retain platform calibration/Bluetooth sector pairs. */
-#define APP_STORE_MAP {0xD8000u,0xDC000u,0xDE000u,0xDA000u,0xD0000u}
+#define APP_STORE_MAP {0xD8000u,0xDC000u,0xDE000u,0xDA000u,0xD0000u,0x97000u}
 void app_init(void);
 void app_render(int32_t *,uint32_t,uint32_t);
 void app_panic(void);

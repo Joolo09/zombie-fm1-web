@@ -4,7 +4,6 @@
  * two-operator FM, phase distortion, percussion and linear PCM sampler.
  * Tables are generated from mathematical definitions by tools/build-core.py. */
 #include "dsp.h"
-#include "drum_suite.h"
 #include "z_tables.h"
 #if Z_SAMPLER_EDITION
 #include "z_samples.h"
@@ -31,7 +30,7 @@ typedef struct { float phase,phase2,env,lp1,lp2,velocity,age,pos,inc; uint32_t s
                  uint8_t track,note,stage,active,released,arp,pad,drum;float drum_decay;z_pad settings;uint32_t sample_start,sample_end; } voice;
 static voice voices[Z_VOICES];
 static Z_POOL float delay_l[8192],delay_r[8192],comb_a[1499],comb_b[1877];
-static Z_POOL uint8_t transfer[Z_SAMPLER_EDITION?Z_SLOT_BYTES:4096u];
+static Z_POOL uint8_t transfer[Z_SLOT_BYTES];
 #ifdef Z_WASM
 static Z_POOL int16_t preview_pcm[4][Z_PCM_MAX];
 #endif
@@ -65,9 +64,9 @@ static void pattern_restore(const z_pattern_snapshot *p){uint32_t t,i,j;for(t=0;
 }z_touch();}
 static void history_push(z_pattern_snapshot *bank,uint32_t *count){uint32_t i;if(*count==4){for(i=0;i<3;i++)bank[i]=bank[i+1];*count=3;}pattern_capture(&bank[(*count)++]);}
 void z_checkpoint(void){history_push(undo_bank,&undo_count);redo_count=0;}
-uint32_t z_history_state(void){return undo_count|(redo_count<<8);}
-void z_history_reset(void){undo_count=redo_count=0;}
-uint32_t z_history(uint32_t redo){
+uint32_t z_history_state(void){if(z_drum_track(z_song.selected))return z_dm_history_state();return undo_count|(redo_count<<8);}
+void z_history_reset(void){z_dm_history_reset();undo_count=redo_count=0;}
+uint32_t z_history(uint32_t redo){if(z_drum_track(z_song.selected))return z_dm_history(redo);
  if(redo>1)return 0;
  if(redo){if(!redo_count)return 0;z_record(0);history_push(undo_bank,&undo_count);pattern_restore(&redo_bank[--redo_count]);}
  else {if(!undo_count)return 0;z_record(0);history_push(redo_bank,&redo_count);pattern_restore(&undo_bank[--undo_count]);}
@@ -77,7 +76,7 @@ uint32_t z_solo_state(void){return solo_track;}
 void z_solo(uint32_t t){uint32_t i;if(t>6)return;solo_track=t;if(t&&midi_out)for(i=0;i<6;i++)if(i+1!=t)midi_out(i,128,0,0);}
 int z_pattern(uint32_t t,uint32_t action,uint32_t target){
  uint32_t i,j,len;z_step step;uint8_t chord[3],duration;
- if(t>=6||action>6)return -1;len=z_song.track[t].p[Z_LENGTH];
+ if(t>=6||action>6)return -1;if(z_drum_track(t))return z_dm_pattern(action);if(action==4&&z_drum_track(target))return -1;len=z_song.track[t].p[Z_LENGTH];
  if(action==1&&len>32)return -1;if(action==4&&(target>=6||target==t))return -1;
  z_record(0);z_checkpoint();
  if(action==0){for(i=0;i<64;i++){z_song.track[t].steps[i].velocity=0;z_song.duration[t][i]=0;for(j=0;j<3;j++)z_song.chord[t][i][j]=0;}}
@@ -105,7 +104,7 @@ static void record_finish(uint32_t t,uint32_t n){
   rec_active[t][n]=0;z_touch();
  }
 }
-void z_record(uint32_t on){uint32_t t,n;on=!!on;if(on&&!z_song.recording)z_checkpoint();
+void z_record(uint32_t on){uint32_t t,n;on=!!on;if(on&&!z_song.recording){if(z_drum_track(z_song.selected))z_dm_checkpoint();else z_checkpoint();}
  if(!on)for(t=0;t<6;t++)for(n=0;n<128;n++)record_finish(t,n);
  if(z_song.recording!=on){z_song.recording=(uint8_t)on;z_touch();}
 }
@@ -137,7 +136,9 @@ static float osc(float p,float dt,int shape) {
  if(shape==2){float q=p+0.5f; if(q>=1)q-=1; return (p<0.5f?1:-1)+blep(p,dt)-blep(q,dt);}
  return 1-4*absf(p-0.5f);
 }
+static uint32_t dm_random(void);
 #include "drums.inc"
+#include "drum_machine.inc"
 void z_set_midi_out(void (*cb)(uint32_t,uint32_t,uint32_t,uint32_t)) { midi_out=cb; }
 void z_touch(void) { if(++revision==0)revision=1; }
 uint32_t z_revision(void) { return revision; }
@@ -153,7 +154,7 @@ int z_set(uint32_t t,uint32_t p,int v) {
   z_touch();}return v;
 }
 int z_get(uint32_t t,uint32_t p) { return t<Z_TRACKS&&p<Z_PARAMS?z_song.track[t].p[p]:-9999; }
-void z_reset_audio(void) {
+void z_reset_audio(void) {if(!Z_SAMPLER_EDITION)z_dm_transport(0);
  dc_xl=dc_xr=dc_yl=dc_yr=0;live_effect=live_requested=0;live_blend=0;click_left=0;
  uint32_t i,t; for(i=0;i<Z_VOICES;i++)voices[i].active=0;
  for(t=0;t<6;t++){arp_count[t]=0;sustain[t]=0;applied_mode[t]=z_song.arp_mode[t];if(midi_out)midi_out(t,128,0,0);for(i=0;i<128;i++){arp_notes[t][i]=0;rec_active[t][i]=0;}for(i=0;i<16;i++)arp_physical[t][i]=0;arp_time[t]=0;arp_index[t]=0;}
@@ -188,16 +189,11 @@ void z_init(void) {
  for(i=0;i<6;i++)z_sample(i,z_factory_pcm[i],z_factory_n[i],11025);
  for(i=0;i<4;i++)z_sample(10+i,z_drum_pcm[i],z_drum_n[i],11025);
 #endif
- sampler_init();z_sampler.tracks=Z_SAMPLER_EDITION?63:0;z_reset_audio();edition_defaults();
-#if !Z_SAMPLER_EDITION
- h_init();h_tempo(z_song.bpm);h_legacy_begin(z_get(5,Z_LENGTH));for(i=0;i<64;i++){h_legacy_step(i,z_song.track[5].steps[i].note,z_song.track[5].steps[i].velocity);for(t=0;t<3;t++)if(z_song.chord[5][i][t])h_legacy_step(i,z_song.chord[5][i][t]-1,z_song.track[5].steps[i].velocity);}
-#endif
-
+ sampler_init();z_sampler.tracks=Z_SAMPLER_EDITION?63:0;z_reset_audio();edition_defaults();if(!Z_SAMPLER_EDITION)z_dm_migrate();
 }
 void z_note(uint32_t t,uint32_t note,uint32_t vel,uint32_t on) {
  uint32_t i,best=0,oldest=0xffffffffu;voice *v;
- if(t>=Z_TRACKS||note>127)return;
- if(z_drum_track(t))return; /* The nested drum suite owns track six's voices. */
+ if(t>=Z_TRACKS||note>127)return;if(z_drum_track(t)){z_dm_key(note,vel,on);return;}
  if(!on||!vel){if(z_drum_track(t))return;for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&voices[i].note==note){voices[i].released=1;if(!sustain[t]&&(voices[i].pad==255||voices[i].settings.mode))voices[i].stage=3;}return;}
  for(i=0;i<Z_VOICES;i++) { if(!voices[i].active){best=i;break;} if(voices[i].stamp<oldest){oldest=voices[i].stamp;best=i;} }
  v=&voices[best];
@@ -217,7 +213,7 @@ void z_note(uint32_t t,uint32_t note,uint32_t vel,uint32_t on) {
 }
 /* Panel, browser and external MIDI all enter through this same key path. */
 void z_key(uint32_t t,uint32_t n,uint32_t v,uint32_t on) {
- uint32_t i,physical=0,was;if(t>=6||n>127)return;on=on&&v;was=arp_physical[t][n/8]>>(n&7)&1;
+ uint32_t i,physical=0,was;if(t>=6||n>127)return;if(z_drum_track(t)){z_dm_key(n,v,on);return;}on=on&&v;was=arp_physical[t][n/8]>>(n&7)&1;
  for(i=0;i<16;i++)physical|=arp_physical[t][i];
  if(on){
   if(was)return; /* duplicate MIDI note-on must not advance or multiply a take */
@@ -273,7 +269,7 @@ static void arp_tick(void) {
 
 void z_bend(uint32_t t,uint32_t value){float pos,f;uint32_t i;if(t>=6)return;if(value>16383)value=16383;pos=69.0f+((int)value-8192)/4096.0f;i=(uint32_t)pos;f=pos-i;bend[t]=(z_frequency[i]*(1-f)+z_frequency[i+1]*f)/440.0f;}
 void z_sustain(uint32_t t,uint32_t on){uint32_t i;if(t>=6)return;sustain[t]=!!on;if(!on)for(i=0;i<8;i++)if(voices[i].active&&voices[i].track==t&&voices[i].released&&voices[i].stage!=4&&(voices[i].pad==255||voices[i].settings.mode))voices[i].stage=3;}
-void z_alloff(uint32_t t){uint32_t i;if(t>=6)return;for(i=0;i<128;i++)record_finish(t,i);arp_count[t]=0;if(midi_out)midi_out(t,128,0,0);sustain[t]=0;for(i=0;i<8;i++)if(voices[i].track==t)voices[i].active=0;for(i=0;i<128;i++)arp_notes[t][i]=0;for(i=0;i<16;i++)arp_physical[t][i]=0;arp_index[t]=0;arp_time[t]=0;}
+void z_alloff(uint32_t t){uint32_t i;if(t>=6)return;if(z_drum_track(t))z_dm_panic();for(i=0;i<128;i++)record_finish(t,i);arp_count[t]=0;if(midi_out)midi_out(t,128,0,0);sustain[t]=0;for(i=0;i<8;i++)if(voices[i].track==t)voices[i].active=0;for(i=0;i<128;i++)arp_notes[t][i]=0;for(i=0;i<16;i++)arp_physical[t][i]=0;arp_index[t]=0;arp_time[t]=0;}
 int z_arp_set(uint32_t t,uint32_t field,uint32_t value){uint32_t i;if(t>=6||field>3)return -1;
  if(field==0){if(value>4)return -1;if(z_song.arp_mode[t]!=value)z_alloff(t);z_song.arp_mode[t]=(uint8_t)value;applied_mode[t]=(uint8_t)value;}
  else if(field==1){if(value>3)return -1;z_song.arp_rate[t]=(uint8_t)value;}
@@ -284,7 +280,9 @@ int z_arp_set(uint32_t t,uint32_t field,uint32_t value){uint32_t i;if(t>=6||fiel
 }
 static void seq_step(void) {
  uint32_t t;pos=(pos+1)&63u;last_step_frame=audio_frame;if(z_song.metronome&&!(pos&3)){click_left=1100;click_phase=0;}
+ if(!Z_SAMPLER_EDITION)z_dm_clock();
  for(t=0;t<Z_TRACKS;t++) {
+  if(z_drum_track(t))continue;
   z_track *tr=&z_song.track[t];z_step *s=&tr->steps[pos%tr->p[Z_LENGTH]];
   if((!solo_track||solo_track==t+1)&&!tr->p[Z_MUTE]&&s->velocity&&(s->chance==127||(random32()&127)<(uint32_t)s->chance)&&(tr->p[Z_PROBABILITY]==127||(random32()&127)<(uint32_t)tr->p[Z_PROBABILITY])){
    uint32_t i,j,at=pos%tr->p[Z_LENGTH];
@@ -300,17 +298,13 @@ static void seq_step(void) {
   }
  }
 }
-void z_transport(uint32_t on) { if(!on){z_record(0);z_reset_audio();solo_track=0;}
-#if !Z_SAMPLER_EDITION
- h_transport(on);
-#endif
- playing=!!on;pos=63;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
+void z_transport(uint32_t on) {if(!Z_SAMPLER_EDITION)z_dm_transport(on); if(!on){z_record(0);z_reset_audio();solo_track=0;}playing=!!on;pos=63;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
 uint32_t z_external(uint32_t on) {external_clock=!!on;if(z_song.reserved!=(uint8_t)external_clock){z_song.reserved=(uint8_t)external_clock;z_touch();}return external_clock;}
 void z_clock(uint32_t status) {
  if(!external_clock)return;
  if(status==0xfa){clock_pulses=0;clock_beat_frame=audio_frame;clock_last_frame=audio_frame;z_transport(1);}
  else if(status==0xfb){playing=1;clock_last_frame=audio_frame;}
- else if(status==0xfc){uint32_t at=pos,ticks=clock_ticks;z_transport(0);pos=at;clock_ticks=ticks;}
+ else if(status==0xfc){uint32_t at=pos,ticks=clock_ticks,drums=dm_count;z_transport(0);pos=at;clock_ticks=ticks;dm_count=drums;}
  else if(status==0xf8){
   clock_last_frame=audio_frame;
   if(!clock_pulses)clock_beat_frame=audio_frame;
@@ -321,7 +315,7 @@ void z_clock(uint32_t status) {
   if(playing&&clock_ticks++%6==0)seq_step();
  }
 }
-void z_songpos(uint32_t sixteenths){if(!external_clock)return;pos=(sixteenths+63)&63;clock_ticks=0;last_step_frame=audio_frame;}
+void z_songpos(uint32_t sixteenths){if(!external_clock)return;pos=(sixteenths+63)&63;if(!Z_SAMPLER_EDITION)z_dm_songpos(sixteenths);clock_ticks=0;last_step_frame=audio_frame;}
 void z_tempo(uint32_t bpm,uint32_t swing) {z_song.bpm=(uint16_t)(bpm<30?30:bpm>300?300:bpm);z_song.swing=(uint8_t)(swing>60?60:swing);z_touch();}
 void z_step_set(uint32_t t,uint32_t i,uint32_t n,uint32_t v,uint32_t c,uint32_t g) {
  z_step *s;if(t>=Z_TRACKS||i>=64)return;z_checkpoint();s=&z_song.track[t].steps[i];s->note=(uint8_t)(n>127?127:n);s->velocity=(uint8_t)(v>127?127:v);s->chance=(uint8_t)(c>127?127:c);s->gate=(uint8_t)(g<1?1:g>127?127:g);z_song.duration[t][i]=0;{uint32_t j;for(j=0;j<3;j++)z_song.chord[t][i][j]=0;}z_touch();
@@ -387,6 +381,7 @@ void z_render(float *out,uint32_t n) {
    a=1+p[Z_DRIVE]/20.0f;x=sat(x*a)*1.4f*e*v->velocity*p[Z_LEVEL]/127.0f*0.5f;
    if(p[Z_MUTE]||(solo_track&&solo_track!=t+1))x=0;pan=clampf(p[Z_PAN]/128.0f+(v->pad==255?0:v->settings.pan/128.0f),-0.5f,0.5f);l+=x*(0.5f-pan);r+=x*(0.5f+pan);sendd+=x*p[Z_DELAY]/127.0f;sendr+=x*p[Z_REVERB]/127.0f;
   }
+  if(!Z_SAMPLER_EDITION)z_dm_audio(&l,&r,&sendd,&sendr,cut[5]);
   {uint32_t di=(delay_i+8192-6615)&8191;float dl=delay_l[di],dr=delay_r[di];delay_l[delay_i]=sendd+dr*0.36f;delay_r[delay_i]=sendd+dl*0.31f;l+=dl*0.5f;r+=dr*0.5f;delay_i=(delay_i+1)&8191;}
   {uint32_t a=comb_i%1499,b=comb_i%1877;float ra=comb_a[a],rb=comb_b[b];comb_a[a]=sendr+ra*0.69f;comb_b[b]=sendr+rb*0.72f;l+=ra*0.24f;r+=rb*0.24f;comb_i++;}
   if(click_left){float c=sine(click_phase)*0.13f*click_left/1100.0f;click_phase+=((pos&15)?1200:1800)/44100.0f;l+=c;r+=c;click_left--;}
@@ -417,13 +412,6 @@ void z_render(float *out,uint32_t n) {
   {float yl=l-dc_xl+0.99715f*dc_yl,yr=r-dc_xr+0.99715f*dc_yr;dc_xl=l;dc_xr=r;dc_yl=yl;dc_yr=yr;
    out[2*frame]=clampf(yl,-0.98f,0.98f);out[2*frame+1]=clampf(yr,-0.98f,0.98f);}
  }
-#if !Z_SAMPLER_EDITION
- {float drums[512];h_tempo(z_song.bpm);h_render(drums,n);
-  float level=z_get(5,Z_LEVEL)/127.0f,pan=(z_get(5,Z_PAN)+64)/127.0f;
-  if(z_get(5,Z_MUTE)||(z_solo_state()&&z_solo_state()!=6))level=0;
-  for(uint32_t i=0;i<n;i++){out[i*2]+=drums[i*2]*level*(1-pan);out[i*2+1]+=drums[i*2+1]*level*pan;}}
-#endif
-
 }
 uint32_t z_position(void){return pos;}
 uint32_t z_playing(void){return playing;}
@@ -432,5 +420,5 @@ float *z_buffer(void){return render_buffer;}
 uint8_t *z_transfer(void){return transfer;}
 uint32_t z_snapshot(void){return (uint32_t)(uintptr_t)&z_song;}
 #ifdef Z_WASM
-void z_preview_sample(uint32_t slot,uint32_t length,uint32_t rate){uint32_t i;if(!Z_SAMPLER_EDITION)return;if(slot>=4||length>Z_PCM_MAX)return;for(i=0;i<length;i++)preview_pcm[slot][i]=(int16_t)(transfer[2*i]|transfer[2*i+1]<<8);z_sample(6+slot,preview_pcm[slot],length,rate);}
+void z_preview_sample(uint32_t slot,uint32_t length,uint32_t rate){uint32_t i;if(slot>=4||length>Z_PCM_MAX)return;for(i=0;i<length;i++)preview_pcm[slot][i]=(int16_t)(transfer[2*i]|transfer[2*i+1]<<8);z_sample(6+slot,preview_pcm[slot],length,rate);}
 #endif

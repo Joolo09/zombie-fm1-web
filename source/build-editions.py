@@ -35,7 +35,7 @@ def presets():
 def prepare(kind):
     app=ED/kind;app.mkdir(exist_ok=True);sample=kind=='sampler';bank,values=presets()
     for p in (ED/'shared').iterdir():
-        if p.is_file():shutil.copy2(p,app/p.name)
+        if p.is_file() and p.name not in ("drum_suite.c","drum_suite.h"):shutil.copy2(p,app/p.name)
     title='ZOMBIE SAMPLER' if sample else 'ZOMBIE GROOVEBOX'
     (app/'edition.h').write_text(f'#pragma once\n#define Z_SAMPLER_EDITION {int(sample)}\n#define Z_EDITION_VERSION "{VERSION}"\n#define Z_EDITION_TITLE "{title}"\n#define Z_PROTOCOL_ID "ZCORE/1/{VERSION}/{kind}"\n',encoding='utf-8')
     (app/'fm1.toml').write_text(f'''name = "zombie-{kind}"
@@ -46,11 +46,10 @@ ble = false
 usb_audio_in = true
 usb_audio_out = false
 second_core = true
-o2 = ["dsp.c", "output.c", "drum_suite.c"]
-size_units = ["drum_suite.c"]
+o2 = ["dsp.c", "output.c"]
 words = "words.tsv"
 tagline = "Independent {kind}, animated 240x240 display and DAW MIDI"
-licence = "{'MIT / MPL-2.0 platform' if sample else 'GPL-3.0-only combined work; MIT synth, MPL-2.0 platform'}"
+licence = "MIT / MPL-2.0 platform"
 ''',encoding='utf-8')
     gen=app/'build/gen';gen.mkdir(parents=True,exist_ok=True)
     for p in (ED/'assets').glob('z_*.h'):
@@ -197,7 +196,7 @@ def main():
             shutil.copy2(fw,OUT/fw.name)
         exports=json.loads((ED/'assets/wasm-exports.json').read_text())
         wasm=OUT/f'{kind}.wasm'
-        run([os.environ.get('ZIG',str(ROOT/'.tooling/zig-windows-x86_64-0.13.0/zig.exe')),'cc','-target','wasm32-freestanding','-O2','-ffp-contract=off','-ffreestanding','-nostdlib','-DZ_WASM','-I'+str(app/'build/gen'),app/'dsp.c',app/'output.c',app/'drum_suite.c','-Wl,--no-entry','-Wl,--export-memory',*['-Wl,--export=z_'+n for n in exports],*(['-Wl,--export='+n for n in ['h_init','h_service','h_remote_release','h_models','h_presets','h_frame','h_flash','h_flash_dirty','h_ui_tick','h_button','h_key','h_knob','h_save','h_bpm','h_requested_playing','h_time','h_remote','h_set','h_get','h_set_global','h_set_step','h_load_preset','h_hit','h_pack','h_unpack']] if kind=='groovebox' else []),'-o',wasm],kind+'-wasm-build.log')
+        run([os.environ.get('ZIG',str(ROOT/'.tooling/zig-windows-x86_64-0.13.0/zig.exe')),'cc','-target','wasm32-freestanding','-O2','-ffp-contract=off','-ffreestanding','-nostdlib','-DZ_WASM','-I'+str(app/'build/gen'),app/'dsp.c',app/'output.c','-Wl,--no-entry','-Wl,--export-memory',*['-Wl,--export=z_'+n for n in exports],*(['-Wl,--export=z_dm_'+n for n in ['data','checkpoint','history_state','pattern','size','snapshot','apply','param','step','select','position','init','migrate']] if kind=='groovebox' else []),'-o',wasm],kind+'-wasm-build.log')
         (OUT/f'{kind}-presets.json').write_text(json.dumps(names),encoding='utf-8')
         if fw.exists():(OUT/(fw.name+'.sha256')).write_text(hashlib.sha256(fw.read_bytes()).hexdigest()+'  '+fw.name+'\n',encoding='utf-8')
     print('Edition builds ready; no physical FM-1 flashed.',flush=True)
