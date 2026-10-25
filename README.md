@@ -1,4 +1,6 @@
-# Zombie FM-1 · Groovebox / Sampler 0.8.0
+# Zombie FM-1 · Groovebox / Sampler
+
+Groovebox 0.10.1 beta fixes on-device recording and editing: immediate REC, preserved fast taps/retriggers, musical step gates, live overwrite, quantized-hit suppression and explicit step/part/track erasure with undo. The obsolete Hortator source import is removed; old release archives remain available. [Device controls and migration](downloads/Groovebox-0.10.1-RU.md).
 
 Groovebox 0.10.0 beta corrects the earlier Hortator integration: original Zombie drum mechanics live only on track 6, with the five synth tracks unchanged. See [controls, migration and tests](source/ZOMBIE-DRUMS-100.md). The default remains 0.8.3; older 0.9.x downloads retain their earlier behavior.
 

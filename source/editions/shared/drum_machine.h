@@ -31,3 +31,5 @@ void z_dm_panic(void);
 int z_dm_pattern(uint32_t);
 
 void z_dm_checkpoint(void);
+
+int z_dm_erase(uint32_t,uint32_t);

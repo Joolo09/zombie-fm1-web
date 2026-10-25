@@ -2,7 +2,7 @@ import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {decodeDrums,encodeDrums,wasmDrums,DRUM_BYTES} from '../webapp/groovebox-100/drum-state.js';
 const create=path=>new WebAssembly.Instance(new WebAssembly.Module(readFileSync(new URL(path,import.meta.url))),{}).exports;
-const fresh=()=>{const w=create('../webapp/groovebox-100/zombie-core.wasm');w.z_init();w.z_dm_init();return w;};
+const fresh=()=>{const w=create('../webapp/'+(process.argv[2]||'groovebox-100')+'/zombie-core.wasm');w.z_init();w.z_dm_init();return w;};
 const render=(w,n)=>{const out=[];for(let at=0;at<n;at+=256){const k=Math.min(256,n-at);w.z_render(w.z_buffer(),k);out.push(...new Float32Array(w.memory.buffer,w.z_buffer(),k*2));}return out;};
 const energy=a=>a.reduce((s,x)=>{assert(Number.isFinite(x)&&Math.abs(x)<=.981);return s+x*x;},0);
 for(let t=0;t<5;t++)for(let model=0;model<8;model++){

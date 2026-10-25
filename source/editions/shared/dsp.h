@@ -50,3 +50,5 @@ float *z_buffer(void);
 uint8_t *z_transfer(void);
 void z_preview_sample(uint32_t slot,uint32_t length,uint32_t rate);
 uint32_t z_voice_count(void);
+
+int z_erase(uint32_t,uint32_t,uint32_t);

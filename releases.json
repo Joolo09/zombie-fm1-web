@@ -162,6 +162,23 @@
       "file": "downloads/zombie-groovebox-0.10.0.fwsc",
       "editor": "webapp/groovebox-100/",
       "source": "downloads/groovebox-source-0.10.0.zip"
+    },
+    {
+      "product": "FM-1_63001001",
+      "version": "0.10.1",
+      "label": {
+        "ru": "Groovebox 0.10.1 BETA · запись и удаление на FM-1",
+        "en": "Groovebox 0.10.1 BETA · device recording and editing"
+      },
+      "notes": {
+        "ru": "REC срабатывает сразу; быстрые касания сохраняются, пошаговые ноты имеют ровную длину, перезапись обновляет длительность. Исправлены повторные удары при квантовании и очистка шага/партии/дорожки с Undo. Удалён старый импорт Hortator. Проекты 0.10.0 совместимы. Проверено в симуляторе, на физическом FM-1 ещё не проверено.",
+        "en": "Immediate REC, preserved fast taps, consistent step gates and measured live overwrite. Fixes quantized duplicate hits and step/part/track erasure with undo. Removes the obsolete Hortator source import. Compatible with 0.10.0 projects. Simulator tested; physical FM-1 not yet tested."
+      },
+      "bytes": 610100,
+      "sha256": "877fd7db58015dc69c002bb0383443b51a45356a20f2768d8abe6c4f03814831",
+      "file": "downloads/zombie-groovebox-0.10.1.fwsc",
+      "editor": "webapp/groovebox-101/",
+      "source": "downloads/groovebox-source-0.10.1.zip"
     }
   ]
 }

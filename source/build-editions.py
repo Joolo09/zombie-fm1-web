@@ -35,7 +35,7 @@ def presets():
 def prepare(kind):
     app=ED/kind;app.mkdir(exist_ok=True);sample=kind=='sampler';bank,values=presets()
     for p in (ED/'shared').iterdir():
-        if p.is_file() and p.name not in ("drum_suite.c","drum_suite.h"):shutil.copy2(p,app/p.name)
+        if p.is_file():shutil.copy2(p,app/p.name)
     title='ZOMBIE SAMPLER' if sample else 'ZOMBIE GROOVEBOX'
     (app/'edition.h').write_text(f'#pragma once\n#define Z_SAMPLER_EDITION {int(sample)}\n#define Z_EDITION_VERSION "{VERSION}"\n#define Z_EDITION_TITLE "{title}"\n#define Z_PROTOCOL_ID "ZCORE/1/{VERSION}/{kind}"\n',encoding='utf-8')
     (app/'fm1.toml').write_text(f'''name = "zombie-{kind}"

@@ -23,4 +23,4 @@ Checks:
 - Python tests/test_save_led.py HOST_EXECUTABLE: K2/SAVE regression.
 - node tests/web-installer.mjs: installer/manifest checks.
 
-Historical 0.9.x source remains only for earlier releases and is excluded from the 0.10.0 source archive and build. The default release remains 0.8.3 until the new behavior is approved and tested.
+Historical 0.9.x source is retained in its published source archives, and is excluded from current source builds. The default release remains 0.8.3 until the new behavior is approved and tested.
