@@ -225,7 +225,7 @@ static void draw_head(void)
 {
     char b[16], m[16];
     uint32_t k;
-    int32_t x, lvl;
+    int32_t x;
     uint32_t rec = (song.rec >> song.sel) & 1u ? 2u : song.rec != 0u, cpu = cpu_alert();
     uint32_t pfx = (perf_k[0] | perf_k[1] | perf_k[2]) != 0;   /* PERFORM's knob effects on (spec §7; DEPTH acts only
                                                                  * with a held black key) */

@@ -19,17 +19,18 @@ static void h_protocol_check(void){
  ed_check(h_wire(44,(uint8_t[]){8,1,7,0},4)!=0,"invalid drum lane rejected");
  ed_check(h_wire(45,(uint8_t[]){0,63,1,1,56,3,12},7)==0,"last step, condition and ratchet command");
  ed_check(h_wire(45,(uint8_t[]){0,64,1,1,56,3,12},7)!=0,"step outside pattern rejected");
- ed_check(h_wire(43,0,0)==0,"independent drum snapshot command");memcpy(bytes,raw_reply+1,3288);
- wr32(begin,crc32(bytes,3288));ed_check(h_wire(47,begin,4)==0,"begin drum project transfer");
+ ed_check(h_wire(46,(uint8_t[]){0,177,0},3)==0,"set imported project tempo");ed_check(h_wire(43,0,0)==0,"independent drum snapshot command");memcpy(bytes,raw_reply+1,3288);
+ z_tempo(120,0);wr32(begin,crc32(bytes,3288));ed_check(h_wire(47,begin,4)==0,"begin drum project transfer");
  ed_check(h_wire(48,0,0)!=0,"incomplete drum project transfer rejected");
  ed_check(h_wire(47,begin,4)==0,"restart drum transfer");
  for(uint32_t i=0;i<3288;i+=192){uint32_t n=3288-i;if(n>192)n=192;payload[0]=(uint8_t)i;payload[1]=(uint8_t)(i>>8);memcpy(payload+2,bytes+i,n);ed_check(h_wire(17,payload,n+2)==0,"drum transfer chunk");}
- ed_check(h_wire(48,0,0)==0,"validated drum project committed");
+ ed_check(h_wire(48,0,0)==0,"validated drum project committed");ed_check(z_song.bpm==177,"drum project import preserves tempo");
  ed_check(!memcmp(before.track,z_song.track,5*sizeof(z_song.track[0])),"drum commands preserve five synth tracks");
 }
 #endif
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
  #if !Z_SAMPLER_EDITION
+ if(!strcmp(cmd,"auditcheck")){int rc=h_audit_check();printf("Audit check stage: %d\n",rc);ed_check(rc==0,"motion export, pending import, active save slot, fresh flash and remote key release");h_test_discard_write=1;ed_check(h_save()!=0,"SAVE reports a silent flash write/read-back failure");h_test_discard_write=0;z_song.selected=5;seq_out(0,60,100,1);off_deadline[0][60]=plat_ms();app_input_only();ed_check(!off_deadline[0][60],"synth MIDI note-offs run while drum panel is selected");return 1;}
  if(!strcmp(cmd,"hortatorcheck")){h_protocol_check();int rc=h_host_check();printf("Hortator check stage: %d\n",rc);ed_check(rc==0,"ratchets, probability, Grids, motion, CPU caps, user presets, four projects and song");return 1;}
 #endif
  if(!strcmp(cmd,"editioncheck")){ed_checks();return 1;}
@@ -49,6 +50,10 @@ int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const
 }
 int app_expect(const char *what,int *got){
  if(!strcmp(what,"dirty"))*got=saved_revision!=z_revision()||system_dirty;
+
+#if !Z_SAMPLER_EDITION
+ else if(!strcmp(what,"drum_keys"))*got=h_host_keys_mode();
+#endif
  else if(!strcmp(what,"midi_mode"))*got=z_sys.midi_mode;
  else if(!strcmp(what,"model"))*got=z_get(z_song.selected,Z_MODEL);
  else if(!strcmp(what,"voices"))*got=z_voice_count();

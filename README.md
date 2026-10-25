@@ -65,3 +65,6 @@ storage and updates remain unverified. 0.8.3 remains the default.
 The combined 0.9.0 firmware/WASM is GPL-3.0-only; standalone original Zombie
 source retains its MIT notices. The complete matching source archive is
 `downloads/groovebox-source-0.9.0.zip`.
+
+Groovebox 0.9.1 beta: [audit fixes and verification](source/AUDIT-091.md),
+[Russian release notes](downloads/Groovebox-0.9.1-RU.md). Default remains 0.8.3.

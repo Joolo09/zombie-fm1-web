@@ -102,8 +102,21 @@ export class PatternHistory {
 }
 export class AudioEngine {
  constructor(module,onMessage){this.module=module;this.onMessage=onMessage;this.requests=new Map();this.requestId=0;this.stateEpoch=0;}
- async start(){if(!this.context){this.context=new AudioContext({sampleRate:44100,latencyHint:'interactive'});if(this.context.sampleRate!==44100){await this.context.close();this.context=null;throw Error('44.1 kHz audio required');}await this.context.audioWorklet.addModule(new URL('./worklet.js',import.meta.url));this.node=new AudioWorkletNode(this.context,'zombie-core',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module}});this.node.port.onmessage=e=>{const reply=e.data;if(reply.requestId){const r=this.requests.get(reply.requestId);if(r){clearTimeout(r.timer);this.requests.delete(reply.requestId);r.resolve(reply);}return;}this.onMessage(reply);};this.gain=this.context.createGain();this.gain.gain.value=.7;this.node.connect(this.gain).connect(this.context.destination);}await this.context.resume();}
+ async start(){
+  if(this.starting)return this.starting;
+  this.starting=(async()=>{try{
+   if(!this.context){this.context=new AudioContext({sampleRate:44100,latencyHint:'interactive'});
+    if(this.context.sampleRate!==44100)throw Error('44.1 kHz audio required');
+    await this.context.audioWorklet.addModule(new URL('./worklet.js?v=091',import.meta.url));
+    this.node=new AudioWorkletNode(this.context,'zombie-core',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module}});
+    this.node.port.onmessage=e=>{const reply=e.data;if(reply.requestId){const r=this.requests.get(reply.requestId);if(r){clearTimeout(r.timer);this.requests.delete(reply.requestId);if(reply.error)r.reject(Error(reply.error));else r.resolve(reply);}return;}this.onMessage(reply);};
+    this.gain=this.context.createGain();this.gain.gain.value=.7;this.node.connect(this.gain).connect(this.context.destination);
+   }await this.context.resume();
+  }catch(e){this.node?.disconnect();const context=this.context;this.node=this.context=null;await context?.close().catch(()=>{});throw e;}})();
+  try{await this.starting;}finally{this.starting=null;}
+ }
+
  send(type,data={}){if(type==='state')this.stateEpoch++;this.node?.port.postMessage({type,...data,epoch:this.stateEpoch});}
- command(type,data={}){if(!this.node)return Promise.resolve(null);return new Promise((resolve,reject)=>{const requestId=++this.requestId,timer=setTimeout(()=>{this.requests.delete(requestId);reject(Error('Audio command timeout'));},2000);this.requests.set(requestId,{resolve,reject,timer});this.node.port.postMessage({type,...data,requestId});});}
- async close(){for(const r of this.requests.values()){clearTimeout(r.timer);r.reject(Error('Audio closed'));}this.requests.clear();this.send('panic');this.node?.disconnect();await this.context?.close();this.node=this.context=null;}
+ command(type,data={}){if(!this.node)return Promise.resolve(null);return new Promise((resolve,reject)=>{const requestId=++this.requestId,timer=setTimeout(()=>{this.requests.delete(requestId);reject(Error('Audio command timeout'));},2000);this.requests.set(requestId,{resolve,reject,timer});try{this.node.port.postMessage({type,...data,requestId});}catch(e){clearTimeout(timer);this.requests.delete(requestId);reject(e);}});}
+ async close(){await this.starting?.catch(()=>{});for(const r of this.requests.values()){clearTimeout(r.timer);r.reject(Error('Audio closed'));}this.requests.clear();this.send('panic');this.node?.disconnect();const context=this.context;this.node=this.context=null;await context?.close();}
 }

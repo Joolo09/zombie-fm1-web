@@ -1,4 +1,4 @@
-# Hortator inside Zombie Groovebox track 6 (0.9.0 beta)
+# Hortator inside Zombie Groovebox track 6 (0.9.1 beta)
 
 This combines the actual Hortator 0.23.3 drum DSP, sequencer and pixel UI with
 Zombie's five existing synth tracks. It is an experimental device build:
@@ -103,9 +103,11 @@ and tempo are shared, as in the original groovebox.
 Use the existing platform/toolchain setup, then:
 
 ```
-python -X utf8 source/build-groovebox-090.py
+python -X utf8 source/build-groovebox-091.py
 node tests/test_hortator_suite.mjs
 node tests/test_hortator_worklet.mjs
+node tests/test_drum_store.mjs
+node tests/test_audio_engine.mjs
 python -X utf8 tests/test_hortator_host.py source/editions/groovebox/build/host/zombie-groovebox_host
 python -X utf8 tests/test_save_led.py source/editions/groovebox/build/host/zombie-groovebox_host
 node --test tests/web-installer.mjs
@@ -126,3 +128,5 @@ are distributed under GPL-3.0-only, with original MIT/MPL notices retained.
 The original standalone Zombie synth source remains MIT. Read the upstream
 LICENSE, LICENSING.md and LICENSES for individual component attribution.
 The proprietary Hügelton sample assets and panel photograph are not included.
+
+Audit fixes and validation: [AUDIT-091.md](../AUDIT-091.md).

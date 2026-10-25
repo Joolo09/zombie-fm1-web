@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only — real C/WASM DSP and state checks. */
 import assert from 'node:assert/strict';
 import {readFile,writeFile} from 'node:fs/promises';
-const bytes=await readFile(new URL('../source/output/editions-0.9.0/groovebox.wasm',import.meta.url));
+const bytes=await readFile(new URL('../source/output/editions-0.9.1/groovebox.wasm',import.meta.url));
 const module=await WebAssembly.compile(bytes);
 const make=()=>new WebAssembly.Instance(module,{}).exports;
 const w=make();w.z_init();
@@ -55,5 +55,15 @@ for(let track=0;track<5;track++)for(const preset of [0,8,16,24,32,40,48,56]){
  }
 }
 console.log('PASS exact five-track synth audio against the released WASM (40 cases)');
-w.z_init();w.h_ui_tick();await writeFile(new URL('../source/output/editions-0.9.0/hortator-screen.rgb565',import.meta.url),new Uint8Array(w.memory.buffer,w.h_frame(),240*240*2));
+w.z_init();w.h_ui_tick();await writeFile(new URL('../source/output/editions-0.9.1/hortator-screen.rgb565',import.meta.url),new Uint8Array(w.memory.buffer,w.h_frame(),240*240*2));
 console.log('PASS native Hortator UI framebuffer generated');
+
+let seed=0x51f15e37;const rnd=n=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed%n;};
+for(let test=0;test<120;test++){
+ const f=make();f.z_init();
+ for(let k=0;k<8;k++){f.h_set(k,0,rnd(45));for(let j=0;j<32;j++)f.h_set(k,rnd(70),rnd(256)-128);for(let j=0;j<8;j++)assert.equal(f.h_set_step(k,rnd(64),1,rnd(2),rnd(57),rnd(4),rnd(128)-60),0);}
+ const ptr=f.z_transfer(),n=f.h_pack(ptr);assert.equal(f.h_unpack(ptr,n),0,`self-export rejected in case ${test}`);
+ f.z_transport(1);for(let k=0;k<8;k++)f.h_hit(k,127);
+ for(let b=0;b<32;b++){f.z_render(f.z_buffer(),256);for(const v of new Float32Array(f.memory.buffer,f.z_buffer(),512))assert(Number.isFinite(v));f.z_post(127,1,f.z_buffer(),256);for(const v of new Float32Array(f.memory.buffer,f.z_buffer(),512))assert(Math.abs(v)<=1);}
+}
+console.log('PASS 120 deterministic eight-lane parameter/pattern/import/audio stress cases without WASM bounds traps');

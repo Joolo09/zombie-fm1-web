@@ -109,7 +109,7 @@ static struct { uint32_t stage, page, home, ui_frames; } felucca_dbg;
 #include "ported/gfx.c"
 #include "../third_party/hortator/firmware/src/panel.c"
 #include "../third_party/hortator/firmware/src/pages.c"
-#define FELUCCA_VERSION "H 0.23.3 / Z 0.9.0"
+#define FELUCCA_VERSION "H 0.23.3 / Z 0.9.1"
 #include "../third_party/hortator/firmware/src/ui.c"
 #ifndef UI_NO_DRAW
 #include "ported/ui_draw.c"
@@ -148,10 +148,10 @@ void h_init(void){
  memset(dly_buf,0,sizeof dly_buf);memset(cho_buf,0,sizeof cho_buf);memset(rev_comb,0,sizeof rev_comb);memset(&rev_u,0,sizeof rev_u);
  memset(rs_buf,0,sizeof rs_buf);memset(sl_buf,0,sizeof sl_buf);memset(sl,0,sizeof sl);memset(&fx,0,sizeof fx);memset(&mo,0,sizeof mo);memset(&chain,0,sizeof chain);memset(&song,0,sizeof song);
  memset(metal_ph,0,sizeof metal_ph);metal_blk=0xffffffffu;dvage=0;mi_w=mi_r=0;comp_reset();
+ memset(proj_slot,0,sizeof proj_slot); /* Flash is authoritative, including restored browser images. */
  persist_boot();settings_init();panel_init();drum_tracks_init();
- if(lastp.set&&proj_ok(&proj_slot[lastp.slot&3]))project_load(lastp.slot);
  memset(&ui,0,sizeof ui);ui.home=1;ui.hmode=1;ui.force=1;
- song.master_q12=4096;safe_start=0;
+ song.master_q12=4096;safe_start=0;project_boot();
 }
 void h_render(float *out,uint32_t n){
  int32_t b[CTL*2];
@@ -174,6 +174,7 @@ void h_input(uint32_t buttons,uint32_t keys,const int32_t *enc){
  ui_input();ui_leds();
  if(led_dim_on){uint32_t ms=h_platform_ms();led_br_lit=(ms%20u)<led_br_level(ms%1130u*1024u/1130u)*20u/65536u;for(uint32_t c=0;c<FM1_NCOL;c++)fm1_led[c]=(uint8_t)led_dim_compose(led_lay[c],ms%20u);}
 }
+void h_service(void){uint32_t f=h_platform_lock();fm1_ms=h_platform_ms();settings_poll();h_platform_unlock(f);}
 void h_draw(void){fm1_ms=h_platform_ms();felucca_dbg.ui_frames++;ui_draw();}
 void h_transport(uint32_t on){transport_req=on?1:2;}
 void h_tempo(uint32_t bpm){song.g[G_BPM]=(int16_t)clamp(bpm,30,300);}
@@ -191,7 +192,7 @@ uint32_t h_presets(void){return PRE_NFACT;}
 
 uint32_t h_requested_playing(void){return transport_req==1?1:transport_req==2?0:song.playing;}
 void h_select(int32_t d){song.sel=(uint8_t)((song.sel+NTRK+d%(int32_t)NTRK)%NTRK);ui.force=1;}
-int h_save(void){transport_req=0;seq_stop();h_store_error=0;project_save(song.g[G_SLOT]>=1&&song.g[G_SLOT]<=4?(uint32_t)song.g[G_SLOT]-1:lastp.set?lastp.slot:0);settings_save();return h_store_error?-1:0;}
+int h_save(void){uint32_t f=h_platform_lock();transport_req=0;seq_stop();h_store_error=!flash_ok;project_save(song.g[G_SLOT]>=1&&song.g[G_SLOT]<=4?(uint32_t)song.g[G_SLOT]-1:lastp.set?lastp.slot:0);settings_save();int rc=h_store_error?-1:0;h_platform_unlock(f);return rc;}
 uint32_t h_has_project(void){return lastp.set;}
 void h_legacy_begin(uint32_t length){if(lastp.set)return;for(uint32_t k=0;k<NTRK;k++){for(uint32_t i=0;i<NSTEP;i++)memset(&trk[k].step[i],0,sizeof(step_t));trk[k].p[P_SLEN]=(int16_t)clamp(length,1,64);}}
 void h_legacy_step(uint32_t at,uint32_t note,uint32_t velocity){if(lastp.set||at>=64||!velocity)return;for(uint32_t k=0;k<NTRK;k++)if((uint32_t)trk[k].p[P_NOTE]==note){trk[k].step[at].on=1;trk[k].step[at].acc=velocity>104;}}
@@ -221,10 +222,11 @@ int h_set_step(uint32_t lane,uint32_t at,uint32_t on,uint32_t accent,uint32_t co
 }
 int h_load_preset(uint32_t lane,uint32_t id){if(lane>=8)return -1;int rc=preset_load(&trk[lane],id);ui.force=1;return rc;}
 void h_hit(uint32_t lane,uint32_t velocity){if(lane<8&&velocity&&velocity<=127)input_hit(&trk[lane],velocity);}
+static int16_t h_patch_value(uint32_t lane,uint32_t param){return ((mo.base_ok>>lane)&1u)&&motion_moved(lane,param)?mo.base[lane][param]:*motion_slot(&trk[lane],param);}
 uint32_t h_pack(uint8_t *dst){
  project_t *p=(project_t*)dst;memset(p,0,sizeof *p);p->magic=PROJ_MAGIC;p->size=sizeof *p;
  for(uint32_t i=0;i<G_COUNT;i++)p->g[i]=song.g[i];p->sel=song.sel;
- for(uint32_t k=0;k<NTRK;k++){for(uint32_t i=0;i<P_NSTORED;i++)p->t[k].p[i]=(int8_t)trk[k].p[i];memcpy(p->t[k].step,trk[k].step,sizeof trk[k].step);proj_xp_put(&p->t[k],trk[k].p);p->pre[k]=(uint16_t)preset_rec_enc(trk[k].pre);p->pre_ed[k]=trk[k].pre_ed;}
+ for(uint32_t k=0;k<NTRK;k++){for(uint32_t i=0;i<P_NSTORED;i++)p->t[k].p[i]=(int8_t)h_patch_value(k,i);memcpy(p->t[k].step,trk[k].step,sizeof trk[k].step);for(uint32_t i=P_NSTORED;i<P_COUNT;i++)p->t[k].step[i-P_NSTORED].rsv=(uint8_t)clamp(h_patch_value(k,i),0,255);p->pre[k]=(uint16_t)preset_rec_enc(trk[k].pre);p->pre_ed[k]=trk[k].pre_ed;}
  p->motion=mo.s;p->song=chain.cfg;memcpy(p->name,chain.name,NAME_LEN);p->sum=proj_sum(p);return sizeof *p;
 }
 int h_unpack(const uint8_t *src,uint32_t n){
@@ -236,12 +238,12 @@ int h_unpack(const uint8_t *src,uint32_t n){
   for(uint32_t i=0;i<P_NSTORED;i++){const param_desc_t *d=i>=P_E0&&i<=P_E7?&DMODELS[m].edit[i-P_E0]:&TP[i];if(p->t[k].p[i]<d->min||p->t[k].p[i]>d->max)return -1;}
   for(uint32_t at=0;at<64;at++)if(p->t[k].step[at].cond>COND_MAX||p->t[k].step[at].nt<NT_MIN||p->t[k].step[at].nt>NT_MAX)return -1;
  }
- seq_stop();for(uint32_t i=0;i<G_COUNT;i++)song.g[i]=p->g[i];song.sel=p->sel;
+ transport_req=0;seq_stop();for(uint32_t i=0;i<G_COUNT;i++)song.g[i]=p->g[i];song.sel=p->sel;
  for(uint32_t k=0;k<8;k++){track_t *t=&trk[k];drum_set_model(t,(uint32_t)p->t[k].p[P_MODEL]);for(uint32_t i=0;i<P_NSTORED;i++)t->p[i]=p->t[k].p[i];for(uint32_t i=P_NSTORED;i<P_COUNT;i++)t->p[i]=(int16_t)clamp(proj_xp_get(&p->t[k],i),TP[i].min,TP[i].max);memcpy(t->step,p->t[k].step,sizeof t->step);t->pre=(uint16_t)preset_ref(preset_rec_dec(p->pre[k]),t->model);t->pre_ed=p->pre_ed[k]?1:0;}
  mo.s=p->motion;chain.cfg=p->song;memcpy(chain.name,p->name,NAME_LEN);chain.name[NAME_LEN]=0;motion_forget();ui.force=1;return 0;
 }
 
-void h_remote_release(void){h_remote_buttons=h_remote_keys=0;}
+void h_remote_release(void){if(!(h_remote_buttons|h_remote_keys))return;h_remote_buttons=h_remote_keys=0;int32_t enc[7]={0};h_input(h_physical_buttons,h_physical_keys,enc);}
 
 #ifdef PLAT_HOST
 #include "host_checks.inc"

@@ -15,7 +15,7 @@ const out=[[new Float32Array(128),new Float32Array(128)]];
 for(let i=0;i<48;i++){assert.equal(p.process([],out),true);for(const c of out[0])for(const v of c)assert(Number.isFinite(v));}
 assert.equal(w.z_playing(),1);assert(p.messages.some(d=>d.hFrame?.length===115200&&d.hProject?.length===3288));
 send({type:'hSnapshot',requestId:77});const reply=p.messages.find(d=>d.requestId===77);assert.equal(reply.drum.length,3288);
-send({type:'hImport',bytes:reply.drum});send({type:'hImport',bytes:new Uint8Array(3288)});
+w.h_set_global(0,177);send({type:'hSnapshot',requestId:78});const imported=p.messages.find(d=>d.requestId===78).drum;w.z_tempo(120,0);send({type:'hImport',bytes:imported,requestId:79});assert.equal(w.z_playing(),0);for(let i=0;i<4;i++)p.process([],out);assert.equal(w.h_bpm(),177);send({type:'hImport',bytes:new Uint8Array(3288),requestId:80});assert.equal(p.messages.find(d=>d.requestId===80).error,'Invalid drum project');
 assert(p.messages.some(d=>d.error==='Invalid drum project'));
 send({type:'hControl',kind:0,index:7,value:1});assert.equal(w.z_playing(),0);
 for(let i=0;i<16;i++)p.process([],out);assert(p.messages.some(d=>d.hFlash?.length===0x100000));
