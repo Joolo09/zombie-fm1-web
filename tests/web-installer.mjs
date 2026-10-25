@@ -91,4 +91,11 @@ await test('failed final acknowledgement never reports a completed transfer',asy
 await test('unrelated MIDI outputs are never probed',async()=>{
  let sent=0;const access={inputs:new Map([['x',{name:'FM-1',state:'connected'}]]),outputs:new Map([['x',{name:'Other Synth',state:'connected',send(){sent++;}}]])};assert.equal(await new Updater(access).find(),null);assert.equal(sent,0);
 });
+await test('Hortator-named ports are discovered by the FM-1 identity handshake',async()=>{
+ const device=new VirtualFM1();device.input.name=device.output.name='Hortator';const found=await device.updater().find();assert(found);assert.equal(found.id.model,'FM-1');await found.link.close();
+});
+await test('partially opened MIDI ports are released after output open failure',async()=>{
+ let closed=0;const input={name:'FM-1',state:'connected',open:async()=>{},close:async()=>{closed++;}},output={name:'FM-1',state:'connected',open:async()=>{throw Error('Busy');},close:async()=>{closed++;}};
+ assert.equal(await new Updater({inputs:new Map([['in',input]]),outputs:new Map([['out',output]])}).find(),null);assert.equal(closed,2);
+});
 console.log(`${passed} web-installer checks passed. USB device was simulated; no hardware was flashed.`);
