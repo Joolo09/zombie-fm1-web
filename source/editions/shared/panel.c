@@ -4,7 +4,7 @@ enum {U_TRACK=Z_PARAMS,U_PRESET,U_OCT,U_BPM,U_SWING,U_CLOCK,U_LANGUAGE,U_BANK,
       U_ARP_MODE,U_ARP_RATE,U_ARP_OCT,U_ARP_HOLD,U_STEP,U_NOTE,U_VELOCITY,U_GATE,U_CHANCE,U_REC_MODE,U_REC_QUANT,U_CLICK,U_FX_AMOUNT,U_FX_RATE,U_CORE,U_TRIM,U_LIMITER,U_GLOW,U_CURVE,U_START,U_MIDI_MODE,U_DAW_TRANSPORT,U_DURATION,U_CHORD1,U_CHORD2,U_CHORD3,U_PAD_SOURCE,U_PAD_TUNE,U_PAD_GAIN,U_PAD_MODE,U_DRUM_SOUND,U_DRUM_LEVEL,U_DRUM_DECAY,U_DRUM_TUNE,U_DRUM_LENGTH,U_DRUM_MUTE,U_DRUM_PAN};
 static const char *word(const char *ru,const char *en){return z_song.language?en:ru;}
 static const uint8_t section_button[Z_SECTIONS]={B_HOME,B_FX,B_SEL,B_ENV,B_LFO,B_EDIT,B_GLO,B_ARP,B_SEQ};
-static uint8_t sampler_page,page_memory[Z_SECTIONS],layer_locked,roll_edit;
+static uint8_t sampler_page,page_memory[Z_SECTIONS],layer_locked,roll_edit,roll_note_slot;
 enum {SECTION_HOLD_MS=400};
 static const uint8_t page_count[Z_SECTIONS]={2,3,2,2,2,Z_SAMPLER_EDITION?4:3,6,2,3};
 static const uint8_t pages[Z_SECTIONS][6][4]={
@@ -42,9 +42,9 @@ static int panel_setting(uint32_t id,uint32_t value){
  else if(id==2){if(value>=page_count[z_song.section])return 0;z_song.subpage=(uint8_t)value;page_memory[z_song.section]=(uint8_t)value;}
  else if(id==3){if(value>3)return 0;z_song.step_bank=(uint8_t)value;z_song.step_edit=(uint8_t)(value*16+z_song.step_edit%16);}
  else if(id==4){if(value>1)return 0;z_record(value);}
- else if(id==5){if(value>63)return 0;z_song.step_edit=(uint8_t)value;z_song.step_bank=(uint8_t)(value/16);}
+ else if(id==5){if(value>63)return 0;roll_note_slot=0;z_song.step_edit=(uint8_t)value;z_song.step_bank=(uint8_t)(value/16);}
  else if(id==6){if(value>1)return 0;z_song.language=(uint8_t)value;}
- else if(id==7){if(value>=6)return 0;z_song.selected=(uint8_t)value;if(z_sys.midi_mode==2)midi_cc(15,110,value);}
+ else if(id==7){if(value>=6)return 0;roll_note_slot=0;z_song.selected=(uint8_t)value;if(z_sys.midi_mode==2)midi_cc(15,110,value);}
  else if(id==8){if(value>1)return 0;z_external(value);}
  else if(id==9){if(value>1)return 0;z_song.rec_mode=value;}
  else if(id==10){if(value>1)return 0;z_song.rec_quant=value;}
@@ -120,7 +120,7 @@ static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;
  number(value,str);return str;
 }
 static void edit_stop(void){if(z_song.recording){z_record(0);z_alloff(z_song.selected);}}
-static void knob(uint32_t id,int delta){if(id==U_NOTE||id==U_VELOCITY||id==U_GATE||id==U_DURATION||id==U_CHANCE||(id>=U_CHORD1&&id<=U_CHORD3))edit_stop();uint32_t t=z_song.selected;int value;z_step s=z_song.track[t].steps[z_song.step_edit];
+static void knob(uint32_t id,int delta){if(id==U_NOTE)roll_note_slot=0;else if(id>=U_CHORD1&&id<=U_CHORD3)roll_note_slot=id-U_CHORD1+1;if(id==U_NOTE||id==U_VELOCITY||id==U_GATE||id==U_DURATION||id==U_CHANCE||(id>=U_CHORD1&&id<=U_CHORD3))edit_stop();uint32_t t=z_song.selected;int value;z_step s=z_song.track[t].steps[z_song.step_edit];
  if(id<Z_PARAMS){if(z_sys.midi_mode==2&&(id==Z_LEVEL||id==Z_PAN)){uint32_t at=id==Z_LEVEL?4:5;daw_values[t][at]=(uint8_t)clamp((int)daw_values[t][at]+delta,0,127);daw_touch_at=plat_ms();midi_cc(z_get(t,Z_CHANNEL)-1,id==Z_LEVEL?7:10,daw_values[t][at]);redraw_at=0;return;}z_set(t,id,z_get(t,id)+delta);return;}
  switch(id){
   case U_DRUM_LENGTH:edit_stop();z_dm_param(z_dm.selected,5,clamp((int)z_dm.sound[z_dm.selected].length+delta,1,64));break;
@@ -170,13 +170,14 @@ static void knob(uint32_t id,int delta){if(id==U_NOTE||id==U_VELOCITY||id==U_GAT
    else if(id==U_CHANCE)s.chance=(uint8_t)clamp(s.chance+delta,0,127);
    z_checkpoint();z_song.track[t].steps[z_song.step_edit]=s;z_touch();break;
  }
+ if(!Z_SAMPLER_EDITION&&!z_sys.midi_mode&&!z_playing()&&(id==U_NOTE||id==U_VELOCITY||id==U_DURATION||(id>=U_CHORD1&&id<=U_CHORD3)))z_audition_step(t,z_song.step_edit);
 }
 static int active_layer=-1;
 static uint8_t button_used[NB];
 static uint32_t button_since[NB],layer_mask,tap_at,tap_sum,tap_count;
 static uint8_t return_section,return_page,layer_page,key_layer[27];
 static uint32_t new_project_confirm;
-static void panel_reset(void){uint32_t i;roll_edit=0;new_project_confirm=0;active_layer=-1;layer_locked=0;sampler_page=0;layer_mask=0;drum_choice=(uint8_t)z_drum_note(z_dm.selected);for(i=0;i<Z_SECTIONS;i++)page_memory[i]=0;tap_at=tap_sum=tap_count=0;for(i=0;i<NB;i++){button_since[i]=0;button_used[i]=0;}return_section=return_page=layer_page=0;}
+static void panel_reset(void){uint32_t i;roll_note_slot=roll_edit=0;new_project_confirm=0;active_layer=-1;layer_locked=0;sampler_page=0;layer_mask=0;drum_choice=(uint8_t)z_drum_note(z_dm.selected);for(i=0;i<Z_SECTIONS;i++)page_memory[i]=0;tap_at=tap_sum=tap_count=0;for(i=0;i<NB;i++){button_since[i]=0;button_used[i]=0;}return_section=return_page=layer_page=0;}
 static const char *const fx_names[16]={"DUCK","CHOP","TREMOLO","BITS","DRIVE","MONO","SWAP","PUMP","RING","BOOST","RIGHT","LEFT","GATE","FUZZ","PHASE","CUT"};
 static void tap_tempo(uint32_t now){uint32_t ms=now-tap_at;tap_at=now;if(ms<200||ms>2000){tap_sum=0;tap_count=0;return;}tap_sum+=ms;if(++tap_count>4){tap_sum=ms;tap_count=1;}z_tempo(60000u*tap_count/tap_sum,z_song.swing);}
 /* EDIT + keyboard writes the focused step without entering a recording take. */
@@ -195,8 +196,21 @@ static void roll_note(uint32_t t,uint32_t at,uint32_t note,uint32_t velocity){
  else {v->velocity=0;z_song.duration[t][at]=0;}
  z_touch();
 }
+static int roll_grid(void){return !Z_SAMPLER_EDITION&&!z_sys.midi_mode&&z_song.section==Z_SEQ&&!z_song.recording&&!roll_edit&&active_layer<0;}
+static void roll_step_key(uint32_t j){
+ uint32_t t=z_song.selected,at=z_song.step_bank*16+j;uint32_t pitch=z_song.track[t].steps[z_song.step_edit].note;edit_stop();panel_setting(5,at);
+ if(z_drum_track(t)){z_dm_step_t *v=&z_dm.step[z_dm.selected][at];if(!v->velocity)z_dm_step(z_dm.selected,at,100,v->chance,v->ratchet);}
+ else if(!z_song.track[t].steps[at].velocity)z_step_set(t,at,pitch,100,127,z_get(t,Z_GATE));
+ if(!z_playing())z_audition_step(t,at);redraw_at=0;
+}
+static void roll_delete(void){
+ uint32_t t=z_song.selected,at=z_song.step_edit,slot=roll_note_slot;edit_stop();z_alloff(t);
+ if(z_drum_track(t))z_erase(t,at,0);
+ else {z_step *v=&z_song.track[t].steps[at];uint32_t n=slot?z_song.chord[t][at][slot-1]:v->note+1;if(v->velocity&&n)roll_note(t,at,n-1,0);}
+ roll_note_slot=0;app_say(word("НОТА УДАЛЕНА / EDIT+OCT-: ОТМЕНА","NOTE DELETED / EDIT+OCT-: UNDO"),0);
+}
 static void drum_shortcut(uint32_t j){
- uint32_t t=5,at=z_song.step_edit,len=z_dm.sound[z_dm.selected].length;
+ uint32_t t=z_song.selected,at=z_song.step_edit,len=z_drum_track(t)?z_dm.sound[z_dm.selected].length:z_get(t,Z_LENGTH);
  /* Cursor moves only after a played chord is released. */
  for(uint32_t k=0;k<27;k++)if(key_action[k]==1){app_say(word("ОТПУСТИ КЛАВИШИ","RELEASE THE KEYS"),0);return;}
  if(j<2)panel_setting(5,(at+len+(j?1:-1))%len);
@@ -204,7 +218,7 @@ static void drum_shortcut(uint32_t j){
  else if(j==3)z_erase(t,at,0);
  else if(j<6)z_history(j==5);
  else if(j<10)panel_setting(3,j-6);
- else {z_dm_step_t v=z_dm.step[z_dm.selected][at];edit_stop();z_dm_step(z_dm.selected,at,v.velocity?0:100,v.chance,v.ratchet);}
+ else if(z_drum_track(t)){z_dm_step_t v=z_dm.step[z_dm.selected][at];edit_stop();z_dm_step(z_dm.selected,at,v.velocity?0:100,v.chance,v.ratchet);}else{if(z_song.track[t].steps[at].velocity)z_erase(t,at,0);else z_step_set(t,at,z_song.track[t].steps[at].note,100,127,z_get(t,Z_GATE));}
  redraw_at=0;
 }
 static uint32_t dm_page(void){return (active_layer==Z_SEQ?layer_page:z_song.subpage)%3;}
@@ -328,14 +342,15 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
  /* A held section is a momentary control layer. Key combinations can enter it immediately. */
  if(active_layer<0){uint32_t section;for(section=0;section<Z_SECTIONS;section++){uint32_t b=section==Z_SECTIONS?B_REC:section_button[section];if((buttons>>b&1)&&!button_used[b]&&((now-button_since[b]>=SECTION_HOLD_MS)||(keys&~panel_keys_before))){if(!Z_SAMPLER_EDITION&&section==Z_EDIT&&z_song.section==Z_SEQ){button_used[B_EDIT]=1;roll_edit=1;}else layer_open(section);break;}}}
  if(active_layer>=0){uint32_t b=active_layer==Z_SECTIONS?B_REC:section_button[active_layer];if(!layer_locked&&!(buttons>>b&1))layer_close();}
- for(k=0;k<Z_SECTIONS;k++){uint32_t b=section_button[k];if(!(buttons>>b&1)&&(held_buttons>>b&1)&&!button_used[b]&&now-button_since[b]<SECTION_HOLD_MS){if(k==Z_HOME){panel_setting(1,Z_HOME);panel_setting(2,0);}else if(z_song.section==k)panel_setting(2,(z_song.subpage+1)%page_count[k]);else panel_setting(1,k);redraw_at=0;}}
+ for(k=0;k<Z_SECTIONS;k++){uint32_t b=section_button[k];if(!(buttons>>b&1)&&(held_buttons>>b&1)&&!button_used[b]&&now-button_since[b]<SECTION_HOLD_MS){if(k==Z_EDIT&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){roll_delete();}else if(k==Z_HOME){panel_setting(1,Z_HOME);panel_setting(2,0);}else if(z_song.section==k)panel_setting(2,(z_song.subpage+1)%page_count[k]);else panel_setting(1,k);redraw_at=0;}}
 
  if(!(buttons>>B_EDIT&1))roll_edit=0;
  t=z_song.selected;
  for(k=0;k<27;k++){uint32_t bit=1u<<k;
   if((keys&bit)&&!(panel_keys_before&bit)){
    int note=clamp(53+(int)k+12*z_song.octave,0,127);held_notes[k]=(uint8_t)note;held_tracks[k]=(uint8_t)t;key_action[k]=0;
-   if(active_layer>=0){static const uint8_t white[16]=PLAT_WHITE_KEYS;uint32_t j;key_action[k]=2;for(j=0;j<16;j++)if(white[j]==k){key_action[k]=(uint8_t)(j+3);key_layer[k]=(uint8_t)active_layer;layer_action(j,1,now);break;}if(key_action[k]==2){static const uint8_t black[11]=PLAT_BLACK_KEYS;for(j=0;j<11;j++)if(black[j]==k){black_action(j);break;}}}
+   if(roll_grid()){static const uint8_t white[16]=PLAT_WHITE_KEYS,black[11]=PLAT_BLACK_KEYS;uint32_t j;key_action[k]=2;for(j=0;j<16;j++)if(white[j]==k){roll_step_key(j);break;}if(j==16)for(j=0;j<11;j++)if(black[j]==k){drum_shortcut(j);break;}}
+   else if(active_layer>=0){static const uint8_t white[16]=PLAT_WHITE_KEYS;uint32_t j;key_action[k]=2;for(j=0;j<16;j++)if(white[j]==k){key_action[k]=(uint8_t)(j+3);key_layer[k]=(uint8_t)active_layer;layer_action(j,1,now);break;}if(key_action[k]==2){static const uint8_t black[11]=PLAT_BLACK_KEYS;for(j=0;j<11;j++)if(black[j]==k){black_action(j);break;}}}
    else {
     if(sampler_open()||((z_sampler.tracks>>t&1)&&z_get(t,Z_MODEL)==8)){static const uint8_t white[16]=PLAT_WHITE_KEYS,black[11]=PLAT_BLACK_KEYS;uint32_t j;
      for(j=0;j<16;j++)if(white[j]==k)break;
@@ -364,5 +379,10 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
  /* SAVE is a button pulse, not a latched dirty-state lamp. Editing K1-K4
   * must not look like a stuck SAVE button; dirty state stays in the UI/protocol. */
  if(z_sys.midi_mode==2){lights&=~((1u<<B_PLAY)|(1u<<B_REC));if(daw_playing)lights|=1u<<B_PLAY;if(daw_recording&&now/250%2)lights|=1u<<B_REC;}
- plat_glow(z_sys.glow);plat_play_red(z_sys.midi_mode==2?daw_recording:z_song.recording);plat_leds(lights,z_sys.glow==2?((1u<<27)-1):keys);
+ plat_glow(z_sys.glow);plat_play_red(z_sys.midi_mode==2?daw_recording:z_song.recording);uint32_t key_lights=keys;
+ if(!Z_SAMPLER_EDITION&&!z_sys.midi_mode){
+  if(roll_grid()||active_layer==Z_SEQ){static const uint8_t white[16]=PLAT_WHITE_KEYS;uint32_t at=z_playing()?(z_drum_track(z_song.selected)?z_dm_position(z_dm.selected):z_position()%z_get(z_song.selected,Z_LENGTH)):z_song.step_edit;key_lights|=1u<<white[at%16];}
+  else {if(z_song.arp_mode[z_song.selected]&&active_layer<0)key_lights=0;key_lights|=z_note_lights(z_song.selected,53+12*z_song.octave);}
+ }
+ plat_leds(lights,z_sys.glow==0?0:z_sys.glow==2?((1u<<27)-1):key_lights);
 }

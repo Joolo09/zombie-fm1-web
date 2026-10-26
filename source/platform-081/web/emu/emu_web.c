@@ -139,3 +139,5 @@ for(uint32_t k=0;k<NKEYS;k++)app_host_key(k,0,0);
 touch_on(0);touch_on(1);
 #endif
 ring_w=ring_r=0;boot();}
+
+__attribute__((used, visibility("default"))) uint32_t web_step_grid(void){return roll_grid();}

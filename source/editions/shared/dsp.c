@@ -435,3 +435,19 @@ int z_erase(uint32_t t,uint32_t at,uint32_t scope){
 uint32_t z_track_hits(uint32_t t){uint32_t n=0;if(t>=6)return 0;if(z_drum_track(t)){for(uint32_t d=0;d<16;d++)for(uint32_t at=0;at<64;at++)n+=z_dm.step[d][at].velocity!=0;}else for(uint32_t at=0;at<64;at++)n+=z_song.track[t].steps[at].velocity!=0;return n;}
 
 void z_new_project(void){uint32_t previous=revision;z_transport(0);z_init();revision=previous;z_touch();}
+
+/* Display-only query of sounding attacks/gates; release tails do not latch LEDs. */
+uint32_t z_note_lights(uint32_t t,int32_t base){
+ static const uint8_t white[16]={0,2,4,6,7,9,11,12,14,16,18,19,21,23,24,26};uint32_t mask=0;
+ if(t>=6||z_get(t,Z_MUTE)||(solo_track&&solo_track!=t+1))return 0;
+ if(z_drum_track(t)){for(uint32_t d=0;d<16;d++)if(dm_voice[d].active&&dm_voice[d].env>.08f&&!z_dm.sound[d].mute)mask|=1u<<white[d];return mask;}
+ for(uint32_t i=0;i<8;i++)if(voices[i].active&&voices[i].track==t&&voices[i].stage<3&&voices[i].env>.001f){int n=voices[i].note+z_get(t,Z_TRANSPOSE);while(n<base)n+=12;while(n>base+26)n-=12;if(n>=base&&n<=base+26)mask|=1u<<(n-base);}
+ return mask;
+}
+/* A grid key previews its event with bounded gates; it never enters a take. */
+void z_audition_step(uint32_t t,uint32_t at){
+ if(t>=6||at>=64||z_get(t,Z_MUTE)||(solo_track&&solo_track!=t+1))return;
+ if(z_drum_track(t)){uint32_t d=z_dm.selected;if(z_dm.step[d][at].velocity)dm_seqhit(d,z_dm.step[d][at].velocity);return;}
+ z_step *s=&z_song.track[t].steps[at];if(!s->velocity)return;
+ for(uint32_t j=0;j<4;j++){uint32_t n=j?z_song.chord[t][at][j-1]:s->note+1;if(!n)continue;n--;z_note(t,n,s->velocity,1);for(uint32_t i=0;i<8;i++)if(voices[i].active&&voices[i].track==t&&voices[i].stamp==stamp)voices[i].gate=4410;if(midi_out)midi_out(t,n,s->velocity,100);}
+}
