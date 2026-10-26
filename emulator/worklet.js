@@ -15,7 +15,7 @@ class Fm1 extends AudioWorkletProcessor {
     this.sentBlits = -1;
     this.sentWrites = -1;
     this.lastFrame = 0;
-    this.inputQueue=[];this.inputMasks={buttons:0,keys:0};this.edgeTimes={buttons:new Float64Array(32).fill(-1e9),keys:new Float64Array(32).fill(-1e9)};this.frameCount=0;
+    this.inputQueue=[];this.inputMasks={buttons:0,keys:0};this.edgeTimes={buttons:new Float64Array(32).fill(-1e9),keys:new Float64Array(32).fill(-1e9)};this.frameCount=0;this.inputBarrier=0;
     this.busy = 0;
     this.frames = 0;
     this.port.onmessage = (e) => this.onMessage(e.data).catch(error=>this.port.postMessage({error:error.message}));
@@ -52,11 +52,10 @@ class Fm1 extends AudioWorkletProcessor {
     } else if (!this.ex) {
       return;
     } else if(m.type==='release'){
-      this.inputQueue=[];this.inputMasks={buttons:0,keys:0};this.ex.web_buttons(0);this.ex.web_keys(0);
-    } else if(m.type==='reset'||m.type==='buttons'||m.type==='keys'){
+      this.inputQueue=[];this.inputMasks={buttons:0,keys:0};this.inputBarrier=0;this.ex.web_buttons(0);this.ex.web_keys(0);
+    } else if(m.type==='reset'||m.type==='buttons'||m.type==='keys'||m.type==='enc'){
       this.inputQueue.push(m);
-    } else if (m.type === "enc") {
-      this.ex.web_enc(m.role, m.n | 0);
+
     } else if (m.type === "master") {
       this.ex.web_master(m.value | 0);
     } else if (m.type === "sysex") {                  // a screen reader's frame: the bytes between F0 and F7
@@ -69,7 +68,8 @@ class Fm1 extends AudioWorkletProcessor {
   publish() {
     const ex = this.ex;
     const blits = ex.web_blits();
-    const msg = { type: "frame", playing:!!ex.z_playing(),recording:!!new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size())[1906],buttons: ex.web_lit_buttons() >>> 0, keys: ex.web_lit_keys() >>> 0 };
+    const root=new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size());
+    const msg = { type: "frame", track:root[9],section:root[1873],step:root[1907],drum:new Uint8Array(this.mem.buffer,ex.z_dm_data(),8)[6],playing:!!ex.z_playing(),recording:!!new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size())[1906],buttons: ex.web_lit_buttons() >>> 0, keys: ex.web_lit_keys() >>> 0 };
     if (this.frames >= 44100) {                       // the share of real time spent running the device
       msg.load = Math.round(100 * this.busy / (this.frames / 44.1));
       this.busy = this.frames = 0;
@@ -103,10 +103,11 @@ class Fm1 extends AudioWorkletProcessor {
     const out = outputs[0];
     const n = out[0].length;
     const t0 = clock();
-    while(this.inputQueue.length){const m=this.inputQueue[0];if(m.type==='reset'){this.inputQueue.shift();this.ex.web_reset();this.inputMasks={buttons:0,keys:0};this.edgeTimes.buttons.fill(-1e9);this.edgeTimes.keys.fill(-1e9);this.sentBlits=-1;continue;}
-      const changed=this.inputMasks[m.type]^m.mask;let blocked=false;for(let bit=0;bit<27;bit++)if(changed>>bit&1&&this.frameCount-this.edgeTimes[m.type][bit]<1058)blocked=true;if(blocked)break;
+    while(this.inputQueue.length){if(this.frameCount<this.inputBarrier)break;const m=this.inputQueue[0];if(m.type==='reset'){this.inputQueue.shift();this.ex.web_reset();this.inputMasks={buttons:0,keys:0};this.edgeTimes.buttons.fill(-1e9);this.edgeTimes.keys.fill(-1e9);this.sentBlits=-1;continue;}
+      if(m.type==='enc'){this.inputQueue.shift();this.ex.web_enc(m.role,m.n|0);continue;}
+      const changed=this.inputMasks[m.type]^m.mask;if(!changed){this.inputQueue.shift();continue;}let blocked=false;for(let bit=0;bit<27;bit++)if(changed>>bit&1&&this.frameCount-this.edgeTimes[m.type][bit]<1058)blocked=true;if(blocked)break;
       this.inputQueue.shift();for(let bit=0;bit<27;bit++)if(changed>>bit&1)this.edgeTimes[m.type][bit]=this.frameCount;this.inputMasks[m.type]=m.mask;
-      if(m.type==='buttons')this.ex.web_buttons(m.mask>>>0);else this.ex.web_keys(m.mask>>>0);
+      if(m.type==='buttons'){this.ex.web_buttons(m.mask>>>0);this.inputBarrier=this.frameCount+1058;break;}else this.ex.web_keys(m.mask>>>0);
     }
     this.ex.web_render(n);this.frameCount+=n;
     this.busy += clock() - t0;

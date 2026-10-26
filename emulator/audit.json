@@ -1,12 +1,27 @@
 {
-  "version": "0.11.0",
+  "version": "0.11.1",
   "hardware_verified": false,
   "scope": "C panel, display, audio and platform doubles; simulated NOR and MIDI",
   "checks": [
     {
+      "name": "groovebox-build",
+      "passed": true,
+      "seconds": 10.094
+    },
+    {
+      "name": "native-emulator-build",
+      "passed": true,
+      "seconds": 4.625
+    },
+    {
       "name": "full-panel",
       "passed": true,
-      "seconds": 1.25
+      "seconds": 0.828
+    },
+    {
+      "name": "keyboard-roll",
+      "passed": true,
+      "seconds": 0.141
     },
     {
       "name": "native-performance",
@@ -21,54 +36,54 @@
     {
       "name": "pattern-recording",
       "passed": true,
-      "seconds": 0.14
+      "seconds": 0.078
     },
     {
       "name": "synth-and-drums",
       "passed": true,
-      "seconds": 0.188
+      "seconds": 0.187
     },
     {
       "name": "audio-lifecycle",
       "passed": true,
-      "seconds": 0.062
+      "seconds": 0.063
     },
     {
       "name": "web-installer",
       "passed": true,
-      "seconds": 4.516
+      "seconds": 4.375
     },
     {
       "name": "save-led",
       "passed": true,
-      "seconds": 0.14
+      "seconds": 0.125
     },
     {
       "name": "physical-pattern-controls",
       "passed": true,
-      "seconds": 0.032
+      "seconds": 0.031
     },
     {
       "name": "drum-save-reboot",
       "passed": true,
-      "seconds": 0.015
+      "seconds": 0.016
     },
     {
       "name": "project-migration-and-orphans",
       "passed": true,
-      "seconds": 0.016
+      "seconds": 0.0
     },
     {
       "name": "journal-build",
       "passed": true,
-      "seconds": 6.812
+      "seconds": 0.39
     },
     {
       "name": "actual-nor-journal",
       "passed": true,
-      "seconds": 0.032
+      "seconds": 0.031
     }
   ],
-  "emulator_sha256": "87076e6f0525a95736e8aa85d622864a81debd322402493c585a444bf201f4e8",
-  "firmware_sha256": "1f9f287a3e974be1b67cfb002e98425ca7ed3db8b61ca773e2acc5638ad7ec3f"
+  "emulator_sha256": "e9ae0bf099488788b8af424d93ceec880cfa9a473b584ec8f6e2b8d8ab473a07",
+  "firmware_sha256": "1dc8dbcf66dc8438bfd7a7ebf758184baa6ed3ac5f561bbc762e358dac694bb2"
 }
