@@ -23,3 +23,7 @@ Zombie panel shell and original procedural block-zombie artwork: MIT.
 The new block-zombie display contains no downloaded Mojang textures or sounds.
 
 Groovebox 0.11.1 matching source: ../downloads/groovebox-source-0.11.1.zip.
+
+Groovebox 0.12.0 matching source: ../downloads/groovebox-source-0.12.0.zip.
+32 additional IDM presets and generated audio examples: original Zombie, MIT.
+No external recordings or third-party preset packs are included in the IDM bank.

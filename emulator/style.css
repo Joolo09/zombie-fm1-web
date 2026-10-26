@@ -3,3 +3,5 @@
 .roll-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0}.roll-tools button{padding:10px;font-size:11px}.roll-tools button[aria-pressed="true"]{background:#506b30;border-color:#b7df71}.roll-tools span{color:#a4bc86;font-size:11px}.key{font-size:8px;overflow:hidden;text-overflow:ellipsis}.key.black{font-size:7px}
 
 .key:not(.black){white-space:normal;overflow-wrap:anywhere;line-height:1.1;padding:4px 1px}
+
+.sound-bank{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:16px 0}.sound-bank label{display:grid;gap:8px;font-size:11px;color:#bbcf9e}.sound-bank select{background:#182418;color:#e4f0cc;padding:10px;max-width:100%;border:1px solid #6d8852}.sound-bank a{font-size:12px}

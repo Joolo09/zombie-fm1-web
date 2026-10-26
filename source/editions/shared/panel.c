@@ -150,7 +150,7 @@ static void knob(uint32_t id,int delta){if(id==U_NOTE||id==U_VELOCITY||id==U_GAT
   case U_FX_AMOUNT:panel_setting(12,clamp(z_song.fx_amount+delta,0,127));break;
   case U_FX_RATE:panel_setting(13,clamp(z_song.fx_rate+delta,0,3));break;
   case U_TRACK:panel_setting(7,(t+6+delta%6)%6);break;
-  case U_PRESET:if(z_drum_track(t)){app_say(word("ДРАМ-КИТ: 16 ЗВУКОВ","DRUM KIT: 16 SOUNDS"),0);break;}value=z_song.preset[t];value=value==255?(delta>0?0:63):(value+64+delta%64)%64;z_preset(t,value);app_say(z_preset_name(value),0);break;
+  case U_PRESET:if(z_drum_track(t)){app_say(word("ДРАМ-КИТ: 16 ЗВУКОВ","DRUM KIT: 16 SOUNDS"),0);break;}value=z_song.preset[t];value=value==255?(delta>0?0:Z_PRESETS-1):(value+Z_PRESETS+delta%(int)Z_PRESETS)%Z_PRESETS;z_preset(t,value);app_say(z_preset_name(value),0);break;
   case U_OCT:panel_setting(0,clamp(z_song.octave+delta,-3,3)+3);break;
   case U_BPM:z_tempo(clamp(z_song.bpm+delta,30,300),z_song.swing);break;
   case U_SWING:z_tempo(z_song.bpm,clamp(z_song.swing+delta,0,60));break;
@@ -161,7 +161,7 @@ static void knob(uint32_t id,int delta){if(id==U_NOTE||id==U_VELOCITY||id==U_GAT
   case U_ARP_RATE:z_arp_set(t,1,clamp(z_song.arp_rate[t]+delta,0,3));break;
   case U_ARP_OCT:z_arp_set(t,2,clamp(z_song.arp_oct[t]+delta,1,3));break;
   case U_ARP_HOLD:z_arp_set(t,3,!z_song.arp_hold[t]);break;
-  case U_STEP:panel_setting(5,clamp(z_song.step_edit+delta,0,63));break;
+  case U_STEP:edit_stop();panel_setting(5,clamp(z_song.step_edit+delta,0,63));break;
   default:
    if(id==U_NOTE&&z_drum_track(t)){drum_choice=(uint8_t)z_drum_note(clamp((int)z_drum_index(drum_choice)+delta,0,15));redraw_at=0;break;}
    if(id==U_NOTE)s.note=(uint8_t)clamp(s.note+delta,0,127);
@@ -210,7 +210,7 @@ static void drum_shortcut(uint32_t j){
 static uint32_t dm_page(void){return (active_layer==Z_SEQ?layer_page:z_song.subpage)%3;}
 static const char *dm_label(uint32_t k){static const char *const names[3][4]={{"STEP","SOUND","VELOCITY","ROLL"},{"STEP","CHANCE","LENGTH","MUTE"},{"STEP","DECAY","LEVEL","TUNE"}};return names[dm_page()][k];}
 static int dm_value(uint32_t k){z_dm_sound_t *p=&z_dm.sound[z_dm.selected];z_dm_step_t *s=&z_dm.step[z_dm.selected][z_song.step_edit];if(dm_page()==0)return k==0?z_song.step_edit+1:k==1?z_dm.selected+1:k==2?s->velocity:s->ratchet;if(dm_page()==1)return k==0?z_song.step_edit+1:k==1?s->chance:k==2?p->length:p->mute;return k==0?z_song.step_edit+1:k==1?p->decay:k==2?p->level:p->tune;}
-static void dm_knob(uint32_t k,int delta){if((dm_page()==0&&k>=2)||(dm_page()==1&&(k==1||k==2)))edit_stop();uint32_t d=z_dm.selected,at=z_song.step_edit,pg=dm_page();z_dm_step_t v=z_dm.step[d][at];if(k==0){panel_setting(5,clamp((int)at+delta,0,63));return;}if(pg==0&&k==1){z_dm_select(clamp((int)d+delta,0,15));drum_choice=z_drum_note(z_dm.selected);return;}if(pg==0){if(k==2)v.velocity=clamp((int)v.velocity+delta,0,127);else v.ratchet=clamp((int)v.ratchet+delta,1,4);z_dm_step(d,at,v.velocity,v.chance,v.ratchet);}else if(pg==1&&k==1)z_dm_step(d,at,v.velocity,clamp((int)v.chance+delta,0,127),v.ratchet);else {uint32_t field=pg==1?(k==2?5:4):k==1?1:k==2?0:2;static const int lo[]={0,1,-24,-64,0,1},hi[]={127,127,24,63,1,64};z_dm_param(d,field,clamp(dm_value(k)+delta,lo[field],hi[field]));}}
+static void dm_knob(uint32_t k,int delta){if((dm_page()==0&&k>=2)||(dm_page()==1&&(k==1||k==2)))edit_stop();uint32_t d=z_dm.selected,at=z_song.step_edit,pg=dm_page();z_dm_step_t v=z_dm.step[d][at];if(k==0){edit_stop();panel_setting(5,clamp((int)at+delta,0,63));return;}if(pg==0&&k==1){z_dm_select(clamp((int)d+delta,0,15));drum_choice=z_drum_note(z_dm.selected);return;}if(pg==0){if(k==2)v.velocity=clamp((int)v.velocity+delta,0,127);else v.ratchet=clamp((int)v.ratchet+delta,1,4);z_dm_step(d,at,v.velocity,v.chance,v.ratchet);}else if(pg==1&&k==1)z_dm_step(d,at,v.velocity,clamp((int)v.chance+delta,0,127),v.ratchet);else {uint32_t field=pg==1?(k==2?5:4):k==1?1:k==2?0:2;static const int lo[]={0,1,-24,-64,0,1},hi[]={127,127,24,63,1,64};z_dm_param(d,field,clamp(dm_value(k)+delta,lo[field],hi[field]));}}
 static uint32_t layer_knob(uint32_t k){
  if(Z_SAMPLER_EDITION&&active_layer==Z_EDIT){static const uint8_t p[]={U_PAD_SOURCE,U_PAD_TUNE,U_PAD_GAIN,U_PAD_MODE,U_DRUM_SOUND,U_DRUM_LEVEL,U_DRUM_DECAY,U_DRUM_TUNE,U_DRUM_LENGTH,U_DRUM_MUTE,U_DRUM_PAN};return p[k];}
  if(active_layer==Z_HOME){static const uint8_t p[]={U_BPM,U_SWING,U_CLOCK,U_LANGUAGE};return p[k];}

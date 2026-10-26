@@ -53,7 +53,7 @@ class Fm1 extends AudioWorkletProcessor {
       return;
     } else if(m.type==='release'){
       this.inputQueue=[];this.inputMasks={buttons:0,keys:0};this.inputBarrier=0;this.ex.web_buttons(0);this.ex.web_keys(0);
-    } else if(m.type==='reset'||m.type==='buttons'||m.type==='keys'||m.type==='enc'){
+    } else if(m.type==='reset'||m.type==='buttons'||m.type==='keys'||m.type==='enc'||m.type==='preset'){
       this.inputQueue.push(m);
 
     } else if (m.type === "master") {
@@ -69,7 +69,7 @@ class Fm1 extends AudioWorkletProcessor {
     const ex = this.ex;
     const blits = ex.web_blits();
     const root=new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size());
-    const msg = { type: "frame", track:root[9],section:root[1873],step:root[1907],drum:new Uint8Array(this.mem.buffer,ex.z_dm_data(),8)[6],playing:!!ex.z_playing(),recording:!!new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size())[1906],buttons: ex.web_lit_buttons() >>> 0, keys: ex.web_lit_keys() >>> 0 };
+    const msg = { type: "frame", track:root[9],section:root[1873],step:root[1907],preset:root[1900+root[9]],drum:new Uint8Array(this.mem.buffer,ex.z_dm_data(),8)[6],playing:!!ex.z_playing(),recording:!!new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size())[1906],buttons: ex.web_lit_buttons() >>> 0, keys: ex.web_lit_keys() >>> 0 };
     if (this.frames >= 44100) {                       // the share of real time spent running the device
       msg.load = Math.round(100 * this.busy / (this.frames / 44.1));
       this.busy = this.frames = 0;
@@ -104,6 +104,7 @@ class Fm1 extends AudioWorkletProcessor {
     const n = out[0].length;
     const t0 = clock();
     while(this.inputQueue.length){if(this.frameCount<this.inputBarrier)break;const m=this.inputQueue[0];if(m.type==='reset'){this.inputQueue.shift();this.ex.web_reset();this.inputMasks={buttons:0,keys:0};this.edgeTimes.buttons.fill(-1e9);this.edgeTimes.keys.fill(-1e9);this.sentBlits=-1;continue;}
+      if(m.type==='preset'){this.inputQueue.shift();const t=new Uint8Array(this.mem.buffer,this.ex.z_snapshot(),this.ex.z_state_size())[9];if(t<5&&Number.isInteger(m.value)&&m.value>=0&&m.value<96)this.ex.z_preset(t,m.value);continue;}
       if(m.type==='enc'){this.inputQueue.shift();this.ex.web_enc(m.role,m.n|0);continue;}
       const changed=this.inputMasks[m.type]^m.mask;if(!changed){this.inputQueue.shift();continue;}let blocked=false;for(let bit=0;bit<27;bit++)if(changed>>bit&1&&this.frameCount-this.edgeTimes[m.type][bit]<1058)blocked=true;if(blocked)break;
       this.inputQueue.shift();for(let bit=0;bit<27;bit++)if(changed>>bit&1)this.edgeTimes[m.type][bit]=this.frameCount;this.inputMasks[m.type]=m.mask;

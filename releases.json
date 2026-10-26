@@ -213,6 +213,23 @@
       "file": "downloads/zombie-groovebox-0.11.1.fwsc",
       "editor": "webapp/groovebox-111/",
       "source": "downloads/groovebox-source-0.11.1.zip"
+    },
+    {
+      "product": "FM-1_63001200",
+      "version": "0.12.0",
+      "label": {
+        "ru": "Groovebox 0.12.0 beta · IDM-банк + исправления",
+        "en": "Groovebox 0.12.0 beta · IDM bank + fixes"
+      },
+      "notes": {
+        "ru": "32 оригинальных IDM-пресета в слотах 65–96, старые 64 сохранены. Исправлены запись вне лупа, преобразование драм-паттерна при REC и счётчик голосов. Есть аудиопримеры. Программные проверки пройдены; физический FM-1 ожидается.",
+        "en": "32 original IDM presets in slots 65–96, existing 64 preserved. Fixes out-of-loop recording, drum pattern transforms during REC and voice metering. Audio examples included; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "edd307e899faddb826803b35e6c1adc886fa1b56ceac5c0a37eca2e8510c8870",
+      "file": "downloads/zombie-groovebox-0.12.0.fwsc",
+      "editor": "webapp/groovebox-120/",
+      "source": "downloads/groovebox-source-0.12.0.zip"
     }
   ]
 }
