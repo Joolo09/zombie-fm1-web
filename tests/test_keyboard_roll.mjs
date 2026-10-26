@@ -22,7 +22,7 @@ for(let d=0;d<16;d++)assert.equal(kit(e)[136+d*192],100);
 e.key(WHITE[0]);assert.equal(e.w.z_track_hits(5),15);assert.equal(kit(e)[136],0);assert.equal(kit(e)[328],100);
 e.up('EDIT');e.key(BLACK[4]);assert.equal(e.w.z_track_hits(5),16);e.key(BLACK[5]);assert.equal(e.w.z_track_hits(5),15);
 e.key(BLACK[1]);assert.equal(e.root()[1907],1);e.key(BLACK[0]);assert.equal(e.root()[1907],0);
-e.key(WHITE[1]);e.key(BLACK[3]);assert.equal(e.w.z_track_hits(5),14,'delete erases the selected sound only');
+e.turn(4,1);e.key(BLACK[3]);assert.equal(e.w.z_track_hits(5),14,'delete erases the selected sound only');
 e.key(BLACK[10]);assert.equal(e.w.z_track_hits(5),15);
 e.key(BLACK[2]);assert.equal(e.root()[1907],1);assert.equal(e.w.z_track_hits(5),14);
 e.key(BLACK[7]);assert.equal(e.root()[1907],17);

@@ -230,6 +230,23 @@
       "file": "downloads/zombie-groovebox-0.12.0.fwsc",
       "editor": "webapp/groovebox-120/",
       "source": "downloads/groovebox-source-0.12.0.zip"
+    },
+    {
+      "product": "FM-1_63001300",
+      "version": "0.13.0",
+      "label": {
+        "ru": "Groovebox 0.13.0 beta · подсветка + клавиши шагов",
+        "en": "Groovebox 0.13.0 beta · playback LEDs + step keys"
+      },
+      "notes": {
+        "ru": "Подсветка нот секвенсора, арпеджиатора и MIDI; 16 клавиш шагов на SEQ без REC; короткий EDIT удаляет выбранную ноту. IDM-банк сохранён. Проверено программно, физический FM-1 ожидается.",
+        "en": "Playback, arp and MIDI note LEDs; direct sixteen-key step entry on SEQ; short EDIT deletes the focused note. IDM bank retained. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "6208a975b6b9a2cdc7282186ae581f29ee89579a90b9c9a812a985e4c90c7ae4",
+      "file": "downloads/zombie-groovebox-0.13.0.fwsc",
+      "editor": "webapp/groovebox-130/",
+      "source": "downloads/groovebox-source-0.13.0.zip"
     }
   ]
 }

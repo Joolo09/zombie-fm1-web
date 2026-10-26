@@ -56,3 +56,6 @@ int z_erase(uint32_t,uint32_t,uint32_t);
 uint32_t z_track_hits(uint32_t);
 
 void z_new_project(void);
+
+uint32_t z_note_lights(uint32_t track,int32_t base);
+void z_audition_step(uint32_t track,uint32_t step);
