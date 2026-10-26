@@ -196,6 +196,23 @@
       "file": "downloads/zombie-groovebox-0.11.0.fwsc",
       "editor": "webapp/groovebox-110/",
       "source": "downloads/groovebox-source-0.11.0.zip"
+    },
+    {
+      "product": "FM-1_63001101",
+      "version": "0.11.1",
+      "label": {
+        "ru": "Groovebox 0.11.1 beta · запись с клавиш + пианоролл",
+        "en": "Groovebox 0.11.1 beta · keyboard recording + piano roll"
+      },
+      "notes": {
+        "ru": "Правка выбранного шага через EDIT + клавиши, 16 барабанных пэдов, чёрные клавиши для шагов и пауз, заметный курсор. Исправлен порядок быстрых нажатий эмулятора. Проверено программно, физический FM-1 ожидается.",
+        "en": "EDIT + keys writes the focused step, sixteen drum pads, black-key step/rest shortcuts, visible cursor and ordered emulator input. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "1dc8dbcf66dc8438bfd7a7ebf758184baa6ed3ac5f561bbc762e358dac694bb2",
+      "file": "downloads/zombie-groovebox-0.11.1.fwsc",
+      "editor": "webapp/groovebox-111/",
+      "source": "downloads/groovebox-source-0.11.1.zip"
     }
   ]
 }

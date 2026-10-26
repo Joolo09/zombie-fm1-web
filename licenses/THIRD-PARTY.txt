@@ -21,3 +21,5 @@ Native emulator platform and emulator/worklet.js: MPL-2.0, Charles Vestal.
 Source: source/platform-081/web/emu/emu_web.c and emulator/worklet.js in that archive.
 Zombie panel shell and original procedural block-zombie artwork: MIT.
 The new block-zombie display contains no downloaded Mojang textures or sounds.
+
+Groovebox 0.11.1 matching source: ../downloads/groovebox-source-0.11.1.zip.
