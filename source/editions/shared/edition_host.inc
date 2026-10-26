@@ -11,7 +11,24 @@ static void ed_checks(void){uint32_t t,p;int old;
  else{ed_check(z_sample_frames(0)==0,"groovebox does not carry Minecraft PCM");ed_check(z_sampler_enable(0,1)==-1&&z_sampler.tracks==0,"groovebox cannot enable hidden sampler");}
  system_set(6,2);ed_check(system_save()==0,"DAW settings saved in simulated flash");app_init();ed_check(z_sys.midi_mode==0&&midi_local,"saved controller mode cannot mute startup");
 }
+static void ed_project_audit(void){
+ if(Z_SAMPLER_EDITION)return;
+ app_panic();for(uint32_t o=0;o<OBJ_NOBJ;o++)store_len[o]=-1;app_init();
+ for(uint32_t t=0;t<6;t++)ed_check(z_track_hits(t)==0,"cold boot: empty track");
+ ed_check(z_song.padding[1]==0xD1,"new project owns its drum state");
+ z_project legacy=z_song;legacy.padding[1]=0;legacy.track[5].steps[0]=(z_step){36,100,127,80};legacy.chord[5][0][0]=39;
+ for(uint32_t v=1;v<=2;v++){legacy.version=v;store_len[OBJ_DRUM]=-1;plat_store_save(OBJ_SETTINGS,&legacy,v==1?1872:1908);app_init();ed_check(z_track_hits(5)==1,"partial legacy wire state keeps its GM base note");}legacy.version=3;
+ ed_check(plat_store_save(OBJ_SETTINGS,&legacy,sizeof legacy)==0,"legacy root saved");store_len[OBJ_DRUM]=-1;app_init();
+ ed_check(z_track_hits(5)==2,"legacy GM drums migrate once");ed_check(z_song.track[5].steps[0].velocity==0&&z_song.padding[1]==0xD1,"legacy shadow retired after migration");
+ z_erase(5,0,2);ed_check(plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song)==0&&plat_store_save(OBJ_DRUM,&z_dm,sizeof z_dm)==0,"erased kit and root saved");app_init();ed_check(z_track_hits(5)==0,"erased drums stay erased after reboot");
+ z_song.track[5].steps[0]=(z_step){36,100,127,80};plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song);store_len[OBJ_DRUM]=-1;app_init();ed_check(z_track_hits(5)==0,"missing kit cannot resurrect an authoritative legacy shadow");
+ z_dm_step(0,0,100,127,1);plat_store_save(OBJ_DRUM,&z_dm,sizeof z_dm);store_len[OBJ_SETTINGS]=-1;app_init();ed_check(z_track_hits(5)==0,"orphaned drum journal cannot overlay a new project");
+ z_project foreign=z_song;foreign.padding[0]=2;z_dm_step(0,0,100,127,1);plat_store_save(OBJ_DRUM,&z_dm,sizeof z_dm);plat_store_save(OBJ_SETTINGS,&foreign,sizeof foreign);app_init();ed_check(z_track_hits(5)==0,"foreign-edition root cannot import a stale Groovebox drum kit");
+ z_project bad=z_song;bad.track[0].steps[0].chance=128;ed_check(!valid_project(&bad),"invalid chance rejected");bad=z_song;bad.track[0].p[Z_CHANNEL]=17;ed_check(!valid_project(&bad),"invalid MIDI channel rejected");
+ for(uint32_t o=0;o<OBJ_NOBJ;o++)store_len[o]=-1;app_init();
+}
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
+ if(!strcmp(cmd,"projectaudit")){ed_project_audit();return 1;}
  if(!strcmp(cmd,"edgecheck")){
 #ifdef APP_TOUCH_EDGE_POLL
  touch_on(1);sense_init(1);touch_held=touch_pending_valid=0;sn_ev_r=sn_ev_w=0;sn_push(EV_ON,0,101,0);sn_push(EV_OFF,0,0,0);touch_poll();ed_check(touch_keys()&1,"fast tap press survives queued release");ed_check(touch_vel(0)==101,"queued tap preserves velocity");touch_poll();ed_check(!(touch_keys()&1),"fast tap release is delivered next poll");sn_push(EV_ON,0,90,0);touch_poll();sn_push(EV_ON,0,110,0);touch_poll();ed_check(!(touch_keys()&1),"same-key retrigger exposes release");touch_poll();ed_check((touch_keys()&1)&&touch_vel(0)==110,"same-key retrigger exposes new attack");touch_held=touch_pending_valid=0;sn_ev_r=sn_ev_w=0;sense_init((1u<<27)-1);for(uint32_t k=0;k<27;k++)sn_push(EV_ON,k,100,0);for(uint32_t k=0;k<27;k++)sn_push(EV_OFF,k,0,0);touch_poll();ed_check(touch_held==((1u<<27)-1),"whole chord press burst is preserved");touch_poll();ed_check(!touch_held,"whole chord release burst is preserved");touch_on(0);touch_on(1);

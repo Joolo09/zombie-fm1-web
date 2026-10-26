@@ -1,0 +1,74 @@
+{
+  "version": "0.11.0",
+  "hardware_verified": false,
+  "scope": "C panel, display, audio and platform doubles; simulated NOR and MIDI",
+  "checks": [
+    {
+      "name": "full-panel",
+      "passed": true,
+      "seconds": 1.25
+    },
+    {
+      "name": "native-performance",
+      "passed": true,
+      "seconds": 0.14
+    },
+    {
+      "name": "native-worklet",
+      "passed": true,
+      "seconds": 0.11
+    },
+    {
+      "name": "pattern-recording",
+      "passed": true,
+      "seconds": 0.14
+    },
+    {
+      "name": "synth-and-drums",
+      "passed": true,
+      "seconds": 0.188
+    },
+    {
+      "name": "audio-lifecycle",
+      "passed": true,
+      "seconds": 0.062
+    },
+    {
+      "name": "web-installer",
+      "passed": true,
+      "seconds": 4.516
+    },
+    {
+      "name": "save-led",
+      "passed": true,
+      "seconds": 0.14
+    },
+    {
+      "name": "physical-pattern-controls",
+      "passed": true,
+      "seconds": 0.032
+    },
+    {
+      "name": "drum-save-reboot",
+      "passed": true,
+      "seconds": 0.015
+    },
+    {
+      "name": "project-migration-and-orphans",
+      "passed": true,
+      "seconds": 0.016
+    },
+    {
+      "name": "journal-build",
+      "passed": true,
+      "seconds": 6.812
+    },
+    {
+      "name": "actual-nor-journal",
+      "passed": true,
+      "seconds": 0.032
+    }
+  ],
+  "emulator_sha256": "87076e6f0525a95736e8aa85d622864a81debd322402493c585a444bf201f4e8",
+  "firmware_sha256": "1f9f287a3e974be1b67cfb002e98425ca7ed3db8b61ca773e2acc5638ad7ec3f"
+}

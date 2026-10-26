@@ -15,3 +15,9 @@ M-VAVE and FM-1 are trademarks of their respective owners.
 
 Groovebox/Sampler 0.8.0 matching source: ../downloads/editions-source-0.8.0.zip.
 Original application, piano roll, display animations and DAW profiles: MIT.
+
+Groovebox 0.11.0 matching source: ../downloads/groovebox-source-0.11.0.zip.
+Native emulator platform and emulator/worklet.js: MPL-2.0, Charles Vestal.
+Source: source/platform-081/web/emu/emu_web.c and emulator/worklet.js in that archive.
+Zombie panel shell and original procedural block-zombie artwork: MIT.
+The new block-zombie display contains no downloaded Mojang textures or sounds.

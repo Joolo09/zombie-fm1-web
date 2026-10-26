@@ -179,6 +179,23 @@
       "file": "downloads/zombie-groovebox-0.10.1.fwsc",
       "editor": "webapp/groovebox-101/",
       "source": "downloads/groovebox-source-0.10.1.zip"
+    },
+    {
+      "product": "FM-1_63001100",
+      "version": "0.11.0",
+      "label": {
+        "ru": "Groovebox 0.11.0 beta · зомби + эмулятор",
+        "en": "Groovebox 0.11.0 beta · zombie + emulator"
+      },
+      "notes": {
+        "ru": "Пустой старт без самопроизвольных барабанов, управление драмкой, анимированный зомби и полный эмулятор. Проверки записи, удаления, MIDI и сохранений пройдены программно; FM-1 ещё не проверен.",
+        "en": "Empty start, retired ghost drum state, working drum controls, animated zombie and full C emulator. Recording, editing, MIDI and persistence tested in software; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "1f9f287a3e974be1b67cfb002e98425ca7ed3db8b61ca773e2acc5638ad7ec3f",
+      "file": "downloads/zombie-groovebox-0.11.0.fwsc",
+      "editor": "webapp/groovebox-110/",
+      "source": "downloads/groovebox-source-0.11.0.zip"
     }
   ]
 }
