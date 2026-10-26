@@ -1,8 +1,8 @@
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
-import {decodeState} from '../webapp/groovebox-101/core.js';
-import {wasmDrums} from '../webapp/groovebox-101/drum-state.js';
-const module=new WebAssembly.Module(readFileSync(new URL('../webapp/groovebox-101/zombie-core.wasm',import.meta.url)));
+const editor=process.argv[2]||'groovebox-101';const {decodeState}=await import('../webapp/'+editor+'/core.js');
+const {wasmDrums}=await import('../webapp/'+editor+'/drum-state.js');
+const module=new WebAssembly.Module(readFileSync(new URL('../webapp/'+editor+'/zombie-core.wasm',import.meta.url)));
 const fresh=()=>{const w=new WebAssembly.Instance(module,{}).exports;w.z_init();w.z_dm_init();for(let t=0;t<5;t++)w.z_erase(t,0,2);w.z_tempo(120,0);return w;};
 const frames=(w,n)=>{for(let i=0;i<n;i+=256)w.z_render(w.z_buffer(),Math.min(256,n-i));};
 const state=w=>decodeState(new Uint8Array(w.memory.buffer,w.z_snapshot(),w.z_state_size()).slice());
