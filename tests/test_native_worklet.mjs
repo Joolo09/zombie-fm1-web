@@ -11,3 +11,7 @@ await p.onMessage({type:'reset'});run(80);
 await p.onMessage({type:'buttons',mask:1<<9});await p.onMessage({type:'buttons',mask:0});await p.onMessage({type:'buttons',mask:1<<4});await p.onMessage({type:'keys',mask:1<<4});await p.onMessage({type:'keys',mask:0});run(110);
 assert.equal(root()[1873],8);assert.equal(root()[1906],0);assert.equal(root()[1907],1);assert.equal(root()[66+4],57);await p.onMessage({type:'buttons',mask:0});run(40);
 console.log('PASS fast SEQ → EDIT → keyboard preserves page transitions and edits the cursor rather than opening synth controls');
+
+await p.onMessage({type:'preset',value:95});run(30);assert.equal(root()[1900],95);assert(messages.some(m=>m.preset===95));console.log('PASS sound-bank picker applies the actual C preset and reports the selected slot');
+
+await p.onMessage({type:'buttons',mask:1<<6});run(20);await p.onMessage({type:'buttons',mask:0});run(20);await p.onMessage({type:'enc',role:4,n:-1});run(30);assert.equal(root()[1900],255);assert(messages.some(m=>m.preset===255));console.log('PASS manual sound edits are reported as CUSTOM instead of the previous factory preset');

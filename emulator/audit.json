@@ -1,37 +1,32 @@
 {
-  "version": "0.11.1",
+  "version": "0.12.0",
   "hardware_verified": false,
   "scope": "C panel, display, audio and platform doubles; simulated NOR and MIDI",
   "checks": [
     {
-      "name": "groovebox-build",
-      "passed": true,
-      "seconds": 10.094
-    },
-    {
-      "name": "native-emulator-build",
-      "passed": true,
-      "seconds": 4.625
-    },
-    {
       "name": "full-panel",
       "passed": true,
-      "seconds": 0.828
+      "seconds": 0.766
     },
     {
       "name": "keyboard-roll",
       "passed": true,
-      "seconds": 0.141
+      "seconds": 0.125
+    },
+    {
+      "name": "idm-regressions",
+      "passed": true,
+      "seconds": 0.109
     },
     {
       "name": "native-performance",
       "passed": true,
-      "seconds": 0.14
+      "seconds": 0.141
     },
     {
       "name": "native-worklet",
       "passed": true,
-      "seconds": 0.11
+      "seconds": 0.094
     },
     {
       "name": "pattern-recording",
@@ -41,12 +36,12 @@
     {
       "name": "synth-and-drums",
       "passed": true,
-      "seconds": 0.187
+      "seconds": 0.156
     },
     {
       "name": "audio-lifecycle",
       "passed": true,
-      "seconds": 0.063
+      "seconds": 0.047
     },
     {
       "name": "web-installer",
@@ -56,12 +51,12 @@
     {
       "name": "save-led",
       "passed": true,
-      "seconds": 0.125
+      "seconds": 0.094
     },
     {
       "name": "physical-pattern-controls",
       "passed": true,
-      "seconds": 0.031
+      "seconds": 0.015
     },
     {
       "name": "drum-save-reboot",
@@ -71,19 +66,24 @@
     {
       "name": "project-migration-and-orphans",
       "passed": true,
-      "seconds": 0.0
+      "seconds": 0.016
     },
     {
       "name": "journal-build",
       "passed": true,
-      "seconds": 0.39
+      "seconds": 0.437
     },
     {
       "name": "actual-nor-journal",
       "passed": true,
       "seconds": 0.031
+    },
+    {
+      "name": "idm-sound-bank",
+      "passed": true,
+      "seconds": 0.813
     }
   ],
-  "emulator_sha256": "e9ae0bf099488788b8af424d93ceec880cfa9a473b584ec8f6e2b8d8ab473a07",
-  "firmware_sha256": "1dc8dbcf66dc8438bfd7a7ebf758184baa6ed3ac5f561bbc762e358dac694bb2"
+  "emulator_sha256": "309b622f9d4660842f0b74f69be1331399c7fa2e1e44bf3a4358d7d1d0e6487e",
+  "firmware_sha256": "edd307e899faddb826803b35e6c1adc886fa1b56ceac5c0a37eca2e8510c8870"
 }

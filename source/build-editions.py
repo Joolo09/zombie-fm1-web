@@ -19,10 +19,11 @@ def run(args,log):
         raise SystemExit(result.returncode)
     print(log+': PASS',flush=True)
 
-def presets():
+def presets(kind="groovebox"):
     rows=re.findall(r'\{"(\w+)",(-?\d+),(-?\d+),(-?\d+)\}',(ED/'shared/dsp.c').read_text())
     bank=json.loads((ED/'presets.json').read_text(encoding='utf-8'))
     assert len(rows)==27 and len(bank)==64
+    if kind=='groovebox':bank+=json.loads((ED/'idm-presets.json').read_text(encoding='utf-8'))
     keys=[r[0] for r in rows];values=[]
     for name,changes in bank:
         assert len(name)<24
@@ -33,11 +34,11 @@ def presets():
     return bank,values
 
 def prepare(kind):
-    app=ED/kind;app.mkdir(exist_ok=True);sample=kind=='sampler';bank,values=presets()
+    app=ED/kind;app.mkdir(exist_ok=True);sample=kind=='sampler';bank,values=presets(kind)
     for p in (ED/'shared').iterdir():
         if p.is_file():shutil.copy2(p,app/p.name)
     title='ZOMBIE SAMPLER' if sample else 'ZOMBIE GROOVEBOX'
-    (app/'edition.h').write_text(f'#pragma once\n#define Z_SAMPLER_EDITION {int(sample)}\n#define Z_EDITION_VERSION "{VERSION}"\n#define Z_EDITION_TITLE "{title}"\n#define Z_PROTOCOL_ID "ZCORE/1/{VERSION}/{kind}"\n',encoding='utf-8')
+    (app/'edition.h').write_text(f'#pragma once\n#define Z_SAMPLER_EDITION {int(sample)}\n#define Z_EDITION_PRESETS {len(bank)}\n#define Z_EDITION_VERSION "{VERSION}"\n#define Z_EDITION_TITLE "{title}"\n#define Z_PROTOCOL_ID "ZCORE/1/{VERSION}/{kind}"\n',encoding='utf-8')
     (app/'fm1.toml').write_text(f'''name = "zombie-{kind}"
 id_prefix = "FM-1_{64 if sample else 63}"
 usb_manufacturer = "Zombie Core"
@@ -58,7 +59,7 @@ licence = "MIT / MPL-2.0 platform"
     if sample:
         names=['Pad Tone %02d'%(i+1) for i in range(64)]
         for p in values:p[0]=8;p[6]=0;p[8]=127;p[9]=8
-    (gen/'z_presets.h').write_text('/* Original MIT factory bank. */\nstatic const char *const Z_PRESET_NAMES[64]='+json.dumps(names).replace('[','{').replace(']','}')+';\nstatic const int16_t Z_PRESET_VALUES[64][27]='+json.dumps(values).replace('[','{').replace(']','}')+';\n',encoding='utf-8')
+    (gen/'z_presets.h').write_text(f'/* Original MIT factory bank. */\nstatic const char *const Z_PRESET_NAMES[{len(bank)}]='+json.dumps(names).replace('[','{').replace(']','}')+f';\nstatic const int16_t Z_PRESET_VALUES[{len(bank)}][27]='+json.dumps(values).replace('[','{').replace(']','}')+';\n',encoding='utf-8')
     return app,names
 
 def script(kind):

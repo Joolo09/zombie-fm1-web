@@ -219,7 +219,7 @@ void z_key(uint32_t t,uint32_t n,uint32_t v,uint32_t on) {
   arp_physical[t][n/8]|=1u<<(n&7);if(!arp_notes[t][n])arp_count[t]++;arp_notes[t][n]=(uint8_t)(v>127?127:v);
   if(!physical){arp_time[t]=0;arp_index[t]=0;}
   if(z_song.recording){
-   uint32_t len=z_song.track[t].p[Z_LENGTH],at=z_song.step_edit,ahead=0;
+   uint32_t len=z_song.track[t].p[Z_LENGTH],at=z_song.step_edit%len,ahead=0;
    if(playing){at=pos==0xffffffffu?0:pos%len;ahead=pos==0xffffffffu;if(!ahead&&!z_song.rec_quant&&(audio_frame-last_step_frame)>=step_frames()*(1+((pos&1)?-1:1)*z_song.swing/200.0f)*0.5f){at=(at+1)%len;ahead=1;}}
    z_step *s=&z_song.track[t].steps[at];uint32_t capture=0;
    for(i=0;i<128;i++)if(rec_active[t][i]&&rec_at[t][i]==at)capture=1;
@@ -414,7 +414,7 @@ void z_render(float *out,uint32_t n) {
 }
 uint32_t z_position(void){return pos;}
 uint32_t z_playing(void){return playing;}
-uint32_t z_voice_count(void){uint32_t i,n=0;for(i=0;i<8;i++)n+=voices[i].active;return n;}
+uint32_t z_voice_count(void){uint32_t i,n=0;for(i=0;i<8;i++)n+=voices[i].active;if(!Z_SAMPLER_EDITION)for(i=0;i<16;i++)n+=dm_voice[i].active;return n;}
 float *z_buffer(void){return render_buffer;}
 uint8_t *z_transfer(void){return transfer;}
 uint32_t z_snapshot(void){return (uint32_t)(uintptr_t)&z_song;}

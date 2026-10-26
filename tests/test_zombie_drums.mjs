@@ -6,7 +6,7 @@ const fresh=()=>{const w=create('../webapp/'+(process.argv[2]||'groovebox-100')+
 const render=(w,n)=>{const out=[];for(let at=0;at<n;at+=256){const k=Math.min(256,n-at);w.z_render(w.z_buffer(),k);out.push(...new Float32Array(w.memory.buffer,w.z_buffer(),k*2));}return out;};
 const energy=a=>a.reduce((s,x)=>{assert(Number.isFinite(x)&&Math.abs(x)<=.981);return s+x*x;},0);
 for(let t=0;t<5;t++)for(let model=0;model<8;model++){
- const a=fresh(),b=create('../webapp/groovebox/zombie-core.wasm');b.z_init();for(const w of [a,b]){w.z_set(t,0,model);w.z_key(t,60,100,1);}assert.deepEqual(render(a,4096),render(b,4096),`synth ${t+1} model ${model}`);
+ const a=fresh(),b=create('../webapp/groovebox/zombie-core.wasm');b.z_init();for(const w of [a,b]){w.z_preset(t,0);w.z_set(t,0,model);w.z_key(t,60,100,1);}assert.deepEqual(render(a,4096),render(b,4096),`synth ${t+1} model ${model}`);
 }
 console.log('PASS: all five synth tracks, all eight engines, bit-identical to previous Zombie');
 let w=fresh();for(let d=0;d<16;d++)assert.equal(w.z_dm_step(d,0,100,127,1),0);assert.equal(wasmDrums(w).sounds.filter(p=>p.steps[0].velocity).length,16);for(let t=0;t<5;t++)w.z_set(t,21,1);w.z_transport(1);assert(energy(render(w,6000))>1);console.log('PASS: sixteen independent parts, simultaneous sequencing, bounded audio');

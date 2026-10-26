@@ -7,7 +7,10 @@
 #define Z_VOICES 8
 #define Z_STEPS 64
 #define Z_PARAMS 27
-#define Z_PRESETS 64
+#ifndef Z_EDITION_PRESETS
+#define Z_EDITION_PRESETS 64
+#endif
+#define Z_PRESETS Z_EDITION_PRESETS
 #define Z_SLOT_BYTES 49152u
 #define Z_PCM_MAX 24448u
 #define Z_RATE 44100
