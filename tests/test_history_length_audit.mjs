@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {create,WHITE,BLACK} from './native_emulator_harness.mjs';
+let failed=0;
+const check=(name,fn)=>{try{fn();console.log('PASS '+name);}catch(e){failed++;console.error('FAIL '+name+': '+e.message);}};
+const kit=e=>new Uint8Array(e.memory.buffer,e.w.z_dm_data(),e.w.z_dm_size());
+check('unavailable drum REDO leaves an active recording intact',()=>{const e=create();e.turn(1,5);e.tap('REC');e.key(WHITE[0]);e.hold('EDIT');e.tap('UP');e.up('EDIT');assert.equal(e.root()[1906],1);e.key(WHITE[1]);assert.equal(e.root()[1907],2);});
+for(const track of [0,5])for(const scope of [0,1,2])check('repeated empty erasure preserves useful undo on track '+(track+1)+' scope '+scope,()=>{const e=create();e.turn(1,track);e.tap('REC');e.key(WHITE[0]);e.tap('REC');e.turn(3,-1);const erase=()=>{e.hold('SEQ');if(scope<2)e.tap(scope?'REC':'EDIT');else e.key(BLACK[10]);e.up('SEQ');};erase();assert.equal(e.w.z_track_hits(track),0);for(let i=0;i<6;i++)erase();e.hold('EDIT');e.tap('DOWN');e.up('EDIT');assert.equal(e.w.z_track_hits(track),1);});
+check('REC layer length knob changes the selected drum part',()=>{const e=create();e.turn(1,5);e.hold('REC');e.tap('HOME');e.up('REC');e.turn(6,5);assert.equal(kit(e)[13],37);});
+for(const [key,len] of [[6,16],[7,32],[8,64]])check('REC layer LEN '+len+' changes the selected drum part only',()=>{const e=create();e.turn(1,5);e.hold('REC');e.tap('HOME');e.up('REC');e.key(WHITE[key]);assert.equal(kit(e)[13],len);assert.equal(kit(e)[21],32);});
+check('unavailable drum UNDO preserves a sounding pad',()=>{const e=create();e.turn(1,5);e.key(WHITE[9]);assert(e.w.web_lit_keys()&(1<<WHITE[9]));e.hold('EDIT');e.tap('DOWN');e.up('EDIT');assert(e.w.web_lit_keys()&(1<<WHITE[9]));});
+check('erasing a silent melodic step still resets non-default note settings',()=>{const e=create();e.tap('SEQ');e.root().set([70,0,21,12],66);e.root()[1908]=65;e.root()[3060]=3;e.hold('SEQ');e.tap('EDIT');e.up('SEQ');assert.deepEqual(Array.from(e.root().slice(66,70)),[60,0,127,80]);assert.equal(e.root()[1908],0);assert.equal(e.root()[3060],0);});
+check('erasing a silent drum step still resets its probability and roll',()=>{const e=create();e.turn(1,5);e.tap('SEQ');kit(e).set([0,21,4],136);e.hold('SEQ');e.tap('EDIT');e.up('SEQ');assert.deepEqual(Array.from(kit(e).slice(136,139)),[0,127,1]);});
+if(failed)process.exitCode=1;
