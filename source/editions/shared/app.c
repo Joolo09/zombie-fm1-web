@@ -42,6 +42,16 @@ static float audio_test_phase;
 static uint8_t editor_notes[6][16];
 
 static uint32_t crc32(const uint8_t *p,uint32_t n){uint32_t c=0xffffffffu,i,b;for(i=0;i<n;i++){c^=p[i];for(b=0;b<8;b++)c=(c>>1)^((c&1)?0xedb88320u:0);}return ~c;}
+#include "project_store.inc"
+static int project_save_all(void){
+ int rc;
+#if Z_SAMPLER_EDITION
+ rc=plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song);if(!rc)rc=system_save();if(!rc)rc=plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler);
+#else
+ rc=system_save();if(!rc)rc=plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler);if(!rc)rc=project_pair_save(&z_song,&z_dm);
+#endif
+ return rc;
+}
 static uint32_t rd32(const uint8_t *p){return p[0]|(uint32_t)p[1]<<8|(uint32_t)p[2]<<16|(uint32_t)p[3]<<24;}
 static void wr32(uint8_t *p,uint32_t x){uint32_t i;for(i=0;i<4;i++)p[i]=(uint8_t)(x>>(8*i));}
 static void note_packet(uint32_t t,uint32_t note,uint32_t vel,uint32_t on){if(on&&(z_get(t,Z_MUTE)||(z_solo_state()&&z_solo_state()!=t+1)))return;uint32_t status=(on?0x90:0x80)|(z_get(t,Z_CHANNEL)-1);plat_midi_out((on?9:8)|status<<8|note<<16|vel<<24);}
@@ -81,27 +91,30 @@ static int valid_project(const z_project *s){uint32_t t,p,i;
   for(i=0;i<64;i++){const z_step *v=&s->track[t].steps[i];uint32_t j;if(s->duration[t][i]>63)return 0;for(j=0;j<3;j++)if(s->chord[t][i][j]>128)return 0;if(v->note>127||v->velocity>127||v->chance>127||v->gate<1||v->gate>127)return 0;}
  }return 1;
 }
-void app_init(void){z_project saved;audio_test_left=0;audio_test_phase=0;system_init();int n,project_loaded=0,drum_root_matches=0;uint32_t i,t;z_init();saved=z_song;
- n=plat_store_load(OBJ_SETTINGS,&saved,sizeof saved);
+void app_init(void){project_pair_boot();z_project saved;audio_test_left=0;audio_test_phase=0;system_init();int n,project_loaded=0,drum_root_matches=0;uint32_t i,t;z_init();saved=z_song;
+ n=project_store_load(OBJ_SETTINGS,&saved,sizeof saved);
  if(n==1872&&saved.version!=1)n=-1;
  if(n==1872&&saved.version==1){saved.version=3;saved.padding[1]=0;for(t=0;t<6;t++)saved.preset[t]=255;}
  if(n==1908&&saved.version==2){saved.version=3;saved.padding[1]=0;}
  if((n==sizeof saved||n==1872||n==1908)&&valid_project(&saved)){project_loaded=1;drum_root_matches=saved.padding[0]==1;z_song=saved;if(z_song.padding[0]!=(Z_SAMPLER_EDITION?2:1))for(t=0;t<6;t++)z_song.preset[t]=255;}
  z_song.padding[0]=Z_SAMPLER_EDITION?2:1;
  {z_sampler_state kit;int bytes=plat_store_load(OBJ_SAMPLER,&kit,sizeof kit);if(bytes==sizeof kit&&z_sampler_valid(&kit))z_sampler=kit;}
- if(!Z_SAMPLER_EDITION){z_dm_state kit;int bytes=plat_store_load(OBJ_DRUM,&kit,sizeof kit);if(project_loaded&&drum_root_matches&&bytes==sizeof kit&&z_dm_valid(&kit))z_dm=kit;else if(project_loaded&&drum_root_matches&&z_song.padding[1]!=0xD1)z_dm_migrate();else z_dm_init();z_dm_authoritative();}
+ if(!Z_SAMPLER_EDITION){z_dm_state kit;int bytes=project_store_load(OBJ_DRUM,&kit,sizeof kit);if(project_loaded&&drum_root_matches&&bytes==sizeof kit&&z_dm_valid(&kit))z_dm=kit;else if(project_loaded&&drum_root_matches&&z_song.padding[1]!=0xD1)z_dm_migrate();else z_dm_init();z_dm_authoritative();}
  z_apply_state();z_song.recording=0;for(t=0;t<6;t++)z_song.arp_hold[t]=0;z_external(z_song.reserved);load_samples();z_set_midi_out(seq_out);
  panel_keys_before=held_buttons=0;editor_effect=0;message[0]=0;message_until=0;redraw_at=0;save_requested=0;upload_slot=255;
  for(i=0;i<27;i++)key_action[i]=0;for(i=0;i<NB;i++)pulse_until[i]=0;
  for(t=0;t<6;t++){for(i=0;i<128;i++)off_deadline[t][i]=0;for(i=0;i<16;i++)editor_notes[t][i]=0;}
  for(t=0;t<6;t++){for(i=0;i<4;i++)daw_values[t][i]=(uint8_t)z_get(t,daw_params[i]);daw_values[t][4]=(uint8_t)z_get(t,Z_LEVEL);daw_values[t][5]=(uint8_t)(z_get(t,Z_PAN)+64);}daw_bpm=z_song.bpm;daw_host=0;
  midi_local=z_sys.midi_mode==0;daw_seen=0;daw_playing=daw_recording=0;daw_name[0]=0;panel_reset();z_song.section=z_sys.start==1?Z_SEQ:z_sys.start==2?Z_SEL:Z_HOME;z_song.subpage=0;saved_revision=z_revision();
+#if !Z_SAMPLER_EDITION
+ if(pair_boot_status){if(pair_boot_status==2)saved_revision=0;app_say(pair_boot_status==1?(z_song.language?"PREVIOUS PROJECT RECOVERED":"ВОССТАНОВЛЕН ПРЕЖНИЙ ПРОЕКТ"):(z_song.language?"PROJECT DAMAGED / EMPTY START":"ПРОЕКТ ПОВРЕЖДЕН / ПУСТОЙ СТАРТ"),0);}
+#endif
 }
 void app_say(const char *a,const char *b){uint32_t i;(void)b;for(i=0;i<95&&a&&a[i];i++)message[i]=a[i];message[i]=0;message_until=plat_ms()+1800;redraw_at=0;}
 #include "panel.c"
 
 void app_input_only(void){uint32_t f=plat_lock();input();plat_unlock(f);}
-void app_frame(void){app_input_only();system_service();if(save_requested){int rc;save_requested=0;app_panic();flash_busy=1;rc=plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song);if(!rc)rc=system_save();if(!rc)rc=plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler);if(!rc&&!Z_SAMPLER_EDITION)rc=plat_store_save(OBJ_DRUM,&z_dm,sizeof z_dm);flash_busy=0;if(!rc)saved_revision=z_revision();app_say(rc?word("СБОЙ СОХРАНЕНИЯ","SAVE FAILED"):word("ПРОЕКТ СОХРАНЕН","PROJECT SAVED"),0);}if(plat_ms()-redraw_at>65||!redraw_at){draw_ui();redraw_at=plat_ms();}}
+void app_frame(void){app_input_only();system_service();if(save_requested){int rc;uint32_t f=plat_lock();save_requested=0;app_panic();flash_busy=1;plat_unlock(f);rc=project_save_all();flash_busy=0;if(!rc)saved_revision=z_revision();else saved_revision=0;app_say(rc?word("СБОЙ СОХРАНЕНИЯ","SAVE FAILED"):word("ПРОЕКТ СОХРАНЕН","PROJECT SAVED"),0);}if(plat_ms()-redraw_at>65||!redraw_at){draw_ui();redraw_at=plat_ms();}}
 void app_ui_init(void){palette_set(0);draw_ui();}
 void app_splash(void){edition_splash();}
 /* Independent ZC protocol: F0 7D 5A 43 request-id command pack7(payload) F7.
@@ -127,7 +140,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  else if(cmd==6&&n==6&&a[0]<6&&a[1]<64)z_step_set(a[0],a[1],a[2],a[3],a[4],a[5]);
  else if(cmd==7&&n==2&&a[0]<6&&a[1]<Z_PRESETS){z_preset(a[0],a[1]);}
  else if(cmd==8&&n==3)z_tempo(a[0]|a[1]<<8,a[2]);
- else if(cmd==9&&n==0){app_panic();plat_unlock(f);flash_busy=1;status=(plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song)||system_save()||plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler)||(!Z_SAMPLER_EDITION&&plat_store_save(OBJ_DRUM,&z_dm,sizeof z_dm)))?5:0;if(!status)saved_revision=z_revision();flash_busy=0;reply(seq,cmd,status,0,0);return 1;}
+ else if(cmd==9&&n==0){app_panic();flash_busy=1;plat_unlock(f);status=project_save_all()?5:0;if(!status)saved_revision=z_revision();else saved_revision=0;flash_busy=0;reply(seq,cmd,status,0,0);return 1;}
  else if(cmd==10&&n==3&&a[0]<2&&a[1]<2&&a[2]<6){z_external(a[0]);z_song.language=a[1];z_song.selected=a[2];z_touch();}
  else if(cmd==11&&n==11&&a[0]<4){uint32_t bytes=rd32(a+1),rate=a[5]|a[6]<<8;if(bytes<4||bytes>Z_PCM_MAX*2||bytes%2||rate<4000||rate>44100)status=1;else {app_panic();upload_slot=a[0];upload_size=bytes;upload_rate=rate;upload_crc=rd32(a+7);upload_at=0;}}
  else if(cmd==12&&n>=3&&upload_slot<4){uint32_t at=a[0]|a[1]<<8;if(at!=upload_at||at+n-2>upload_size)status=2;else{for(j=2;j<n;j++)z_transfer()[upload_at++]=a[j];}}

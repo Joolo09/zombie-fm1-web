@@ -332,6 +332,23 @@
       "file": "downloads/zombie-groovebox-0.13.5.fwsc",
       "editor": "webapp/groovebox-135/",
       "source": "downloads/groovebox-source-0.13.5.zip"
+    },
+    {
+      "product": "FM-1_63001306",
+      "version": "0.13.6",
+      "label": {
+        "ru": "Groovebox 0.13.6 beta · согласованное сохранение",
+        "en": "Groovebox 0.13.6 beta · paired project saves"
+      },
+      "notes": {
+        "ru": "Мелодии и драмка сохраняются согласованной парой: сбой не смешивает разные поколения проекта. Старые проекты загружаются; новая схема хранения требует экспорта JSON перед откатом на 0.13.5. Физический FM-1 не проверен.",
+        "en": "Commits melodies and drums as a verified pair, preventing mixed generations after a failed save. Legacy projects load; export JSON before downgrading to 0.13.5. Physical FM-1 unverified."
+      },
+      "bytes": 610100,
+      "sha256": "250cd44f2e40610986b2792f791b6720e4eba15c15770b57296d343a4646f76a",
+      "file": "downloads/zombie-groovebox-0.13.6.fwsc",
+      "editor": "webapp/groovebox-136/",
+      "source": "downloads/groovebox-source-0.13.6.zip"
     }
   ]
 }
