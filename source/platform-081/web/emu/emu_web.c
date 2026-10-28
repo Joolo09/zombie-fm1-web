@@ -126,6 +126,8 @@ __attribute__((used, visibility("default"))) void web_store_set_len(uint32_t obj
     if (obj < OBJ_NOBJ)
         store_len[obj] = n < 0 ? -1 : n > (int)PLAT_STORE_MAX ? (int)PLAT_STORE_MAX : n;
 }
+/* Simulator-only failure injection; no hardware storage hook. */
+__attribute__((used, visibility("default"))) void web_store_fail(uint32_t obj){web_store_failed_object=obj<OBJ_NOBJ?(int)obj:-1;}
 __attribute__((used, visibility("default"))) uint32_t web_store_writes(void) { return store_writes; }
 __attribute__((used, visibility("default"))) uint32_t web_nobj(void) { return OBJ_NOBJ; }
 __attribute__((used, visibility("default"))) uint32_t web_store_max(void) { return PLAT_STORE_MAX; }

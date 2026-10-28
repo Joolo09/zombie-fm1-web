@@ -439,9 +439,15 @@ int plat_store_load(uint32_t obj, void *dst, uint32_t max)
     memcpy(dst, store[obj], (size_t)n);
     return n;
 }
+#ifdef PLAT_WEB
+static int web_store_failed_object=-1;
+#endif
 int plat_store_save(uint32_t obj, const void *src, uint32_t len)
 {
     store_ready();
+#ifdef PLAT_WEB
+    if((int)obj==web_store_failed_object)return -9;
+#endif
     if (obj >= OBJ_NOBJ || len > PLAT_STORE_MAX)
         return -1;
     memcpy(store[obj], src, len);

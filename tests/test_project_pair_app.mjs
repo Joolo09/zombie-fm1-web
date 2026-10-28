@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {create} from './native_emulator_harness.mjs';
+import {protocol} from './native_protocol_harness.mjs';
+let failed=0;const check=(name,fn)=>{try{fn();console.log('PASS '+name);}catch(e){failed++;console.error('FAIL '+name+': '+e.message);}};
+const kit=e=>new Uint8Array(e.memory.buffer,e.w.z_dm_data(),e.w.z_dm_size());
+const edit=(p,n,v)=>{p(24,[0,0,0,0,0,0,n,100,127,80]);p(45,[0,0,v,127,1]);};
+const match=(e,n,v)=>{assert.equal(e.root()[66],n);assert.equal(e.root()[67],100);assert.equal(kit(e)[136],v);};
+const reboot=e=>{const writes=e.w.web_store_writes();e.w.web_reset();e.run(90);assert.equal(e.w.web_store_writes(),writes);};
+check('SAVE commits the pair and alternates banks; reboot restores matching melody and drums',()=>{const e=create(),p=protocol(e);edit(p,60,100);p(9);assert.equal(e.w.web_store_len(6),3452);assert.equal(e.w.web_store_len(7),3208);assert.equal(e.w.web_store_len(8),24);reboot(e);match(e,60,100);edit(p,67,55);p(9);reboot(e);match(e,67,55);assert.equal(p(20)[11],0);});
+for(const object of [3,4,0,5,8])check('SAVE failure at object '+object+' reports error, preserves old pair and permits retry',()=>{const e=create(),p=protocol(e);edit(p,60,100);p(9);edit(p,67,55);e.w.web_store_fail(object);p(9,[],5);assert.equal(p(20)[11],1);e.w.web_store_fail(0xffffffff);reboot(e);match(e,60,100);edit(p,67,55);p(9);reboot(e);match(e,67,55);});
+check('physical SAVE failure does not clear dirty status or replace the committed pair',()=>{const e=create(),p=protocol(e);edit(p,60,100);p(9);edit(p,67,55);e.w.web_store_fail(0);e.tap('SAVE');assert.equal(p(20)[11],1);e.w.web_store_fail(0xffffffff);reboot(e);match(e,60,100);});
+check('a damaged active component recovers the previous whole musical pair',()=>{const e=create(),p=protocol(e);edit(p,60,100);p(9);edit(p,67,55);p(9);new Uint8Array(e.memory.buffer,e.w.web_store(0),3452)[66]^=1;reboot(e);match(e,60,100);assert.equal(p(20)[11],0);});
+check('no intact pair starts empty and dirty; erased drums cannot return',()=>{const e=create(),p=protocol(e);edit(p,60,100);p(9);edit(p,67,55);p(9);new Uint8Array(e.memory.buffer,e.w.web_store(0),3452)[66]^=1;new Uint8Array(e.memory.buffer,e.w.web_store(7),3208)[136]^=1;reboot(e);for(let t=0;t<6;t++)assert.equal(e.w.z_track_hits(t),0);assert.equal(p(20)[11],1);e.tap('PLAY');assert.equal(e.run(500),0);});
+check('a lost manifest cannot load an uncommitted tagged bank as legacy',()=>{const e=create(),p=protocol(e);edit(p,60,100);p(9);edit(p,67,55);p(9);e.w.web_store_set_len(8,-1);reboot(e);for(let t=0;t<6;t++)assert.equal(e.w.z_track_hits(t),0);assert.equal(p(20)[11],1);});
+check('legacy v3 project and drum kit migrate on SAVE without writes during boot',()=>{const e=create(),p=protocol(e);edit(p,60,100);const root=e.root().slice(),drums=kit(e).slice();for(const [obj,bytes] of [[0,root],[5,drums]]){new Uint8Array(e.memory.buffer,e.w.web_store(obj),bytes.length).set(bytes);e.w.web_store_set_len(obj,bytes.length);}reboot(e);match(e,60,100);p(9);reboot(e);match(e,60,100);assert.deepEqual(new Uint8Array(e.memory.buffer,e.w.web_store(0),3452),root);});
+check('a failed musical SAVE keeps dirty status even after system preferences were saved',()=>{const e=create(),p=protocol(e);p(9);p(29,[3,2]);e.w.web_store_fail(0);p(9,[],5);assert.equal(p(20)[11],1);e.w.web_store_fail(0xffffffff);p(9);assert.equal(p(20)[11],0);});
+for(const object of [0,5,8])check('SAVE retry without reboot succeeds after failure at '+object,()=>{const e=create(),p=protocol(e);edit(p,60,100);p(9);edit(p,67,55);e.w.web_store_fail(object);p(9,[],5);e.w.web_store_fail(0xffffffff);p(9);reboot(e);match(e,67,55);});
+if(failed)process.exitCode=1;
