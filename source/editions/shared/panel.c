@@ -40,8 +40,8 @@ static int panel_setting(uint32_t id,uint32_t value){
  if(id==0){if(value>6)return 0;z_song.octave=(int8_t)((int)value-3);}
  else if(id==1){if(value>=Z_SECTIONS)return 0;page_memory[z_song.section]=z_song.subpage;z_song.section=(uint8_t)value;z_song.subpage=page_memory[value]%page_count[value];}
  else if(id==2){if(value>=page_count[z_song.section])return 0;z_song.subpage=(uint8_t)value;page_memory[z_song.section]=(uint8_t)value;}
- else if(id==3){if(value>3)return 0;z_song.step_bank=(uint8_t)value;z_song.step_edit=(uint8_t)(value*16+z_song.step_edit%16);}
- else if(id==4){if(value>1)return 0;z_record(value);}
+ else if(id==3){if(value>3)return 0;if(value!=z_song.step_bank)roll_note_slot=0;z_song.step_bank=(uint8_t)value;z_song.step_edit=(uint8_t)(value*16+z_song.step_edit%16);}
+ else if(id==4){if(value>1)return 0;if(value)roll_edit=roll_note_slot=0;z_record(value);}
  else if(id==5){if(value>63)return 0;roll_note_slot=0;z_song.step_edit=(uint8_t)value;z_song.step_bank=(uint8_t)(value/16);}
  else if(id==6){if(value>1)return 0;z_song.language=(uint8_t)value;}
  else if(id==7){if(value>=6)return 0;roll_note_slot=0;z_song.selected=(uint8_t)value;if(z_sys.midi_mode==2)midi_cc(15,110,value);}
@@ -334,7 +334,7 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
   else if(k==B_PLAY){if(z_sys.midi_mode==2)daw_transport(0);else{if(z_playing())all_off();z_transport(!z_playing());}}
   else if(k==B_SAVE)save_requested=1;
   else if(k==B_ARP&&z_drum_track(z_song.selected)){button_used[B_ARP]=1;panel_setting(1,Z_SEQ);panel_setting(2,0);app_say(word("ДРОБЬ: K4 НА СТРАНИЦЕ SEQ","ROLL: K4 ON THE SEQ PAGE"),0);}
-  else if(k==B_REC){button_used[B_REC]=1;if(z_sys.midi_mode==2)daw_transport(1);else{panel_setting(4,!z_song.recording);if(z_song.recording)panel_setting(1,Z_SEQ);}}
+  else if(k==B_REC){button_used[B_REC]=1;if(z_sys.midi_mode==2)daw_transport(1);else{if(active_layer>=0)layer_close();panel_setting(4,!z_song.recording);if(z_song.recording)panel_setting(1,Z_SEQ);}}
   else if((k==B_SEL&&(buttons&(1u<<B_HOME)))||(k==B_HOME&&(buttons&(1u<<B_SEL)))){button_used[B_SEL]=button_used[B_HOME]=1;system_set(6,(z_sys.midi_mode+1)%3);app_say(z_sys.midi_mode==2?"DAW CONTROLLER":z_sys.midi_mode==1?"DAW SYNTH":"STANDALONE",0);}
   else if(k==B_GLO&&(buttons&(1u<<B_HOME))){button_used[B_HOME]=button_used[B_GLO]=1;panel_setting(6,!z_song.language);}
   else {(void)section;}

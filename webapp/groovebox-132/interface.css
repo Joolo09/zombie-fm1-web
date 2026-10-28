@@ -1,0 +1,93 @@
+/* SPDX-License-Identifier: MIT — Afterglow, original theme and motion layer. */
+body[data-theme=afterglow]{
+ color-scheme:dark;--bg:#080e16;--panel:#101d29;--line:#263b49;
+ --fg:#e6f2f4;--muted:#91a9b9;--accent:#73efd0;--ink:#06251e;
+ background-image:radial-gradient(ellipse at 12% 0%,#164f493d,transparent 48%),radial-gradient(ellipse at 95% 22%,#1f3e6b24,transparent 42%);
+ background-attachment:fixed;
+}
+body{transition:background-color .24s,color .24s}
+button,.file-button,select,#clock-details summary{
+ transition:background-color .16s,border-color .16s,color .16s,box-shadow .16s,transform .12s;
+}
+button:not(:disabled),.file-button{position:relative;isolation:isolate}
+button:hover:not(:disabled),.file-button:hover{
+ border-color:var(--accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 13%,transparent),0 0 20px color-mix(in srgb,var(--accent) 10%,transparent);
+}
+button:active:not(:disabled),.file-button:active{transform:translateY(1px) scale(.985)}
+button:disabled{box-shadow:none!important;animation:none!important}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px;box-shadow:0 0 20px color-mix(in srgb,var(--accent) 14%,transparent)}
+button[aria-pressed=true]:not(:disabled),button[aria-selected=true]:not(:disabled){
+ box-shadow:inset 0 1px 0 #ffffff24,0 0 16px color-mix(in srgb,var(--accent) 19%,transparent);
+}
+.tabs button{position:relative;transition:color .18s,background-color .18s}
+.tabs button::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:center;opacity:0;transition:transform .2s,opacity .2s;box-shadow:0 0 10px var(--accent)}
+.tabs button[aria-selected=true]{border-bottom-color:transparent;box-shadow:none;color:var(--accent)}
+.tabs button[aria-selected=true]::after{transform:scaleX(1);opacity:1}
+#tracks button{transition:background-color .18s,border-color .18s,box-shadow .18s,transform .12s}
+#tracks button::after{content:'';position:absolute;right:10px;top:9px;width:5px;height:5px;border-radius:50%;background:var(--color);opacity:.35;transition:opacity .18s,box-shadow .18s}
+#tracks button[aria-selected=true]{background:color-mix(in srgb,var(--color) 9%,var(--panel));box-shadow:inset 0 0 22px color-mix(in srgb,var(--color) 6%,transparent),0 0 15px color-mix(in srgb,var(--color) 9%,transparent)}
+#tracks button[aria-selected=true]::after{opacity:1;box-shadow:0 0 9px var(--color)}
+.transport #play[aria-pressed=true]{background:var(--accent);color:var(--ink);border-color:var(--accent);animation:play-light 2.4s ease-in-out infinite}
+.transport #record[aria-pressed=true]{background:#e96581;color:#fff;border-color:#fa9aae;animation:record-light 1.8s ease-in-out infinite}
+#audio{border-color:color-mix(in srgb,var(--accent) 28%,var(--line))}
+.pill.connected{border-color:color-mix(in srgb,var(--accent) 50%,var(--line));background:color-mix(in srgb,var(--accent) 9%,var(--panel));box-shadow:0 0 14px color-mix(in srgb,var(--accent) 11%,transparent)}
+#live-pads button[aria-pressed=true],#sampler-pads button.held,.key.held,.key.black.held{
+ border-color:var(--accent);background:var(--accent);color:var(--ink);box-shadow:inset 0 1px 0 #fff6,0 0 21px color-mix(in srgb,var(--accent) 35%,transparent);
+}
+.key,.key.black{transition:background-color .065s,box-shadow .065s,transform .065s}
+.key.held,.key.black.held{transform:translateY(2px)}
+#step-grid button.on{box-shadow:inset 0 1px 0 #fff2,0 0 10px color-mix(in srgb,var(--accent) 16%,transparent)}
+#step-grid button.playhead{box-shadow:inset 0 -4px 0 #8fbcff,0 0 18px #8fbcff25;transition:box-shadow .07s}
+#banks button[aria-selected=true],.pad-banks button[aria-pressed=true]{box-shadow:0 0 12px color-mix(in srgb,var(--accent) 20%,transparent)}
+.control:focus-within output{color:var(--fg);text-shadow:0 0 12px color-mix(in srgb,var(--accent) 45%,transparent)}
+@keyframes play-light{0%,100%{box-shadow:0 0 12px color-mix(in srgb,var(--accent) 23%,transparent)}50%{box-shadow:0 0 24px color-mix(in srgb,var(--accent) 35%,transparent)}}
+@keyframes record-light{0%,100%{box-shadow:0 0 10px #e9658133}50%{box-shadow:0 0 24px #e9658166}}
+/* Theme-specific surfaces; the musical controls and geometry stay stable. */
+body[data-theme=afterglow] header{background:#080e16bb;border-bottom-color:#263e4d;padding:17px 3vw}
+body[data-theme=afterglow] .sigil{background:linear-gradient(145deg,#b2ffb0,#6ce7db);border-radius:9px;box-shadow:0 0 24px #73efd01a;color:#0b2d27}
+body[data-theme=afterglow] .brand strong{letter-spacing:.14em}
+body[data-theme=afterglow] .brand small{color:#85b9b2;margin-top:3px}
+body[data-theme=afterglow] .hero{padding:17px 0 15px}
+body[data-theme=afterglow] .hero h1{font-size:24px;letter-spacing:-.035em}
+body[data-theme=afterglow] .card{background:linear-gradient(155deg,#142432e8,#101a26ee);border-color:#263b49;border-radius:12px;box-shadow:inset 0 1px 0 #e7f9ff04,0 8px 28px #00000012}
+body[data-theme=afterglow] .transport{background:#0c1622f5;border-radius:12px;box-shadow:0 8px 24px #0004,inset 0 1px 0 #ffffff04;padding:13px 14px;gap:10px}
+body[data-theme=afterglow] button,body[data-theme=afterglow] select,body[data-theme=afterglow] .file-button{border-radius:7px;background-color:#132230}
+body[data-theme=afterglow] #tracks{gap:8px;margin:14px 0 15px}
+body[data-theme=afterglow] #tracks button{border-radius:8px;border-top-width:2px;padding:12px 14px}
+body[data-theme=afterglow] .tabs{gap:9px;border-color:#263b49;padding:0 3px;margin-bottom:18px}
+body[data-theme=afterglow] .tabs button{border-radius:7px 7px 0 0;background:transparent;padding:11px 13px;font-size:12px;color:var(--muted);border-bottom-width:2px}
+body[data-theme=afterglow] .tabs button:hover{background:#73efd009;box-shadow:none;color:var(--fg)}
+body[data-theme=afterglow] .tabs button[aria-selected=true]{background:#73efd00c;color:var(--accent)}
+body[data-theme=afterglow] .sound-grid{gap:14px}
+body[data-theme=afterglow] .sound-grid h2{font-size:12px;letter-spacing:.04em;color:#b2c8d5;border-color:#2a4251;padding-bottom:11px}
+body[data-theme=afterglow] .sound-header{padding:17px 19px}
+body[data-theme=afterglow] canvas{border-radius:7px;background:#0a141f;border:1px solid #1d3342}
+body[data-theme=afterglow] #preset-search,body[data-theme=afterglow] input[type=number],body[data-theme=afterglow] .system-fields input[type=text],body[data-theme=afterglow] #pad-fields input{border-radius:6px;background:#0a141f;border-color:#2b4352}
+body[data-theme=afterglow] .pill{border-radius:18px;font-size:10px}
+body[data-theme=afterglow] .position-display{font-size:15px;color:#94d6f0;letter-spacing:.025em}
+body[data-theme=afterglow] .eyebrow{color:#74c7ba;letter-spacing:.16em}
+body[data-theme=afterglow] .live-strip{border-radius:7px;background:#0a141f}
+body[data-theme=afterglow] #live-pads{gap:10px;margin:18px 0}
+body[data-theme=afterglow] #live-pads button{border-radius:9px;background:linear-gradient(140deg,#192d3d,#101e2a);height:68px;font-size:11px;letter-spacing:.045em;box-shadow:inset 0 1px 0 #ffffff06}
+body[data-theme=afterglow] #live-pads button[aria-pressed=true]{background:var(--accent);color:var(--ink);box-shadow:0 0 24px #73efd04d}
+body[data-theme=afterglow] #sampler-pads button{background:linear-gradient(145deg,#152636,#0e1a26);border-radius:9px}
+body[data-theme=afterglow] #sampler-pads button.held{background:var(--accent);color:var(--ink)}
+body[data-theme=afterglow] #sampler-pads button[aria-pressed=true]:not(.held){background:#73efd00c;box-shadow:inset 0 0 22px #73efd006,0 0 12px #73efd00a}
+body[data-theme=afterglow] .system-block{background:#0c1823;border-radius:10px;border-color:#28404e}
+body[data-theme=afterglow] .key{background:linear-gradient(#e2f0e8,#cbdcd6);color:#182c28}
+body[data-theme=afterglow] .key.black{background:linear-gradient(#253d4e,#122332);color:#b0c6d0;border-color:#080e16}
+body[data-theme=afterglow] .key.held,body[data-theme=afterglow] .key.black.held{background:var(--accent);color:var(--ink)}
+body[data-theme=afterglow] #status{background:#0b1520f5;border-color:#263b49;border-radius:8px 8px 0 0;color:#93cfbe;margin-top:12px}
+body[data-theme=afterglow] .meter{background:#1b303e;height:5px}.meter i{background:linear-gradient(90deg,var(--accent),#91c8ff)}
+body[data-theme=paper] #tracks button[aria-selected=true]{background:color-mix(in srgb,var(--color) 14%,var(--panel))}
+@media(max-width:850px){body[data-theme=afterglow] .tabs{gap:3px}body[data-theme=afterglow] .tabs button{padding:10px 11px}body[data-theme=afterglow] header{padding:16px 20px}}
+@media(max-width:600px){body[data-theme=afterglow] #tracks button{padding:11px 10px}body[data-theme=afterglow] .tabs button{padding:10px 8px}body[data-theme=afterglow] #live-pads{gap:6px}body[data-theme=afterglow] #live-pads button{height:57px;padding:10px}body[data-theme=afterglow] .transport{gap:7px;padding:11px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto!important}}
+
+body[data-theme=afterglow] #banks button[aria-selected=true],body[data-theme=afterglow] .pad-banks button[aria-pressed=true]{background:var(--accent);color:var(--ink)}
+#sampler-enable:disabled{opacity:1;color:var(--accent);background:var(--panel);border-color:var(--line)}
+
+body[data-drum-kit="true"] #piano-roll,body[data-drum-kit="true"] #step-grid,body[data-drum-kit="true"] #step-edit,body[data-drum-kit="true"] #toggle-step,body[data-drum-kit="true"] #arp-controls{display:none}
+.dm-controls label,.dm-step label{display:grid;gap:6px;min-width:90px;flex:1}.dm-controls input,.dm-step input{width:100%;min-width:70px}.dm-controls,.dm-step{margin:18px 0}.dm-scroll{overflow:auto}.dm-grid{display:grid;grid-template-columns:110px repeat(16,minmax(32px,1fr));gap:4px;min-width:740px}.dm-grid button{padding:8px 2px;min-height:35px}.dm-grid button.on{background:var(--accent);color:#101622}.dm-grid button.outside{opacity:.35}.dm-grid button.playhead{outline:2px solid #fff}.dm-grid button:first-child{position:sticky;left:0}.dm-step>span{width:100%}
+
+#drum-kit-pads button[aria-pressed="true"]{background:var(--accent);color:#101622}

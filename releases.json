@@ -264,6 +264,23 @@
       "file": "downloads/zombie-groovebox-0.13.1.fwsc",
       "editor": "webapp/groovebox-131/",
       "source": "downloads/groovebox-source-0.13.1.zip"
+    },
+    {
+      "product": "FM-1_63001302",
+      "version": "0.13.2",
+      "label": {
+        "ru": "Groovebox 0.13.2 beta · переходы и запись",
+        "en": "Groovebox 0.13.2 beta · track and recording transitions"
+      },
+      "notes": {
+        "ru": "Исправлены курсор после смены дорожки, REC из удерживаемых меню, удаление аккорда после смены банка и клавиши, зажатые до записи. Управление и IDM-банк сохранены. Проверено программно; физический FM-1 ожидается.",
+        "en": "Fixes late releases across tracks, REC from held menus, stale chord focus after bank changes and keys held before recording. Controls and IDM bank retained. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "8d96b3543e00910579200e8fa89090a49431a0c0d6f2aa44a704b62fc42a3ded",
+      "file": "downloads/zombie-groovebox-0.13.2.fwsc",
+      "editor": "webapp/groovebox-132/",
+      "source": "downloads/groovebox-source-0.13.2.zip"
     }
   ]
 }
