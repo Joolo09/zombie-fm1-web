@@ -42,3 +42,5 @@ Groovebox 0.13.4 matching source: downloads/groovebox-source-0.13.4.zip. Origina
 Groovebox 0.13.5 matching source: downloads/groovebox-source-0.13.5.zip. Original Zombie additions are MIT; upstream notices remain in the archive.
 
 Groovebox 0.13.6 matching source: downloads/groovebox-source-0.13.6.zip. Original Zombie additions are MIT; upstream notices remain in the archive.
+
+Groovebox 0.13.7 matching source: downloads/groovebox-source-0.13.7.zip. Original Zombie additions are MIT; upstream notices remain in the archive.

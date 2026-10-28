@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {create,WHITE} from './native_emulator_harness.mjs';
-const module=new WebAssembly.Module(readFileSync('webapp/groovebox-136/zombie-core.wasm'));
+const module=new WebAssembly.Module(readFileSync('webapp/groovebox-137/zombie-core.wasm'));
 const fresh=()=>{const w=new WebAssembly.Instance(module,{}).exports;w.z_init();return w;};
 const root=w=>new Uint8Array(w.memory.buffer,w.z_snapshot(),w.z_state_size());
 let w=fresh();w.z_set(0,23,4);root(w)[1907]=20;w.z_record(1);w.z_key(0,60,100,1);w.z_key(0,60,0,0);assert.equal(root(w)[67],100);assert.equal(root(w)[67+20*4],0);assert.equal(root(w)[1907],1);

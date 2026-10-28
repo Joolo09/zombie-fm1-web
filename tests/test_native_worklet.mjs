@@ -15,3 +15,11 @@ console.log('PASS fast SEQ → EDIT → keyboard preserves page transitions and 
 await p.onMessage({type:'preset',value:95});run(30);assert.equal(root()[1900],95);assert(messages.some(m=>m.preset===95));console.log('PASS sound-bank picker applies the actual C preset and reports the selected slot');
 
 await p.onMessage({type:'buttons',mask:1<<6});run(20);await p.onMessage({type:'buttons',mask:0});run(20);await p.onMessage({type:'enc',role:4,n:-1});run(30);assert.equal(root()[1900],255);assert(messages.some(m=>m.preset===255));console.log('PASS manual sound edits are reported as CUSTOM instead of the previous factory preset');
+
+// The emulator must expose the printed OP row and the same step edits as FM-1.
+await p.onMessage({type:'enc',role:1,n:5});run(30);await p.onMessage({type:'buttons',mask:1<<9});await p.onMessage({type:'buttons',mask:0});run(40);
+const drumBytes=()=>new Uint8Array(w.memory.buffer,w.z_dm_data(),3208);
+for(const mask of [(1<<1)|1,(1<<3)|1,1]){await p.onMessage({type:'keys',mask});await p.onMessage({type:'keys',mask:0});run(40);}
+assert.equal(root()[9],5);assert.equal(drumBytes()[136],100);assert.equal(drumBytes()[328],0);assert(messages.some(m=>m.operatorPanel&&m.stepGrid&&m.drum===1));
+await p.onMessage({type:'buttons',mask:1<<4});await p.onMessage({type:'keys',mask:1<<7});await p.onMessage({type:'keys',mask:0});await p.onMessage({type:'buttons',mask:0});run(60);assert.equal(drumBytes()[328+4*3],0);assert.equal(w.z_track_hits(5),1);
+console.log('PASS native worklet: simultaneous OP+step, repeated-step erase and EDIT+empty-step');

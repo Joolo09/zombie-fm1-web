@@ -69,7 +69,7 @@ class Fm1 extends AudioWorkletProcessor {
     const ex = this.ex;
     const blits = ex.web_blits();
     const root=new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size());
-    const msg = { type: "frame", stepGrid:!!ex.web_step_grid(),bank:root[1875],octave:(root[1872]<<24)>>24,track:root[9],section:root[1873],step:root[1907],preset:root[1900+root[9]],drum:new Uint8Array(this.mem.buffer,ex.z_dm_data(),8)[6],playing:!!ex.z_playing(),recording:!!new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size())[1906],buttons: ex.web_lit_buttons() >>> 0, keys: ex.web_lit_keys() >>> 0 };
+    const msg = { type: "frame", stepGrid:!!ex.web_step_grid(),operatorPanel:!!ex.web_drum_operators(),bank:root[1875],octave:(root[1872]<<24)>>24,track:root[9],section:root[1873],step:root[1907],preset:root[1900+root[9]],drum:new Uint8Array(this.mem.buffer,ex.z_dm_data(),8)[6],playing:!!ex.z_playing(),recording:!!new Uint8Array(this.mem.buffer,ex.z_snapshot(),ex.z_state_size())[1906],buttons: ex.web_lit_buttons() >>> 0, keys: ex.web_lit_keys() >>> 0 };
     if (this.frames >= 44100) {                       // the share of real time spent running the device
       msg.load = Math.round(100 * this.busy / (this.frames / 44.1));
       this.busy = this.frames = 0;
