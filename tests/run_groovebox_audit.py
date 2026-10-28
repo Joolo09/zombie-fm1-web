@@ -14,10 +14,10 @@ def run(name,cmd):
   print((r.stdout+r.stderr).decode('utf-8',errors='replace')[-4200:]);raise SystemExit(r.returncode)
 py=[sys.executable,'-X','utf8'];node=os.environ.get('NODE','node')
 if args.build:
- run('groovebox-build',py+['source/build-groovebox-131.py'])
+ run('groovebox-build',py+['source/build-groovebox-132.py'])
  run('native-emulator-build',py+['source/build-emulator.py'])
-shutil.copy2(ROOT/'source/output/editions-0.13.1/groovebox.wasm',ROOT/'webapp/groovebox-131/zombie-core.wasm')
-for name,test,extra in [('full-panel','test_full_emulator.mjs',[]),('keyboard-roll','test_keyboard_roll.mjs',[]),('followup-regressions','test_followup_audit.mjs',[]),('playback-lights-and-grid','test_lights_grid.mjs',[]),('idm-regressions','test_idm_regressions.mjs',[]),('native-performance','test_native_performance.mjs',[]),('native-worklet','test_native_worklet.mjs',[]),('pattern-recording','test_pattern_recording.mjs',['groovebox-131']),('synth-and-drums','test_zombie_drums.mjs',['groovebox-131']),('audio-lifecycle','test_audio_engine.mjs',['groovebox-131']),('web-installer','web-installer.mjs',[])]:
+shutil.copy2(ROOT/'source/output/editions-0.13.2/groovebox.wasm',ROOT/'webapp/groovebox-132/zombie-core.wasm')
+for name,test,extra in [('full-panel','test_full_emulator.mjs',[]),('keyboard-roll','test_keyboard_roll.mjs',[]),('transition-regressions','test_transition_audit.mjs',[]),('followup-regressions','test_followup_audit.mjs',[]),('playback-lights-and-grid','test_lights_grid.mjs',[]),('idm-regressions','test_idm_regressions.mjs',[]),('native-performance','test_native_performance.mjs',[]),('native-worklet','test_native_worklet.mjs',[]),('pattern-recording','test_pattern_recording.mjs',['groovebox-132']),('synth-and-drums','test_zombie_drums.mjs',['groovebox-132']),('audio-lifecycle','test_audio_engine.mjs',['groovebox-132']),('web-installer','web-installer.mjs',[])]:
  run(name,[node,ROOT/'tests'/test,*extra])
 host=ROOT/'source/editions/groovebox/build/host/zombie-groovebox_host'
 run('save-led',py+['tests/test_save_led.py',host])
@@ -25,12 +25,12 @@ run('physical-pattern-controls',[host,'tests/native-pattern-editing.txt',OUT])
 run('drum-save-reboot',[host,'tests/zombie-drum-controls.txt',OUT])
 project=OUT/'project-audit.txt';project.write_text('wait 100\nprojectaudit\nwait 100\n',encoding='utf-8')
 run('project-migration-and-orphans',[host,project,OUT])
-zig=os.environ.get('ZIG',str(ROOT.parent/'.tooling/zig-windows-x86_64-0.13.1/zig.exe'))
+zig=os.environ.get('ZIG',str(ROOT.parent/'.tooling/zig-windows-x86_64-0.13.2/zig.exe'))
 run('journal-build',[zig,'cc','-O2','-I'+str(ROOT/'source/editions/shared'),'-I'+str(ROOT/'source/editions/groovebox'),'-I'+str(ROOT/'source/platform-081/include'),ROOT/'tests/test_zombie_journal.c','-o',OUT/'journal-test.exe'])
 run('actual-nor-journal',[OUT/'journal-test.exe'])
 run('idm-sound-bank',[node,'source/render-idm-bank.mjs'])
-report=dict(version='0.13.1',hardware_verified=False,scope='C panel, display, audio and platform doubles; simulated NOR and MIDI',checks=results)
-for key,p in [('emulator','emulator/app.wasm'),('firmware','source/output/editions-0.13.1/zombie-groovebox-0.13.1.fwsc')]:
+report=dict(version='0.13.2',hardware_verified=False,scope='C panel, display, audio and platform doubles; simulated NOR and MIDI',checks=results)
+for key,p in [('emulator','emulator/app.wasm'),('firmware','source/output/editions-0.13.2/zombie-groovebox-0.13.2.fwsc')]:
  f=ROOT/p
  if f.exists():report[key+'_sha256']=hashlib.sha256(f.read_bytes()).hexdigest()
 (ROOT/'emulator/audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

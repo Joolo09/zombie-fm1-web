@@ -94,6 +94,7 @@ int z_pattern(uint32_t t,uint32_t action,uint32_t target){
  z_touch();return 0;
 }
 static float step_frames(void){return 661500.0f/z_song.bpm;}
+static void dm_record_reset(void);
 static void record_finish(uint32_t t,uint32_t n){
  if(rec_active[t][n]&&rec_live[t][n]){uint32_t at=rec_at[t][n];float len=(audio_frame-rec_start[t][n])/step_frames();
   uint32_t whole,gate;if(len<0.04f)len=0.04f;if(len>63.99f)len=63.99f;
@@ -107,7 +108,7 @@ static void record_finish(uint32_t t,uint32_t n){
 }
 void z_record(uint32_t on){uint32_t t,n;on=!!on;if(on&&!z_song.recording){z_checkpoint();if(!Z_SAMPLER_EDITION)z_dm_checkpoint();}
  if(!on)for(t=0;t<6;t++)for(n=0;n<128;n++)record_finish(t,n);
- if(z_song.recording!=on){z_song.recording=(uint8_t)on;z_touch();}
+ if(z_song.recording!=on){if(!Z_SAMPLER_EDITION)dm_record_reset();z_song.recording=(uint8_t)on;z_touch();}
 }
 void z_live(uint32_t effect){live_requested=effect<=16?effect:0;if(live_requested)live_effect=live_requested;}
 uint32_t z_live_state(void){return live_requested;}
@@ -224,20 +225,21 @@ void z_key(uint32_t t,uint32_t n,uint32_t v,uint32_t on) {
    z_step *s=&z_song.track[t].steps[at];uint32_t capture=0;
    for(i=0;i<128;i++)if(rec_active[t][i]&&rec_at[t][i]==at)capture=1;
    if(!capture){z_song.duration[t][at]=0;s->gate=playing?1:(uint8_t)z_get(t,Z_GATE);}
-   if(!s->velocity||(z_song.rec_mode&&!physical)){
+   if(!s->velocity||(z_song.rec_mode&&!capture)){
     s->note=(uint8_t)n;s->velocity=(uint8_t)v;s->chance=127;s->gate=playing?1:(uint8_t)z_get(t,Z_GATE);z_song.duration[t][at]=0;
     for(i=0;i<3;i++)z_song.chord[t][at][i]=0;
    }else if(s->note!=n){for(i=0;i<3;i++)if(z_song.chord[t][at][i]==n+1)break;else if(!z_song.chord[t][at][i]){z_song.chord[t][at][i]=(uint8_t)(n+1);break;}}
    rec_active[t][n]=1;rec_at[t][n]=(uint8_t)at;rec_start[t][n]=audio_frame;rec_live[t][n]=(uint8_t)playing;
    if(playing&&ahead)rec_skip[t][n]=pos+2;
-   z_song.step_edit=(uint8_t)at;z_song.step_bank=(uint8_t)(at/16);z_touch();
+   if(z_song.selected==t){z_song.step_edit=(uint8_t)at;z_song.step_bank=(uint8_t)(at/16);}z_touch();
   }
  }else{
   if(!was)return;
-  record_finish(t,n);arp_physical[t][n/8]&=(uint8_t)~(1u<<(n&7));
+  uint32_t captured=rec_active[t][n],capture_at=rec_at[t][n];record_finish(t,n);arp_physical[t][n/8]&=(uint8_t)~(1u<<(n&7));
   if(!z_song.arp_hold[t]||!z_song.arp_mode[t]){if(arp_notes[t][n])arp_count[t]--;arp_notes[t][n]=0;}
   physical=0;for(i=0;i<16;i++)physical|=arp_physical[t][i];
-  if(z_song.recording&&!playing&&!physical){z_song.step_edit=(uint8_t)((z_song.step_edit+1)%z_song.track[t].p[Z_LENGTH]);z_song.step_bank=z_song.step_edit/16;z_touch();}
+  uint32_t pending=0;for(i=0;i<128;i++)if(rec_active[t][i]&&rec_at[t][i]==capture_at)pending=1;
+  if(z_song.recording&&!playing&&captured&&!pending&&z_song.selected==t&&z_song.step_edit==capture_at){z_song.step_edit=(uint8_t)((z_song.step_edit+1)%z_song.track[t].p[Z_LENGTH]);z_song.step_bank=z_song.step_edit/16;z_touch();}
   if(z_song.arp_mode[t]&&!arp_count[t]){
    arp_time[t]=0;arp_index[t]=0;
    /* Terminate generated gates now. Keep a short click-free release, not seconds of sustained arp. */
