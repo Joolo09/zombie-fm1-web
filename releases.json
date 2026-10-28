@@ -315,6 +315,23 @@
       "file": "downloads/zombie-groovebox-0.13.4.fwsc",
       "editor": "webapp/groovebox-134/",
       "source": "downloads/groovebox-source-0.13.4.zip"
+    },
+    {
+      "product": "FM-1_63001305",
+      "version": "0.13.5",
+      "label": {
+        "ru": "Groovebox 0.13.5 beta · правка во время REC",
+        "en": "Groovebox 0.13.5 beta · live editing and feedback"
+      },
+      "notes": {
+        "ru": "Исправлены правка зажатой записи, оставшиеся удары удалённой дроби, расход UNDO одинаковыми командами, подсветка крайних нот, признак несохранённых настроек и гонки дорожек/переподключения в редакторе. Физический FM-1 не проверен.",
+        "en": "Fixes held-take editing, deleted roll retriggers, no-op undo pollution, extreme-pitch LEDs, system dirty status and editor note/reconnect races. Physical FM-1 unverified."
+      },
+      "bytes": 610100,
+      "sha256": "2860c50060e55e4738a6c42928b34b069c5ae26faf2f906d6607160cf4feb5d9",
+      "file": "downloads/zombie-groovebox-0.13.5.fwsc",
+      "editor": "webapp/groovebox-135/",
+      "source": "downloads/groovebox-source-0.13.5.zip"
     }
   ]
 }
