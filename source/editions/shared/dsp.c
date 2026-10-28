@@ -321,7 +321,7 @@ void z_clock(uint32_t status) {
 void z_songpos(uint32_t sixteenths){if(!external_clock)return;pos=sixteenths-1;if(!Z_SAMPLER_EDITION)z_dm_songpos(sixteenths);clock_ticks=0;last_step_frame=audio_frame;}
 void z_tempo(uint32_t bpm,uint32_t swing) {z_song.bpm=(uint16_t)(bpm<30?30:bpm>300?300:bpm);z_song.swing=(uint8_t)(swing>60?60:swing);z_touch();}
 void z_step_set(uint32_t t,uint32_t i,uint32_t n,uint32_t v,uint32_t c,uint32_t g) {
- z_step *s;if(t>=Z_TRACKS||i>=64)return;if(z_drum_track(t)){z_dm_step(z_drum_index(n),i,v,c,z_dm.step[z_drum_index(n)][i].ratchet);return;}z_checkpoint();s=&z_song.track[t].steps[i];s->note=(uint8_t)(n>127?127:n);s->velocity=(uint8_t)(v>127?127:v);s->chance=(uint8_t)(c>127?127:c);s->gate=(uint8_t)(g<1?1:g>127?127:g);z_song.duration[t][i]=0;{uint32_t j;for(j=0;j<3;j++)z_song.chord[t][i][j]=0;}z_touch();
+ z_step *s;if(t>=Z_TRACKS||i>=64)return;if(z_drum_track(t)){z_dm_step(z_drum_index(n),i,v,c,z_dm.step[z_drum_index(n)][i].ratchet);return;}z_step next={(uint8_t)(n>127?127:n),(uint8_t)(v>127?127:v),(uint8_t)(c>127?127:c),(uint8_t)(g<1?1:g>127?127:g)};s=&z_song.track[t].steps[i];if(s->note==next.note&&s->velocity==next.velocity&&s->chance==next.chance&&s->gate==next.gate&&!z_song.duration[t][i]&&!z_song.chord[t][i][0]&&!z_song.chord[t][i][1]&&!z_song.chord[t][i][2])return;if(z_song.recording){z_record(0);z_alloff(t);}z_checkpoint();*s=next;z_song.duration[t][i]=0;{uint32_t j;for(j=0;j<3;j++)z_song.chord[t][i][j]=0;}z_touch();
 }
 void z_render(float *out,uint32_t n) {
  uint32_t frame,k,t;float attack[6],decay[6],release[6],cut[6],lfo[6];
@@ -443,7 +443,7 @@ uint32_t z_note_lights(uint32_t t,int32_t base){
  static const uint8_t white[16]={0,2,4,6,7,9,11,12,14,16,18,19,21,23,24,26};uint32_t mask=0;
  if(t>=6||z_get(t,Z_MUTE)||(solo_track&&solo_track!=t+1))return 0;
  if(z_drum_track(t)){for(uint32_t d=0;d<16;d++)if(dm_voice[d].active&&dm_voice[d].env>.08f&&!z_dm.sound[d].mute)mask|=1u<<white[d];return mask;}
- for(uint32_t i=0;i<8;i++)if(voices[i].active&&voices[i].track==t&&voices[i].stage<3&&voices[i].env>.001f){int n=voices[i].note+z_get(t,Z_TRANSPOSE);while(n<base)n+=12;while(n>base+26)n-=12;if(n>=base&&n<=base+26)mask|=1u<<(n-base);}
+ for(uint32_t i=0;i<8;i++)if(voices[i].active&&voices[i].track==t&&voices[i].stage<3&&voices[i].env>.001f){int n=voices[i].note+z_get(t,Z_TRANSPOSE);if(n<0)n=0;if(n>127)n=127;while(n<base)n+=12;while(n>base+26)n-=12;if(n>=base&&n<=base+26)mask|=1u<<(n-base);}
  return mask;
 }
 /* A grid key previews its event with bounded gates; it never enters a take. */
