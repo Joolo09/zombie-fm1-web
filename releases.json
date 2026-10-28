@@ -247,6 +247,23 @@
       "file": "downloads/zombie-groovebox-0.13.0.fwsc",
       "editor": "webapp/groovebox-130/",
       "source": "downloads/groovebox-source-0.13.0.zip"
+    },
+    {
+      "product": "FM-1_63001301",
+      "version": "0.13.1",
+      "label": {
+        "ru": "Groovebox 0.13.1 beta · MIDI + запись + отмена",
+        "en": "Groovebox 0.13.1 beta · MIDI + recording + undo"
+      },
+      "notes": {
+        "ru": "Повторные MIDI-удары снова срабатывают. REPLACE убирает старую дробь; пустые повороты ручек не стирают историю отмены; одинаковые высоты аккорда не дублируются. Проверено программно; физический FM-1 ожидается.",
+        "en": "Repeated MIDI attacks retrigger, REPLACE clears stale rolls, no-op knob turns preserve undo, duplicate chord pitches are rejected. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "69c787012d5925fb54490393a5c239d3c9c0f4ec53098f9d122bbc246c6a3785",
+      "file": "downloads/zombie-groovebox-0.13.1.fwsc",
+      "editor": "webapp/groovebox-131/",
+      "source": "downloads/groovebox-source-0.13.1.zip"
     }
   ]
 }

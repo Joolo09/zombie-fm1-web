@@ -48,13 +48,16 @@ static void note_packet(uint32_t t,uint32_t note,uint32_t vel,uint32_t on){if(on
 static void seq_out(uint32_t t,uint32_t n,uint32_t v,uint32_t ms){uint32_t i;if(z_sys.midi_mode)return;if(n==128){for(i=0;i<128;i++)if(off_deadline[t][i]&&(!v||off_arp[t][i])){note_packet(t,i,0,0);off_deadline[t][i]=0;}if(!v){uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(120u<<16));}return;}off_arp[t][n]=ms>>31;ms&=0x7fffffffu;if(off_deadline[t][n])note_packet(t,n,0,0);note_packet(t,n,v,1);off_deadline[t][n]=plat_ms()+ms+1;}
 static void all_off(void){uint32_t t,n;for(t=0;t<27;t++)if(key_action[t]==1){if(held_raw[t])raw_note(held_channels[t],held_notes[t],0,0);key_action[t]=held_local[t]=0;}for(t=0;t<6;t++)for(n=0;n<128;n++)if(off_deadline[t][n]){note_packet(t,n,0,0);off_deadline[t][n]=0;}for(t=0;t<6;t++){uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(64u<<16));plat_midi_out(11|((0xb0|ch)<<8)|(123u<<16));for(n=0;n<16;n++)editor_notes[t][n]=0;}}
 static void midi_mode_changed(uint32_t mode){app_panic();midi_local=mode==0;daw_bpm=z_song.bpm;daw_playing=daw_recording=0;daw_seen=0;daw_host=0;daw_name[0]=0;}
+/* External MIDI Note On is an attack, including repeated percussion hits without Note Off.
+ * Keep physical/editor key deduplication in z_key unchanged. */
+static void midi_key(uint32_t t,uint32_t n,uint32_t v,uint32_t on){if(on&&v)z_key(t,n,0,0);z_key(t,n,v,on);}
 static void midi_receive(void){uint32_t pkt;int port;while(plat_midi_in(&pkt,&port)){
  uint32_t status=(pkt>>8)&255,n=(pkt>>16)&127,v=(pkt>>24)&127,t;
  if(status>=0xf8){if(z_sys.midi_mode!=2)z_clock(status);continue;}
  if(status==0xf2){if(z_sys.midi_mode!=2)z_songpos(n|(v<<7));continue;}
  for(t=0;t<6;t++)if((status&15)+1==(uint32_t)z_get(t,Z_CHANNEL)){
   if(z_sys.midi_mode==2){if((status&0xf0)==0xb0){uint32_t k;for(k=0;k<4;k++)if(n==daw_cc[k])daw_values[t][k]=v;if(n==7)daw_values[t][4]=v;else if(n==10)daw_values[t][5]=v;else if(n==120||n==123)z_alloff(t);}continue;}
-  if((status&0xf0)==0x90){edition_note(t,n,v,v!=0);z_key(t,n,v,v!=0);}
+  if((status&0xf0)==0x90){edition_note(t,n,v,v!=0);midi_key(t,n,v,v!=0);}
   else if((status&0xf0)==0x80)z_key(t,n,0,0);
   else if((status&0xf0)==0xb0){if(n==123||n==120)z_alloff(t);else if(n==121){z_bend(t,8192);z_sustain(t,0);}else if(n==122&&z_sys.midi_mode==0)midi_local=v>=64;else if(n==73)z_set(t,Z_ATTACK,v);else if(n==72)z_set(t,Z_RELEASE,v);else if(n==64)z_sustain(t,v>=64);else if(n==74)z_set(t,Z_CUTOFF,v);else if(n==71)z_set(t,Z_RESONANCE,v);else if(n==1)z_set(t,Z_FM,v);else if(n==7)z_set(t,Z_LEVEL,v);else if(n==10)z_set(t,Z_PAN,(int)v-64);}
   else if((status&0xf0)==0xe0)z_bend(t,n|(v<<7));
