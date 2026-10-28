@@ -349,6 +349,23 @@
       "file": "downloads/zombie-groovebox-0.13.6.fwsc",
       "editor": "webapp/groovebox-136/",
       "source": "downloads/groovebox-source-0.13.6.zip"
+    },
+    {
+      "product": "FM-1_63001307",
+      "version": "0.13.7",
+      "label": {
+        "ru": "Groovebox 0.13.7 beta · драмка с клавиш",
+        "en": "Groovebox 0.13.7 beta · drum key workflow"
+      },
+      "notes": {
+        "ru": "Драмка: OP1–OP6 выбирают звук, PITCH/GLOBAL листают группы. Без REC белые включают/выключают шаги, EDIT + белая стирает. Исправлены подсветка и переход при смене OP на зажатой записи. REC сохраняет 16 пэдов. Мелодии не изменены. Физический FM-1 не проверен.",
+        "en": "Drums: OP1–OP6 select sound, PITCH/GLOBAL change group. REC off: white keys toggle steps, EDIT+white erases. Fixes LEDs and held-take cursor after OP changes. REC keeps 16 pads; melody controls unchanged. Physical FM-1 unverified."
+      },
+      "bytes": 610100,
+      "sha256": "3649786e2ae644a171a8e32acb7de79b95780dc4fdeafc72430ed49affcc7d60",
+      "file": "downloads/zombie-groovebox-0.13.7.fwsc",
+      "editor": "webapp/groovebox-137/",
+      "source": "downloads/groovebox-source-0.13.7.zip"
     }
   ]
 }

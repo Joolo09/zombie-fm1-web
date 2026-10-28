@@ -142,4 +142,5 @@ touch_on(0);touch_on(1);
 #endif
 ring_w=ring_r=0;boot();}
 
-__attribute__((used, visibility("default"))) uint32_t web_step_grid(void){return roll_grid();}
+__attribute__((used, visibility("default"))) uint32_t web_drum_operators(void){return drum_operator_panel();}
+__attribute__((used, visibility("default"))) uint32_t web_step_grid(void){return roll_grid()||drum_grid_keys(plat_buttons());}
