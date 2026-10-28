@@ -301,8 +301,8 @@ static void seq_step(void) {
   }
  }
 }
-void z_transport(uint32_t on) {if(on)for(uint32_t t=0;t<6;t++)for(uint32_t n=0;n<128;n++)rec_skip[t][n]=0;if(!Z_SAMPLER_EDITION)z_dm_transport(on); if(!on){z_record(0);z_reset_audio();solo_track=0;}playing=!!on;pos=0xffffffffu;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
-uint32_t z_external(uint32_t on) {external_clock=!!on;if(z_song.reserved!=(uint8_t)external_clock){z_song.reserved=(uint8_t)external_clock;z_touch();}return external_clock;}
+void z_transport(uint32_t on) {if(on)clock_last_frame=audio_frame;if(on)for(uint32_t t=0;t<6;t++)for(uint32_t n=0;n<128;n++)rec_skip[t][n]=0;if(!Z_SAMPLER_EDITION)z_dm_transport(on); if(!on){z_record(0);z_reset_audio();solo_track=0;}playing=!!on;pos=0xffffffffu;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
+uint32_t z_external(uint32_t on) {if(on&&!external_clock){clock_last_frame=audio_frame;clock_pulses=0;clock_beat_frame=audio_frame;}external_clock=!!on;if(z_song.reserved!=(uint8_t)external_clock){z_song.reserved=(uint8_t)external_clock;z_touch();}return external_clock;}
 void z_clock(uint32_t status) {
  if(!external_clock)return;
  if(status==0xfa){clock_pulses=0;clock_beat_frame=audio_frame;clock_last_frame=audio_frame;z_transport(1);}
