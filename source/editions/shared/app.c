@@ -46,7 +46,7 @@ static uint32_t rd32(const uint8_t *p){return p[0]|(uint32_t)p[1]<<8|(uint32_t)p
 static void wr32(uint8_t *p,uint32_t x){uint32_t i;for(i=0;i<4;i++)p[i]=(uint8_t)(x>>(8*i));}
 static void note_packet(uint32_t t,uint32_t note,uint32_t vel,uint32_t on){if(on&&(z_get(t,Z_MUTE)||(z_solo_state()&&z_solo_state()!=t+1)))return;uint32_t status=(on?0x90:0x80)|(z_get(t,Z_CHANNEL)-1);plat_midi_out((on?9:8)|status<<8|note<<16|vel<<24);}
 static void seq_out(uint32_t t,uint32_t n,uint32_t v,uint32_t ms){uint32_t i;if(z_sys.midi_mode)return;if(n==128){for(i=0;i<128;i++)if(off_deadline[t][i]&&(!v||off_arp[t][i])){note_packet(t,i,0,0);off_deadline[t][i]=0;}if(!v){uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(120u<<16));}return;}off_arp[t][n]=ms>>31;ms&=0x7fffffffu;if(off_deadline[t][n])note_packet(t,n,0,0);note_packet(t,n,v,1);off_deadline[t][n]=plat_ms()+ms+1;}
-static void all_off(void){uint32_t t,n;for(t=0;t<27;t++)if(key_action[t]==1){if(held_raw[t])raw_note(held_channels[t],held_notes[t],0,0);key_action[t]=held_local[t]=0;}for(t=0;t<6;t++)for(n=0;n<128;n++)if(off_deadline[t][n]){note_packet(t,n,0,0);off_deadline[t][n]=0;}for(t=0;t<6;t++){uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(64u<<16));plat_midi_out(11|((0xb0|ch)<<8)|(123u<<16));for(n=0;n<16;n++)editor_notes[t][n]=0;}}
+static void all_off(void){uint32_t t,n;for(t=0;t<27;t++)if(key_action[t]==1){if(held_raw[t])raw_note(held_channels[t],held_notes[t],0,0);key_action[t]=held_local[t]=0;}for(t=0;t<6;t++)for(n=0;n<128;n++)if(off_deadline[t][n]){note_packet(t,n,0,0);off_deadline[t][n]=0;}for(t=0;t<6;t++){z_alloff(t);uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(64u<<16));plat_midi_out(11|((0xb0|ch)<<8)|(123u<<16));for(n=0;n<16;n++)editor_notes[t][n]=0;}}
 static void midi_mode_changed(uint32_t mode){app_panic();midi_local=mode==0;daw_bpm=z_song.bpm;daw_playing=daw_recording=0;daw_seen=0;daw_host=0;daw_name[0]=0;}
 /* External MIDI Note On is an attack, including repeated percussion hits without Note Off.
  * Keep physical/editor key deduplication in z_key unchanged. */
@@ -148,7 +148,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  else if(cmd==15&&n==0){for(k=0;k<4;k++){const uint8_t *p=plat_data(0xA0000u+k*0xC000u);wr32(out+8*k,p&&rd32(p)==0x3150435au?rd32(p+4):0);wr32(out+8*k+4,p?rd32(p+8):0);}count=32;}
  else if(cmd==16&&n==4){app_panic();upload_slot=254;upload_size=sizeof z_song;upload_at=0;upload_crc=rd32(a);}
  else if(cmd==17&&n>=3&&(upload_slot==254||upload_slot==253||upload_slot==252)){uint32_t at=a[0]|a[1]<<8;if(at!=upload_at||at+n-2>upload_size)status=2;else for(j=2;j<n;j++)z_transfer()[upload_at++]=a[j];}
- else if(cmd==18&&n==0&&upload_slot==254){if(upload_at!=sizeof z_song||crc32(z_transfer(),upload_at)!=upload_crc||!valid_project((const z_project *)z_transfer()))status=3;else {z_song=*(const z_project *)z_transfer();z_song.recording=0;if(!Z_SAMPLER_EDITION){if(z_song.padding[1]==0xD1)z_dm_init();else z_dm_migrate();z_dm_authoritative();}z_history_reset();z_apply_state();z_external(z_song.reserved);z_touch();}upload_slot=255;}
+ else if(cmd==18&&n==0&&upload_slot==254){if(upload_at!=sizeof z_song||crc32(z_transfer(),upload_at)!=upload_crc||!valid_project((const z_project *)z_transfer()))status=3;else {app_panic();z_song=*(const z_project *)z_transfer();z_song.recording=0;if(!Z_SAMPLER_EDITION){if(z_song.padding[1]==0xD1)z_dm_init();else z_dm_migrate();z_dm_authoritative();}z_history_reset();panel_reset();z_apply_state();z_external(z_song.reserved);z_touch();}upload_slot=255;}
  else if(cmd==19&&n==7){
   uint32_t at=a[0]|a[1]<<8,amount=a[2],token=rd32(a+3);
   if(!amount||amount>192||at+amount>sizeof z_song)status=1;
@@ -178,7 +178,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  else if(!Z_SAMPLER_EDITION&&cmd==44&&n==4){if(z_dm_param(a[0],a[1],(int16_t)(a[2]|a[3]<<8)))status=1;}
  else if(!Z_SAMPLER_EDITION&&cmd==45&&n==5){if(z_dm_step(a[0],a[1],a[2],a[3],a[4]))status=1;}
  else if(!Z_SAMPLER_EDITION&&cmd==47&&n==4){app_panic();upload_slot=252;upload_size=sizeof z_dm;upload_at=0;upload_crc=rd32(a);}
- else if(!Z_SAMPLER_EDITION&&cmd==48&&n==0&&upload_slot==252){if(upload_at!=sizeof z_dm||crc32(z_transfer(),upload_at)!=upload_crc||z_dm_apply(upload_at))status=3;upload_slot=255;}
+ else if(!Z_SAMPLER_EDITION&&cmd==48&&n==0&&upload_slot==252){if(upload_at!=sizeof z_dm||crc32(z_transfer(),upload_at)!=upload_crc||!z_dm_valid((const z_dm_state *)z_transfer()))status=3;else{app_panic();z_dm_apply(upload_at);}upload_slot=255;}
  else if(cmd==32&&n>=7&&n<=54&&a[0]<=1&&a[1]<=1&&(a[4]<6||a[4]==255)&&a[5]<=127&&a[6]<=127&&system_text(a+7,n-7)){
   uint32_t bpm=a[2]|a[3]<<8;if(bpm<30||bpm>300)status=1;else{daw_playing=a[0];daw_recording=a[1];daw_seen=plat_ms();for(j=7;j<n;j++)daw_name[j-7]=(char)a[j];daw_name[n-7]=0;if(z_sys.midi_mode==2){if(plat_ms()-daw_touch_at>300)daw_bpm=(uint16_t)bpm;if(a[4]<6&&z_song.selected!=a[4]){z_song.selected=a[4];z_touch();}if(plat_ms()-daw_touch_at>300){daw_values[z_song.selected][4]=a[5];daw_values[z_song.selected][5]=a[6];}}}
  }

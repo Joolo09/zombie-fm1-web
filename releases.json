@@ -298,6 +298,23 @@
       "file": "downloads/zombie-groovebox-0.13.3.fwsc",
       "editor": "webapp/groovebox-133/",
       "source": "downloads/groovebox-source-0.13.3.zip"
+    },
+    {
+      "product": "FM-1_63001304",
+      "version": "0.13.4",
+      "label": {
+        "ru": "Groovebox 0.13.4 beta · MIDI Clock и импорт",
+        "en": "Groovebox 0.13.4 beta · MIDI clock and import"
+      },
+      "notes": {
+        "ru": "Исправлены зависшие ноты при запуске из редактора, завершение импорта проекта и драм-набора, старый фокус EDIT и таймер внешнего MIDI Clock. Расширены проверки протокола и управления. Физический FM-1 не проверен.",
+        "en": "Fixes stuck notes on editor PLAY, project/kit import finalization, stale EDIT focus and external MIDI clock timeout. Expanded protocol and control audit. Physical FM-1 unverified."
+      },
+      "bytes": 610100,
+      "sha256": "ad121665b1949f3a85a1d784b41e3cd738f8445b3ffa0acf274ca783b9947a6a",
+      "file": "downloads/zombie-groovebox-0.13.4.fwsc",
+      "editor": "webapp/groovebox-134/",
+      "source": "downloads/groovebox-source-0.13.4.zip"
     }
   ]
 }
