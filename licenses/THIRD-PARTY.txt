@@ -34,3 +34,5 @@ Playback LED tracking and direct step-key workflow: original Zombie, MIT.
 Groovebox 0.13.1 matching source: ../downloads/groovebox-source-0.13.1.zip.
 
 Groovebox 0.13.2 matching source: ../downloads/groovebox-source-0.13.2.zip.
+
+Groovebox 0.13.3 matching source: downloads/groovebox-source-0.13.3.zip. Original Zombie additions are MIT; upstream notices remain in the archive.

@@ -229,7 +229,7 @@ static uint32_t layer_knob(uint32_t k){
  if(Z_SAMPLER_EDITION&&active_layer==Z_EDIT){static const uint8_t p[]={U_PAD_SOURCE,U_PAD_TUNE,U_PAD_GAIN,U_PAD_MODE,U_DRUM_SOUND,U_DRUM_LEVEL,U_DRUM_DECAY,U_DRUM_TUNE,U_DRUM_LENGTH,U_DRUM_MUTE,U_DRUM_PAN};return p[k];}
  if(active_layer==Z_HOME){static const uint8_t p[]={U_BPM,U_SWING,U_CLOCK,U_LANGUAGE};return p[k];}
  if(active_layer==Z_FX){static const uint8_t p[]={U_FX_AMOUNT,U_FX_RATE,Z_DELAY,Z_REVERB};return p[k];}
- if(active_layer==Z_SECTIONS){static const uint8_t p[]={U_REC_MODE,U_REC_QUANT,U_CLICK,Z_LENGTH};return p[k];}
+ if(active_layer==Z_SECTIONS){static const uint8_t p[]={U_REC_MODE,U_REC_QUANT,U_CLICK,Z_LENGTH};return k==3&&z_drum_track(z_song.selected)?U_DRUM_LENGTH:p[k];}
  return page_knob(active_layer,layer_page,k);
 }
 static const char *tile_name(uint32_t j,char *buf){
@@ -257,7 +257,7 @@ static void layer_action(uint32_t j,uint32_t on,uint32_t now){uint32_t t=z_song.
  if(active_layer==Z_LFO){if(j==0)z_set(t,Z_LFO_DEPTH,0);else if(j<4){z_set(t,Z_LFO_RATE,j==1?8:j==2?40:100);z_set(t,Z_LFO_DEPTH,64);}else{static const uint8_t p[]={Z_LFO_DEPTH,Z_LFO_RATE,Z_FM,Z_RATIO,Z_CUTOFF,Z_MIX};uint32_t p0=p[(j-4)/2];if(z_drum_track(t)){static const uint8_t drum[]={Z_LFO_DEPTH,Z_LFO_RATE,Z_DRIVE,Z_REVERB,Z_CUTOFF,Z_PAN};p0=drum[(j-4)/2];}z_set(t,p0,z_get(t,p0)+((j&1)?1:-1)*(p0==Z_RATIO?1:8));}return;}
  if(active_layer==Z_EDIT&&z_drum_track(t)){z_dm_select(j);drum_choice=z_drum_note(j);return;}
  if(active_layer==Z_EDIT){if(Z_SAMPLER_EDITION){if(j<14)z_sampler_set(z_sampler.selected,2,j);else if(j==14)z_sampler_set(z_sampler.selected,7,!z_sampler.pad[z_sampler.selected].reverse);else app_panic();}else{if(j<8)z_set(t,Z_MODEL,j);else if(j<13){static const uint8_t presets[5]={0,16,24,32,48};z_preset(t,presets[j-8]);}else if(j<15)panel_setting(0,clamp(z_song.octave+(j==13?-1:1),-3,3)+3);else app_panic();}return;}
- if(active_layer==Z_SECTIONS){if(j<2)panel_setting(9,j);else if(j<4)panel_setting(10,j-2);else if(j<6)panel_setting(11,j==4);else if(j<9)z_set(t,Z_LENGTH,j==6?16:j==7?32:64);else if(j<13)panel_setting(3,j-9);else if(j<15)panel_setting(4,j==14);else app_panic();return;}
+ if(active_layer==Z_SECTIONS){if(j<2)panel_setting(9,j);else if(j<4)panel_setting(10,j-2);else if(j<6)panel_setting(11,j==4);else if(j<9){uint32_t length=j==6?16:j==7?32:64;if(z_drum_track(t)){edit_stop();z_dm_param(z_dm.selected,5,length);}else z_set(t,Z_LENGTH,length);}else if(j<13)panel_setting(3,j-9);else if(j<15)panel_setting(4,j==14);else app_panic();return;}
  if(active_layer==Z_SEQ){edit_stop();uint32_t at=z_song.step_bank*16+j;z_step *a=&z_song.track[t].steps[at];panel_setting(5,at);
   if(z_drum_track(t)){z_dm_step_t *v=&z_dm.step[z_dm.selected][at];z_dm_step(z_dm.selected,at,v->velocity?0:100,v->chance,v->ratchet);
   }else{z_checkpoint();a->velocity=a->velocity?0:100;}

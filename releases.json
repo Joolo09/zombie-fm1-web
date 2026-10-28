@@ -281,6 +281,23 @@
       "file": "downloads/zombie-groovebox-0.13.2.fwsc",
       "editor": "webapp/groovebox-132/",
       "source": "downloads/groovebox-source-0.13.2.zip"
+    },
+    {
+      "product": "FM-1_63001303",
+      "version": "0.13.3",
+      "label": {
+        "ru": "Groovebox 0.13.3 beta · отмена и длина драмки",
+        "en": "Groovebox 0.13.3 beta · undo and drum length"
+      },
+      "notes": {
+        "ru": "Исправлены потеря UNDO после повторной очистки, выключение REC недоступным REDO и длина драм-партии в меню записи. Проверено программно; физический FM-1 ожидается.",
+        "en": "Fixes undo loss after repeated clearing, unavailable redo stopping a drum take, and recording-menu drum length controls. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "cb2d88cbdd4837a481c7ec52c346e39ea6b947c7e8a5131556f96ea694f0eaf8",
+      "file": "downloads/zombie-groovebox-0.13.3.fwsc",
+      "editor": "webapp/groovebox-133/",
+      "source": "downloads/groovebox-source-0.13.3.zip"
     }
   ]
 }

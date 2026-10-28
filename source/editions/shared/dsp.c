@@ -429,7 +429,7 @@ int z_erase(uint32_t t,uint32_t at,uint32_t scope){
  if(t>=6||at>=64||scope>2)return -1;
  z_record(0);z_alloff(t);
  if(z_drum_track(t))return z_dm_erase(at,scope);
- z_checkpoint();uint32_t first=scope?0:at,last=scope?64:at+1;
+ uint32_t first=scope?0:at,last=scope?64:at+1,changed=0;for(uint32_t i=first;i<last;i++){z_step *s=&z_song.track[t].steps[i];if(s->note!=60||s->velocity||s->chance!=127||s->gate!=z_get(t,Z_GATE)||z_song.duration[t][i])changed=1;for(uint32_t j=0;j<3;j++)if(z_song.chord[t][i][j])changed=1;}if(!changed)return 0;z_checkpoint();
  for(uint32_t i=first;i<last;i++){z_song.track[t].steps[i]=(z_step){60,0,127,(uint8_t)z_get(t,Z_GATE)};z_song.duration[t][i]=0;for(uint32_t j=0;j<3;j++)z_song.chord[t][i][j]=0;}
  z_touch();return 0;
 }
