@@ -30,3 +30,5 @@ No external recordings or third-party preset packs are included in the IDM bank.
 
 Groovebox 0.13.0 matching source: ../downloads/groovebox-source-0.13.0.zip.
 Playback LED tracking and direct step-key workflow: original Zombie, MIT.
+
+Groovebox 0.13.1 matching source: ../downloads/groovebox-source-0.13.1.zip.

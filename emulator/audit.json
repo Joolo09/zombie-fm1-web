@@ -1,17 +1,17 @@
 {
-  "version": "0.13.0",
+  "version": "0.13.1",
   "hardware_verified": false,
   "scope": "C panel, display, audio and platform doubles; simulated NOR and MIDI",
   "checks": [
     {
       "name": "groovebox-build",
       "passed": true,
-      "seconds": 9.031
+      "seconds": 15.625
     },
     {
       "name": "native-emulator-build",
       "passed": true,
-      "seconds": 3.828
+      "seconds": 7.14
     },
     {
       "name": "full-panel",
@@ -21,12 +21,17 @@
     {
       "name": "keyboard-roll",
       "passed": true,
-      "seconds": 0.11
+      "seconds": 0.141
+    },
+    {
+      "name": "followup-regressions",
+      "passed": true,
+      "seconds": 0.109
     },
     {
       "name": "playback-lights-and-grid",
       "passed": true,
-      "seconds": 0.125
+      "seconds": 0.141
     },
     {
       "name": "idm-regressions",
@@ -36,7 +41,7 @@
     {
       "name": "native-performance",
       "passed": true,
-      "seconds": 0.125
+      "seconds": 0.141
     },
     {
       "name": "native-worklet",
@@ -46,22 +51,22 @@
     {
       "name": "pattern-recording",
       "passed": true,
-      "seconds": 0.094
+      "seconds": 0.125
     },
     {
       "name": "synth-and-drums",
       "passed": true,
-      "seconds": 0.156
+      "seconds": 0.203
     },
     {
       "name": "audio-lifecycle",
       "passed": true,
-      "seconds": 0.047
+      "seconds": 0.063
     },
     {
       "name": "web-installer",
       "passed": true,
-      "seconds": 4.36
+      "seconds": 4.515
     },
     {
       "name": "save-led",
@@ -71,12 +76,12 @@
     {
       "name": "physical-pattern-controls",
       "passed": true,
-      "seconds": 0.015
+      "seconds": 0.032
     },
     {
       "name": "drum-save-reboot",
       "passed": true,
-      "seconds": 0.016
+      "seconds": 0.015
     },
     {
       "name": "project-migration-and-orphans",
@@ -86,19 +91,19 @@
     {
       "name": "journal-build",
       "passed": true,
-      "seconds": 0.468
+      "seconds": 0.5
     },
     {
       "name": "actual-nor-journal",
       "passed": true,
-      "seconds": 0.032
+      "seconds": 0.031
     },
     {
       "name": "idm-sound-bank",
       "passed": true,
-      "seconds": 0.843
+      "seconds": 0.844
     }
   ],
-  "emulator_sha256": "42dbe0bc7d14e2b066ac8568862b00917ecae319237cff17159e7b8e9a2cb497",
-  "firmware_sha256": "6208a975b6b9a2cdc7282186ae581f29ee89579a90b9c9a812a985e4c90c7ae4"
+  "emulator_sha256": "e05d10c0f9b5a0c169940236ee8ebe1dc5c9f61bf6b7aa11e334da7e04ec2175",
+  "firmware_sha256": "69c787012d5925fb54490393a5c239d3c9c0f4ec53098f9d122bbc246c6a3785"
 }

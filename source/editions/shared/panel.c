@@ -134,8 +134,8 @@ static void knob(uint32_t id,int delta){if(id==U_NOTE)roll_note_slot=0;else if(i
   case U_PAD_TUNE:z_sampler_set(z_sampler.selected,3,clamp((int)z_sampler.pad[z_sampler.selected].tune+delta,-24,24));break;
   case U_PAD_GAIN:z_sampler_set(z_sampler.selected,4,clamp((int)z_sampler.pad[z_sampler.selected].gain+delta,0,127));break;
   case U_PAD_MODE:z_sampler_set(z_sampler.selected,6,clamp((int)z_sampler.pad[z_sampler.selected].mode+delta,0,2));break;
-  case U_DURATION:z_checkpoint();z_song.duration[t][z_song.step_edit]=clamp((int)z_song.duration[t][z_song.step_edit]+delta,0,63);z_touch();break;
-  case U_CHORD1:case U_CHORD2:case U_CHORD3:{uint32_t at=id-U_CHORD1;int v=z_song.chord[t][z_song.step_edit][at];if(z_drum_track(t)){int idx=v?(int)z_drum_index(v-1)+1:0;idx=clamp(idx+delta,0,16);v=idx?(int)z_drum_note(idx-1)+1:0;delta=0;}else if(!v&&delta>0){static const uint8_t intervals[3]={4,7,12};v=s.note+intervals[at]+1;delta=0;}z_checkpoint();z_song.chord[t][z_song.step_edit][at]=clamp(v+delta,0,128);z_touch();break;}
+  case U_DURATION:{uint32_t v=clamp((int)z_song.duration[t][z_song.step_edit]+delta,0,63);if(v==z_song.duration[t][z_song.step_edit])return;z_checkpoint();z_song.duration[t][z_song.step_edit]=v;z_touch();break;}
+  case U_CHORD1:case U_CHORD2:case U_CHORD3:{uint32_t at=id-U_CHORD1;int v=z_song.chord[t][z_song.step_edit][at];if(z_drum_track(t)){int idx=v?(int)z_drum_index(v-1)+1:0;idx=clamp(idx+delta,0,16);v=idx?(int)z_drum_note(idx-1)+1:0;delta=0;}else if(!v&&delta>0){static const uint8_t intervals[3]={4,7,12};v=s.note+intervals[at]+1;delta=0;}v=clamp(v+delta,0,128);if(v==z_song.chord[t][z_song.step_edit][at])return;if(v&&!z_drum_track(t)){int duplicate=s.velocity&&v==s.note+1;for(uint32_t j=0;j<3;j++)if(j!=at&&z_song.chord[t][z_song.step_edit][j]==v)duplicate=1;if(duplicate){app_say(word("НОТА УЖЕ В АККОРДЕ","NOTE ALREADY IN CHORD"),0);return;}}z_checkpoint();z_song.chord[t][z_song.step_edit][at]=v;z_touch();break;}
   case U_MIDI_MODE:system_set(6,clamp((int)z_sys.midi_mode+delta,0,2));break;
   case U_DAW_TRANSPORT:system_set(7,delta>0);break;
   case U_CORE:system_set(0,delta>0);break;
@@ -164,11 +164,11 @@ static void knob(uint32_t id,int delta){if(id==U_NOTE)roll_note_slot=0;else if(i
   case U_STEP:edit_stop();panel_setting(5,clamp(z_song.step_edit+delta,0,63));break;
   default:
    if(id==U_NOTE&&z_drum_track(t)){drum_choice=(uint8_t)z_drum_note(clamp((int)z_drum_index(drum_choice)+delta,0,15));redraw_at=0;break;}
-   if(id==U_NOTE)s.note=(uint8_t)clamp(s.note+delta,0,127);
+   if(id==U_NOTE){s.note=(uint8_t)clamp(s.note+delta,0,127);for(uint32_t j=0;j<3;j++)if(z_song.chord[t][z_song.step_edit][j]==s.note+1){app_say(word("НОТА УЖЕ В АККОРДЕ","NOTE ALREADY IN CHORD"),0);return;}}
    else if(id==U_VELOCITY)s.velocity=(uint8_t)clamp(s.velocity+delta,0,127);
    else if(id==U_GATE)s.gate=(uint8_t)clamp(s.gate+delta,1,127);
    else if(id==U_CHANCE)s.chance=(uint8_t)clamp(s.chance+delta,0,127);
-   z_checkpoint();z_song.track[t].steps[z_song.step_edit]=s;z_touch();break;
+   z_step *old=&z_song.track[t].steps[z_song.step_edit];if(old->note==s.note&&old->velocity==s.velocity&&old->chance==s.chance&&old->gate==s.gate)return;z_checkpoint();*old=s;z_touch();break;
  }
  if(!Z_SAMPLER_EDITION&&!z_sys.midi_mode&&!z_playing()&&(id==U_NOTE||id==U_VELOCITY||id==U_DURATION||(id>=U_CHORD1&&id<=U_CHORD3)))z_audition_step(t,z_song.step_edit);
 }
