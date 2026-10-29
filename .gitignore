@@ -1,0 +1,6 @@
+# Build outputs and local caches (python -X utf8 tests/run_groovebox_audit.py --build)
+.tooling/
+__pycache__/
+source/output/
+source/editions/groovebox/
+source/editions/sampler/
