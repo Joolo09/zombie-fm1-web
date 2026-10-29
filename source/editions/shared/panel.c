@@ -180,7 +180,8 @@ static uint8_t button_used[NB];
 static uint32_t button_since[NB],layer_mask,tap_at,tap_sum,tap_count;
 static uint8_t return_section,return_page,layer_page,key_layer[27];
 static uint32_t new_project_confirm;
-static void panel_reset(void){uint32_t i;roll_note_slot=roll_edit=0;new_project_confirm=0;active_layer=-1;layer_locked=0;sampler_page=0;layer_mask=0;drum_choice=(uint8_t)z_drum_note(z_dm.selected);for(i=0;i<Z_SECTIONS;i++)page_memory[i]=0;tap_at=tap_sum=tap_count=0;for(i=0;i<NB;i++){button_since[i]=0;button_used[i]=(uint8_t)(held_buttons>>i&1);}return_section=return_page=layer_page=0;}
+/* Also called after a project is loaded or imported: the step bank always shows the cursor's 16 steps. */
+static void panel_reset(void){uint32_t i;z_song.step_bank=(uint8_t)(z_song.step_edit/16);z_song.subpage=(uint8_t)(z_song.subpage%page_count[z_song.section<Z_SECTIONS?z_song.section:0]);roll_note_slot=roll_edit=0;new_project_confirm=0;active_layer=-1;layer_locked=0;sampler_page=0;layer_mask=0;drum_choice=(uint8_t)z_drum_note(z_dm.selected);for(i=0;i<Z_SECTIONS;i++)page_memory[i]=0;tap_at=tap_sum=tap_count=0;for(i=0;i<NB;i++){button_since[i]=0;button_used[i]=(uint8_t)(held_buttons>>i&1);}return_section=return_page=layer_page=0;}
 static const char *const fx_names[16]={"DUCK","CHOP","TREMOLO","BITS","DRIVE","MONO","SWAP","PUMP","RING","BOOST","RIGHT","LEFT","GATE","FUZZ","PHASE","CUT"};
 static void tap_tempo(uint32_t now){uint32_t ms=now-tap_at;tap_at=now;if(ms<200||ms>2000){tap_sum=0;tap_count=0;return;}tap_sum+=ms;if(++tap_count>4){tap_sum=ms;tap_count=1;}z_tempo(60000u*tap_count/tap_sum,z_song.swing);}
 /* EDIT + keyboard writes the focused step without entering a recording take. */

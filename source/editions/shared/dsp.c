@@ -130,7 +130,8 @@ static uint32_t random32(void) { uint32_t x=rng_state; x^=x<<13; x^=x>>17; x^=x<
 static float absf(float x) { return x<0?-x:x; }
 static float clampf(float x,float a,float b) { return x<a?a:x>b?b:x; }
 static float sat(float x) { return x/(1.0f+absf(x)); }
-static float sine(float p) { int i; float f; p-=(int)p; if(p<0)p+=1; p*=512; i=(int)p; f=p-i; return z_sine[i]+(z_sine[(i+1)&511]-z_sine[i])*f; }
+/* p in (-1,0) can round to exactly 1.0f after +1: wrap the index, the table is periodic. */
+static float sine(float p) { int i; float f; p-=(int)p; if(p<0)p+=1; p*=512; i=(int)p; f=p-i; i&=511; return z_sine[i]+(z_sine[(i+1)&511]-z_sine[i])*f; }
 static float blep(float p,float dt) { if(p<dt) { p/=dt; return p+p-p*p-1; } if(p>1-dt) { p=(p-1)/dt; return p*p+p+p+1; } return 0; }
 static float osc(float p,float dt,int shape) {
  if(shape==0)return sine(p);
@@ -467,3 +468,17 @@ void z_audition_step(uint32_t t,uint32_t at){
  z_step *s=&z_song.track[t].steps[at];if(!s->velocity)return;
  for(uint32_t j=0;j<4;j++){uint32_t n=j?z_song.chord[t][at][j-1]:s->note+1;if(!n)continue;n--;z_note(t,n,s->velocity,1);for(uint32_t i=0;i<8;i++)if(voices[i].active&&voices[i].track==t&&voices[i].stamp==stamp)voices[i].gate=4410;if(midi_out)midi_out(t,n,s->velocity,100);}
 }
+#ifdef PLAT_HOST
+#include <stdio.h>
+/* Host-only diagnostics for tests/fuzz_panel.py. A held voice has not reached its release stage. */
+/* Every DSP state variable finite: a NaN in a filter or the reverb would silence the output for good. */
+static int fin(float x){return x==x&&x<1e30f&&x>-1e30f;}
+uint32_t z_dsp_finite(void){uint32_t i;for(i=0;i<Z_VOICES;i++){voice *v=&voices[i];if(v->active&&!(fin(v->env)&&fin(v->lp1)&&fin(v->lp2)&&fin(v->phase)&&fin(v->phase2)&&fin(v->pos)&&fin(v->inc)))return 0;}
+ if(!Z_SAMPLER_EDITION)for(i=0;i<16;i++){voice *v=&dm_voice[i];if(v->active&&!(fin(v->env)&&fin(v->lp1)&&fin(v->lp2)&&fin(v->phase)))return 0;}
+ for(i=0;i<8192;i++)if(!fin(delay_l[i])||!fin(delay_r[i]))return 0;for(i=0;i<1499;i++)if(!fin(comb_a[i]))return 0;for(i=0;i<1877;i++)if(!fin(comb_b[i]))return 0;
+ return fin(dc_yl)&&fin(dc_yr)&&fin(bus_gain)&&fin(declick_l)&&fin(declick_r)&&fin(live_blend);}
+uint32_t z_held_voices(void){uint32_t n=0;for(uint32_t i=0;i<Z_VOICES;i++)n+=voices[i].active&&voices[i].stage<3;return n;}
+void z_debug_voices(void){for(uint32_t i=0;i<Z_VOICES;i++)if(voices[i].active)printf("voice %u track %u note %u stage %u released %u arp %u gate %u env %.4f pad %u sustain %u\n",i,voices[i].track,voices[i].note,voices[i].stage,voices[i].released,voices[i].arp,voices[i].gate,voices[i].env,voices[i].pad,sustain[voices[i].track]);
+ if(!Z_SAMPLER_EDITION)for(uint32_t d=0;d<16;d++)if(dm_voice[d].active)printf("drum %u env %.4f\n",d,dm_voice[d].env);
+ for(uint32_t t=0;t<6;t++)printf("track %u arp_mode %u hold %u arp_count %u playing %u\n",t,z_song.arp_mode[t],z_song.arp_hold[t],arp_count[t],playing);}
+#endif

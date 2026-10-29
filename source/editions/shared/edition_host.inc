@@ -27,8 +27,40 @@ static void ed_project_audit(void){
  z_project bad=z_song;bad.track[0].steps[0].chance=128;ed_check(!valid_project(&bad),"invalid chance rejected");bad=z_song;bad.track[0].p[Z_CHANNEL]=17;ed_check(!valid_project(&bad),"invalid MIDI channel rejected");
  for(uint32_t o=0;o<OBJ_NOBJ;o++)store_len[o]=-1;app_init();
 }
+/* Fuzz support: every saved or transient field must stay inside what the firmware itself can produce. */
+static uint32_t inv_fail;
+static void inv(int ok,const char *what,int a,int b){if(!ok){fprintf(stderr,"INVARIANT FAIL: %s (%d,%d)\n",what,a,b);inv_fail=1;}}
+static void ed_invariants(void){uint32_t t,i,j;inv_fail=0;
+ inv(z_song.selected<6,"selected track",z_song.selected,0);inv(z_song.section<Z_SECTIONS,"section",z_song.section,0);
+ inv(z_song.subpage<page_count[z_song.section<Z_SECTIONS?z_song.section:0],"subpage",z_song.section,z_song.subpage);
+ inv(z_song.step_edit<64,"step cursor",z_song.step_edit,0);inv(z_song.step_bank<4,"step bank",z_song.step_bank,0);inv(z_song.step_bank==z_song.step_edit/16,"bank follows cursor",z_song.step_bank,z_song.step_edit);
+ inv(z_song.octave>=-3&&z_song.octave<=3,"octave",z_song.octave,0);inv(z_song.bpm>=30&&z_song.bpm<=300,"bpm",z_song.bpm,0);inv(z_song.swing<=60,"swing",z_song.swing,0);
+ inv(z_song.language<=1&&z_song.rec_mode<=1&&z_song.rec_quant<=1&&z_song.metronome<=1&&z_song.recording<=1,"flags",z_song.language,z_song.recording);
+ inv(z_song.fx_amount<=127&&z_song.fx_rate<=3,"fx",z_song.fx_amount,z_song.fx_rate);
+ for(t=0;t<6;t++){
+  for(i=0;i<Z_PARAMS;i++)inv(z_song.track[t].p[i]>=z_desc[i].min&&z_song.track[t].p[i]<=z_desc[i].max,z_desc[i].name,t,z_song.track[t].p[i]);
+  inv(z_song.arp_mode[t]<=4&&z_song.arp_rate[t]<=3&&z_song.arp_oct[t]>=1&&z_song.arp_oct[t]<=3&&z_song.arp_hold[t]<=1,"arp",t,z_song.arp_mode[t]);
+  inv(z_song.preset[t]<Z_PRESETS||z_song.preset[t]==255,"preset",t,z_song.preset[t]);
+  for(i=0;i<64;i++){z_step *s=&z_song.track[t].steps[i];inv(s->note<=127&&s->velocity<=127&&s->chance<=127&&s->gate>=1&&s->gate<=127,"step",t,i);
+   inv(z_song.duration[t][i]<=63,"duration",t,i);for(j=0;j<3;j++)inv(z_song.chord[t][i][j]<=128,"chord",t,i);}
+ }
+ if(!Z_SAMPLER_EDITION){inv(z_dm.selected<16,"drum selected",z_dm.selected,0);
+  for(i=0;i<16;i++){z_dm_sound_t *p=&z_dm.sound[i];inv(p->level<=127&&p->decay>=1&&p->decay<=127&&p->tune>=-24&&p->tune<=24&&p->pan>=-64&&p->pan<=63&&p->mute<=1&&p->length>=1&&p->length<=64,"drum sound",i,p->length);
+   for(j=0;j<64;j++){z_dm_step_t *s=&z_dm.step[i][j];inv(s->velocity<=127&&s->chance<=127&&s->ratchet>=1&&s->ratchet<=4,"drum step",i,j);}}}
+ inv(z_voice_count()<=24,"voices",z_voice_count(),0);{uint32_t z_dsp_finite(void);inv(z_dsp_finite(),"DSP state finite (no NaN/inf)",0,0);}inv(z_sys.midi_mode<=2,"midi mode",z_sys.midi_mode,0);
+ if(inv_fail)exit(3);
+}
+static uint32_t stuck_skip;
+static void ed_stuck_prep(void){uint32_t t;stuck_skip=0;for(t=0;t<6;t++){if(z_song.arp_mode[t]&&z_song.arp_hold[t])stuck_skip=1;z_sustain(t,0);}if(z_playing())z_transport(0);if(z_song.recording)z_record(0);}
+static void ed_stuck_expect(void){if(stuck_skip||z_sys.midi_mode==1)return;inv_fail=0;{uint32_t z_held_voices(void);inv(z_held_voices()==0,"notes still held after every key, MIDI note and pedal released + STOP",z_held_voices(),0);}if(inv_fail)exit(4);}
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
  if(!strcmp(cmd,"projectaudit")){ed_project_audit();return 1;}
+ if(!strcmp(cmd,"invariants")){ed_invariants();return 1;}
+ /* sysex HEX: one editor frame without F0/F7, straight into the protocol handler. */
+ if(!strcmp(cmd,"sysex")){static uint8_t w[4096];uint32_t n=0;const char *p=a;while(p&&p[0]&&p[1]&&n<sizeof w){unsigned v;if(sscanf(p,"%2x",&v)!=1)break;w[n++]=(uint8_t)(v&127);p+=2;}app_sysex(w,n);return 1;}
+ if(!strcmp(cmd,"stuckprep")){ed_stuck_prep();return 1;}
+ if(!strcmp(cmd,"stuckexpect")){ed_stuck_expect();return 1;}
+ if(!strcmp(cmd,"voices")){void z_debug_voices(void);z_debug_voices();return 1;}
  if(!strcmp(cmd,"edgecheck")){
 #ifdef APP_TOUCH_EDGE_POLL
  touch_on(1);sense_init(1);touch_held=touch_pending_valid=0;sn_ev_r=sn_ev_w=0;sn_push(EV_ON,0,101,0);sn_push(EV_OFF,0,0,0);touch_poll();ed_check(touch_keys()&1,"fast tap press survives queued release");ed_check(touch_vel(0)==101,"queued tap preserves velocity");touch_poll();ed_check(!(touch_keys()&1),"fast tap release is delivered next poll");sn_push(EV_ON,0,90,0);touch_poll();sn_push(EV_ON,0,110,0);touch_poll();ed_check(!(touch_keys()&1),"same-key retrigger exposes release");touch_poll();ed_check((touch_keys()&1)&&touch_vel(0)==110,"same-key retrigger exposes new attack");touch_held=touch_pending_valid=0;sn_ev_r=sn_ev_w=0;sense_init((1u<<27)-1);for(uint32_t k=0;k<27;k++)sn_push(EV_ON,k,100,0);for(uint32_t k=0;k<27;k++)sn_push(EV_OFF,k,0,0);touch_poll();ed_check(touch_held==((1u<<27)-1),"whole chord press burst is preserved");touch_poll();ed_check(!touch_held,"whole chord release burst is preserved");touch_on(0);touch_on(1);

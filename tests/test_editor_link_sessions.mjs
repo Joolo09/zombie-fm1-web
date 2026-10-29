@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {Link,DeviceSync} from '../webapp/groovebox-150/core.js';
+import {Link,DeviceSync} from '../webapp/groovebox-151/core.js';
 import {create} from './native_emulator_harness.mjs';
 function ports(e){const commands=[],input={state:'connected',open:async()=>{},close:async()=>{input.closed=true;}},output={state:'connected',open:async()=>{},close:async()=>{output.closed=true;},send:wire=>{commands.push(wire[5]);const body=wire.slice(1,-1);e.w.web_said_clear();new Uint8Array(e.memory.buffer,e.w.web_sysex_buf(),body.length).set(body);e.w.web_sysex(body.length);const data=new Uint8Array(e.memory.buffer,e.w.web_said_buf(),e.w.web_said_len()).slice();setTimeout(()=>input.onmidimessage?.({data}),0);}};return {input,output,commands};}
 let e=create(),device=ports(e),link=new Link();const state=await link.connect(device.input,device.output);assert.equal(state.tracks.length,6);assert.equal(state.drums.sounds.length,16);await Promise.all([link.command(4,[0,60,100,1]),link.command(21,[7,1]),link.command(4,[0,60,0,0])]);e.run(60);assert.equal(e.w.web_lit_keys(),0);const runtime=await link.runtime();assert.equal(runtime.selected,1);link.close();console.log('PASS actual Link handshake, full C state/kit read, serialized commands and runtime');
