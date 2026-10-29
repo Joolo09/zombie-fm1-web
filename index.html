@@ -1,24 +1,123 @@
 <!doctype html>
 <html lang="ru">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Zombie Core для M-VAVE FM-1: веб-редактор звука и установка прошивки по USB MIDI.">
-<title>Zombie Core · FM-1 Web Installer</title>
-<link rel="stylesheet" href="webapp/editor/style.css"><link rel="stylesheet" href="webapp/editor/interface.css?v=afterglow1"><link rel="stylesheet" href="installer.css"><link rel="stylesheet" href="zombie-theme.css">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Zombie Groovebox для M-VAVE FM-1: установка прошивки из браузера по USB, эмулятор и редактор звука.">
+<title>Zombie FM-1 · Установка</title>
+<link rel="stylesheet" href="site.css?v=140">
 </head>
-<body data-theme="afterglow">
-<header><a class="brand" href="./" aria-label="Zombie Core"><span class="sigil">Z</span><div><strong>ZOMBIE CORE</strong><small>FM-1 / WEB STUDIO</small></div></a><div class="top-controls"><a class="editor-link" href="emulator/">Эмулятор FM-1 ↗</a><a class="editor-link" href="webapp/editor/" data-t="editor">Открыть редактор ↗</a><select id="language" aria-label="Язык / Language"><option value="ru">Русский</option><option value="en">English</option></select></div></header>
-<main>
-<div class="install-layout">
-<section class="install-intro"><p class="eyebrow">ZOMBIE / USB MIDI</p><h1 data-t="headline">Твой FM-1.<br>Твой звук.</h1><p class="lead" data-t="intro">Редактируй звук и устанавливай Zombie Core прямо из браузера. По обычному USB-кабелю.</p><a class="button-link primary" href="emulator/" data-t="tryEmulator">Играть на FM-1 в браузере →</a><a class="button-link" href="webapp/editor/" data-t="tryEditor">Открыть студию →</a><p class="muted" data-t="preview">Для знакомства устройство не нужно: синтезатор работает и в браузере.</p><p class="row"><a href="emulator/">Zombie · настоящая панель ↗</a><a href="webapp/groovebox/">Groovebox / Piano Roll ↗</a><a href="webapp/sampler/">Sampler / Pads ↗</a></p><div class="features"><span>6 TRACKS</span><span>96 PRESETS</span><span>32 PADS</span><span>RU / EN</span></div><div class="zombie-art" aria-hidden="true"><svg viewBox="0 0 70 70" shape-rendering="crispEdges"><ellipse cx="35" cy="66" rx="27" ry="3" fill="#142012"/><g class="zombie-body"><path fill="#385544" d="M20 33h30v23H20z"/><path fill="#26857a" d="M22 34h26v21H22z"/><path fill="#4b476e" d="M22 54h11v12H22zm15 0h11v12H37z"/><path fill="#5d903e" d="M10 34h10v21H10zm40 0h10v21H50z"/><path fill="#8db653" d="M11 49h9v6h-9zm39 0h9v6h-9z"/><path fill="#294320" d="M15 3h40v34H15z"/><path fill="#75a64d" d="M17 5h36v30H17z"/><path fill="#527c35" d="M17 5h36v7H17zm31 7h5v23h-5z"/><path fill="#9ac763" d="M20 7h7v4h-7zm-1 19h7v7h-7z"/><path fill="#182a14" d="M22 16h9v6h-9zm18 0h9v6h-9zm-12 14h16v3H28z"/><path fill="#bfd58d" d="M23 17h4v2h-4zm18 0h4v2h-4z"/><path fill="#4f7a34" d="M32 22h7v5h-7z"/></g><path fill="#507237" d="M1 65h68v5H1z"/></svg><div><strong>Сначала почувствуй грув.</strong><span>Настоящий экран. Те же кнопки. Тот же звук.</span></div></div></section>
-<section class="card install-card" aria-labelledby="install-heading"><div class="row"><p class="eyebrow">FIRMWARE / USB</p><span id="package-badge" class="pill">0.7.4</span></div><h2 id="install-heading" data-t="installTitle">Установить в FM-1</h2><p class="muted" data-t="browserHelp">Открой в Chrome или Edge на компьютере. Подключи FM-1 кабелем с передачей данных и закрой FL Studio, Ableton и другие вкладки редактора.</p>
-<label for="release"><span data-t="releaseLabel">Версия прошивки</span></label><select id="release" disabled aria-label="Версия / Release"></select>
-<p id="release-note" class="muted"></p>
-<ol class="install-steps"><li id="step-package" aria-current="step"><span>01</span><strong data-t="stepPackage">Проверка файла</strong></li><li id="step-device"><span>02</span><strong data-t="stepDevice">Подключение FM-1</strong></li><li id="step-write"><span>03</span><strong data-t="stepWrite">Установка</strong></li><li id="step-done"><span>04</span><strong data-t="stepDone">Перезапуск</strong></li></ol>
-<p id="device" class="device-label" data-t="noDevice">Устройство не подключено</p><div class="install-actions"><button id="detect" disabled data-t="detect">Найти FM-1</button><button id="install" class="accent" disabled data-t="install">Установить</button></div>
-<label class="progress-label" for="progress" data-t="progress">Ход установки</label><progress id="progress" max="100" value="0"></progress><div id="status" role="status" aria-live="polite"></div><p id="error" role="alert" hidden></p>
-<p class="muted install-notice" data-t="notice">Установка заменит прошивку FM-1. Сначала сохрани проекты и исходные WAV. Во время записи не отключай USB и не закрывай страницу.</p>
-<details><summary data-t="details">Файл и журнал</summary><p><a id="firmware-download" download data-t="download">Скачать .fwsc</a></p><code id="checksum"></code><pre id="log"></pre></details>
-</section></div>
-<section class="bottom-notes"><article><h2>Groovebox 0.13.7 beta</h2><img src="emulator/home.png" width="240" height="240" alt="Новый экран Zombie Groovebox с блочным зомби"><p class="muted">Подсветка нот · клавиши шагов · EDIT удаляет ноту</p><a href="emulator/">Сыграть в эмуляторе ↗</a> · <a href="emulator/sounds/">Послушать IDM-банк ↗</a></article><article><h2>Сначала попробуй</h2><p class="muted">Экран, кнопки, запись и звук работают на коде прошивки. Можно проверить паттерн и управление до установки.</p><a href="?release=FM-1_63001307">Выбрать 0.13.7 beta для установки ↗</a><p><a href="source/GROOVEBOX-137-RU.md">Управление и проверенные функции ↗</a> · <a href="emulator/audit.json">Отчёт проверок ↗</a></p></article></section><section class="bottom-notes" id="controls-082"><article><h2>Зомби ФМ-1 · 0.8.2</h2><img src="previews/zombie-splash.png" width="240" height="240" alt="Восстановленная заставка Зомби ФМ-1"><p class="muted">240 × 240 · 256 colors · host render</p></article><article><h2>SELECT = BPM · HOLD + HOME = LOCK</h2><img src="previews/groovebox-lock.png" width="240" height="240" alt="Зафиксированный слой FX"><p class="muted">ALGO: track · SEQ + OCT: bank · EDIT + OCT: Undo / Redo</p><a href="downloads/Groovebox-0.8.2-RU.md">Управление / Controls ↗</a></article></section><section class="bottom-notes"><article><h2>Groovebox / FM-1</h2><img src="previews/groovebox-piano.png" alt="Пианоролл FM-1 из host-симулятора" width="240" height="240"><p class="muted">5 synths + drum kit · 96 presets · piano roll / drum grid<br>Экраны из симулятора / simulator preview<br><a href="previews/groovebox-motion.gif">Animation ↗</a> · <a href="previews/groovebox-demo.wav">Groove demo ↗</a></p></article><article><h2>Sampler / FM-1</h2><img src="previews/sampler-pads.png" alt="Пэды FM-1 из host-симулятора" width="240" height="240"><p class="muted">32 pads · 4 user slots · chop / reverse / loop<br>Экраны из симулятора / simulator preview<br><a href="previews/sampler-motion.gif">Animation ↗</a></p><a href="downloads/Zombie-FM1-DAW-Profiles-0.8.2.zip" download>FL Studio + Ableton Live · scripts / RU + EN</a></article></section><section class="bottom-notes"><article><h2 data-t="resumeTitle">Если USB оборвался</h2><p class="muted" data-t="resumeHelp">Подключи FM-1 снова, выбери ту же версию и нажми «Найти FM-1», затем «Установить». Если загрузчик доступен, запись начнётся заново, а результат проверится после перезапуска.</p></article><article><h2 data-t="localTitle">Звук остаётся у тебя</h2><p class="muted" data-t="privacy">Сэмплы и настройки передаются по USB прямо между браузером и FM-1. Для прослушивания без устройства открой студию и включи звук ПК.</p><a href="downloads/groovebox-source-0.8.3.zip" download data-t="source">Исходники прошивки и лицензии</a> · <a href="https://github.com/Joolo09/zombie-fm1-web" target="_blank" rel="noopener">GitHub ↗</a></article></section>
-<footer><span>ZOMBIE CORE / WEB 1.1 · GROOVEBOX 0.8.3 / SAMPLER 0.8.0</span><a href="licenses/THIRD-PARTY.txt" data-t="licenses">Лицензии и авторство</a></footer>
-</main><script type="module" src="installer.js?v=0110"></script></body></html>
+<body>
+<header class="top"><div class="wrap">
+ <a class="brand" href="./"><span class="sigil">Z</span><span>ZOMBIE FM-1<small>GROOVEBOX · WEB</small></span></a>
+ <nav class="links" aria-label="Разделы">
+  <a href="#install" data-t="navInstall">Установка</a>
+  <a href="emulator/" data-t="navEmulator">Эмулятор</a>
+  <a id="editor-link" href="webapp/groovebox-140/" data-t="navEditor">Редактор</a>
+  <a href="#new" data-t="navNew">Что нового</a>
+  <a href="#help" data-t="navHelp">Помощь</a>
+ </nav>
+ <select id="lang" aria-label="Язык / Language"><option value="ru">RU</option><option value="en">EN</option></select>
+</div></header>
+
+<main class="wrap">
+<div class="hero">
+ <section>
+  <p class="eyebrow">M-VAVE FM-1 · USB MIDI</p>
+  <h1 data-t="headline">Прошивка FM-1 прямо из браузера</h1>
+  <p class="lead" data-t="lead">Шесть дорожек, 96 пресетов, драм-машина, пианоролл. Установка займёт около минуты. Нужны кабель USB и Chrome или Edge.</p>
+  <div class="cta"><a class="btn primary" href="#install" data-t="ctaInstall">Установить →</a><a class="btn" href="emulator/" data-t="ctaTry">Попробовать в эмуляторе</a></div>
+  <ul class="facts"><li>6 TRACKS</li><li>96 PRESETS</li><li>16 DRUMS</li><li>64 STEPS</li><li>RU / EN</li></ul>
+  <div class="screen"><img src="emulator/home.png" width="240" height="240" alt="Экран Zombie Groovebox"><p class="muted small" data-t="screenNote">Экран снят в эмуляторе, который работает на том же C-коде, что и прошивка.</p></div>
+ </section>
+
+ <section id="install" class="card installer" aria-labelledby="install-title">
+  <p class="eyebrow" data-t="installEyebrow">Веб-установщик</p>
+  <h2 id="install-title" data-t="installTitle">Установить в FM-1</h2>
+  <ul class="checks" id="checks" aria-label="Проверка браузера">
+   <li id="chk-browser" data-t="chkBrowser">Браузер с Web MIDI (Chrome, Edge, Opera на компьютере)</li>
+   <li id="chk-https" data-t="chkHttps">Защищённое соединение (HTTPS)</li>
+   <li id="chk-package" data-t="chkPackage">Файл прошивки скачан и проверен (SHA-256)</li>
+  </ul>
+  <ol class="steps">
+   <li class="step" id="step-1" data-state="active">
+    <header><span class="n"><span>1</span></span><h3 data-t="s1">Выберите прошивку</h3></header>
+    <div class="releases" id="release-list" role="radiogroup" aria-label="Версия прошивки"></div>
+    <details class="archive"><summary data-t="archive">Другие версии (архив)</summary><select id="archive-select" aria-label="Архив версий"></select></details>
+    <p id="release-note" class="small muted"></p>
+   </li>
+   <li class="step" id="step-2" data-state="locked">
+    <header><span class="n"><span>2</span></span><h3 data-t="s2">Подключите FM-1</h3></header>
+    <p class="small muted" data-t="s2help">Подключите FM-1 кабелем с передачей данных и включите его. Закройте FL Studio, Ableton и другие вкладки, которые используют MIDI. Браузер попросит разрешение на MIDI: нажмите «Разрешить».</p>
+    <p id="device" class="device" data-t="noDevice">Устройство не найдено</p>
+    <button id="detect" class="btn" disabled data-t="detect">Найти FM-1</button>
+   </li>
+   <li class="step" id="step-3" data-state="locked">
+    <header><span class="n"><span>3</span></span><h3 data-t="s3">Установите</h3></header>
+    <label class="confirm"><input type="checkbox" id="confirm"><span data-t="confirm">Я сохранил свои проекты (экспорт JSON в редакторе) и WAV. Пока идёт запись, не отключаю USB и не закрываю страницу.</span></label>
+    <button id="install-btn" class="btn primary" disabled data-t="install">Установить</button>
+    <div class="progress" aria-hidden="true"><div class="bar"><i id="bar"></i></div><div class="meta"><span id="stage"></span><span id="pct">0%</span></div></div>
+   </li>
+   <li class="step" id="step-4" data-state="locked">
+    <header><span class="n"><span>4</span></span><h3 data-t="s4">Готово</h3></header>
+    <p class="small muted" data-t="s4help">FM-1 перезапустится. Установщик дождётся устройства и проверит новую версию.</p>
+   </li>
+  </ol>
+  <p id="status" class="status" role="status" aria-live="polite"></p>
+  <details class="log"><summary data-t="details">Файл и журнал</summary><p><a id="download" download data-t="download">Скачать .fwsc</a> · <a id="source" data-t="source">Исходники</a></p><code id="checksum"></code><pre id="log"></pre></details>
+ </section>
+</div>
+
+<section class="block" id="new">
+ <div class="grid2">
+  <div>
+   <p class="eyebrow">0.14.0 beta</p>
+   <h2 data-t="newTitle">Что нового: чистый звук</h2>
+   <ul class="changes" id="changes">
+    <li data-t="c1">STOP больше не щёлкает: ноты, дилей и реверб плавно затухают.</li>
+    <li data-t="c2">Лимитер на выходе вместо жёсткого клиппинга, если громко играют все дорожки или все 16 барабанов.</li>
+    <li data-t="c3">Девятая нота перехватывает самый тихий голос, без щелчка.</li>
+    <li data-t="c4">Одна и та же нота из DAW или длинных шагов больше не занимает все 8 голосов.</li>
+    <li data-t="c5">ATTACK 0 без щелчка. Нота и аккорды на экране показываются названиями (C4, E4).</li>
+    <li data-t="c6">Управление, драм-секвенсор и формат проектов 0.13.7 не изменились.</li>
+   </ul>
+   <p class="small"><a href="source/GROOVEBOX-140-RU.md" data-t="notesLink">Подробно: что изменено и как проверено</a> · <a href="emulator/audit.json" data-t="auditLink">Отчёт тестов</a></p>
+  </div>
+  <div>
+   <h2 data-t="ctrlTitle">Главное управление</h2>
+   <ul class="changes small">
+    <li data-t="k1"><b>ALGO</b> выбирает дорожку, шестая — драмка. <b>SELECT</b> задаёт темп.</li>
+    <li data-t="k2"><b>SEQ</b>: 16 белых клавиш ставят и выбирают шаги. <b>EDIT</b> удаляет ноту.</li>
+    <li data-t="k3"><b>PLAY</b> + <b>REC</b>: запись в ритм. Без PLAY запись идёт по шагам.</li>
+    <li data-t="k4"><b>EDIT + OCT−/OCT+</b>: отмена и повтор. <b>SAVE</b>: сохранить проект.</li>
+    <li data-t="k5">Драмка на SEQ: <b>OP1–OP6</b> выбирают звук, <b>PITCH/GLOBAL</b> листают группы.</li>
+    <li data-t="k6"><b>HOME + SEL</b>: Standalone → DAW Synth → DAW Controller.</li>
+   </ul>
+   <p class="small"><a href="source/GROOVEBOX-137-RU.md" data-t="ctrlLink">Полное управление драмкой</a> · <a href="downloads/Groovebox-0.8.2-RU.md" data-t="ctrlLink2">Страницы и сочетания</a></p>
+  </div>
+ </div>
+</section>
+
+<section class="block faq" id="help">
+ <h2 data-t="helpTitle">Если что-то пошло не так</h2>
+ <details><summary data-t="q1">FM-1 не находится</summary><ol><li data-t="q1a">Нужен кабель с передачей данных: зарядный кабель не подойдёт.</li><li data-t="q1b">Закройте DAW и все вкладки редактора или эмулятора, подключённые к FM-1.</li><li data-t="q1c">Нажмите на значок замка в адресной строке, разрешите MIDI-устройства и обновите страницу.</li><li data-t="q1d">Оставьте подключённым только один FM-1.</li></ol></details>
+ <details><summary data-t="q2">USB отключился во время записи</summary><p data-t="q2a">Не паникуйте: загрузчик FM-1 остаётся рабочим. Подключите кабель снова, выберите ту же версию, нажмите «Найти FM-1», затем «Установить». Запись начнётся заново, и результат проверится после перезапуска.</p></details>
+ <details><summary data-t="q3">Установщик пишет «Open-прошивка»</summary><p data-t="q3a">На FM-1 стоит официальная Open-прошивка M-VAVE, и она принимает только штатную FM-1 V15. Сначала верните её официальным установщиком M-VAVE, затем установите Zombie.</p></details>
+ <details><summary data-t="q4">Звук трещит или новая версия не нравится</summary><p data-t="q4a">Откройте «Другие версии» и установите 0.13.7 beta или стабильную 0.8.3. Перед откатом на 0.13.5 и старше экспортируйте проект в JSON в редакторе. 0.14.0 проверена в эмуляторе и тестах, но на настоящем FM-1 ещё не проверялась.</p></details>
+ <details><summary data-t="q5">Как вернуть заводскую прошивку M-VAVE</summary><p data-t="q5a">Воспользуйтесь официальным установщиком M-VAVE для FM-1 (V15). Сохранённые в Zombie проекты при этом не переносятся.</p></details>
+</section>
+
+<section class="block">
+ <h2 data-t="moreTitle">Ещё</h2>
+ <div class="grid3">
+  <a class="card tile" href="emulator/"><img src="emulator/home.png" alt="" width="240" height="240"><h3 data-t="t1">Эмулятор FM-1</h3><p class="small muted" data-t="t1a">Экран, кнопки и звук на коде прошивки 0.14.0. Можно поиграть с клавиатуры ПК.</p></a>
+  <a class="card tile" href="emulator/sounds/"><img src="previews/groovebox-piano.png" alt="" width="240" height="240"><h3 data-t="t2">IDM-банк</h3><p class="small muted" data-t="t2a">Послушайте 32 пресета до установки.</p></a>
+  <a class="card tile" href="downloads/Zombie-FM1-DAW-Profiles-0.8.2.zip" download><img src="previews/groovebox-lock.png" alt="" width="240" height="240"><h3 data-t="t3">Профили FL Studio и Ableton</h3><p class="small muted" data-t="t3a">Скрипты для режима DAW Controller, инструкции RU/EN.</p></a>
+ </div>
+</section>
+</main>
+
+<footer class="bottom"><div class="wrap"><span>ZOMBIE FM-1 · WEB 2.0 · <span id="footer-version">GROOVEBOX 0.14.0</span></span><span><a href="licenses/THIRD-PARTY.txt" data-t="licenses">Лицензии</a> · <a href="lab/">Lab</a> · <a href="https://github.com/Joolo09/zombie-fm1-web" rel="noopener">GitHub</a></span></div></footer>
+<script type="module" src="installer.js?v=140"></script>
+</body>
+</html>

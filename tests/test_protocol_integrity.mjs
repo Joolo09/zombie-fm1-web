@@ -4,7 +4,7 @@ import {create} from './native_emulator_harness.mjs';
 import {protocol,upload,crc32,u32} from './native_protocol_harness.mjs';
 let e=create(),p=protocol(e),bad=0;const saved=e.root().slice();
 const rejectProject=bytes=>{upload(p,bytes);p(18,[],3);assert.deepEqual(e.root(),saved);bad++;};
-const schema=JSON.parse(readFileSync('webapp/groovebox-137/schema.json','utf8'));
+const schema=JSON.parse(readFileSync('webapp/groovebox-140/schema.json','utf8'));
 for(let t=0;t<6;t++)for(let id=0;id<27;id++)for(const v of [schema[id].min-1,schema[id].max+1]){const b=saved.slice();new DataView(b.buffer).setInt16(12+t*310+id*2,v,true);rejectProject(b);}
 for(const [at,v] of [[0,0],[4,0],[6,0],[8,61],[9,6],[10,2],[11,2],[1872,4],[1873,9],[1874,6],[1875,4],[1876,5],[1882,4],[1888,0],[1894,2],[1900,96],[1906,2],[1907,64],[3444,2],[3445,2],[3446,2],[3447,128],[3448,4]]){const b=saved.slice();b[at]=v;rejectProject(b);}
 for(let t=0;t<6;t++)for(const at of [0,63])for(const [off,v] of [[66+t*310+at*4,128],[67+t*310+at*4,128],[68+t*310+at*4,128],[69+t*310+at*4,0],[1908+(t*64+at)*3,129],[3060+t*64+at,64]]){const b=saved.slice();b[off]=v;rejectProject(b);}

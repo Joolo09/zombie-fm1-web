@@ -27,7 +27,7 @@ const z_descriptor z_desc[Z_PARAMS]={
  {"gate",1,127,80},{"transpose",-24,24,0},{"probability",0,127,127}};
 z_project z_song;
 typedef struct { float phase,phase2,env,lp1,lp2,velocity,age,pos,inc; uint32_t stamp,gate;
-                 uint8_t track,note,stage,active,released,arp,pad,drum;float drum_decay;z_pad settings;uint32_t sample_start,sample_end; } voice;
+                 uint8_t track,note,stage,active,released,arp,pad,drum;float drum_decay,out_l,out_r;z_pad settings;uint32_t sample_start,sample_end; } voice;
 static voice voices[Z_VOICES];
 static Z_POOL float delay_l[8192],delay_r[8192],comb_a[1499],comb_b[1877];
 static Z_POOL uint8_t transfer[Z_SLOT_BYTES];
@@ -42,7 +42,7 @@ static uint32_t rng_state,stamp,delay_i,comb_i,playing,pos,external_clock,clock_
 static float step_time,lfo_phase[Z_TRACKS];
 static float bend[Z_TRACKS];
 static uint8_t sustain[Z_TRACKS];
-static float dc_xl,dc_xr,dc_yl,dc_yr;
+static float dc_xl,dc_xr,dc_yl,dc_yr,bus_gain=1,declick_l,declick_r,wet_l,wet_r;
 static uint8_t arp_notes[6][128],arp_physical[6][16];
 static float arp_time[6];
 static uint32_t arp_index[6],revision;
@@ -157,8 +157,9 @@ int z_set(uint32_t t,uint32_t p,int v) {
 }
 int z_get(uint32_t t,uint32_t p) { return t<Z_TRACKS&&p<Z_PARAMS?z_song.track[t].p[p]:-9999; }
 void z_reset_audio(void) {if(!Z_SAMPLER_EDITION)z_dm_transport(0);
- dc_xl=dc_xr=dc_yl=dc_yr=0;live_effect=live_requested=0;live_blend=0;click_left=0;
- uint32_t i,t; for(i=0;i<Z_VOICES;i++)voices[i].active=0;
+ /* Stopping fades what was sounding (voices, echo and reverb) over ~25 ms instead of cutting it: no click on STOP. */
+ uint32_t i,t;declick_l+=wet_l;declick_r+=wet_r;wet_l=wet_r=0;for(i=0;i<Z_VOICES;i++){if(voices[i].active){declick_l+=voices[i].out_l;declick_r+=voices[i].out_r;}voices[i].active=0;}
+ live_effect=live_requested=0;live_blend=0;click_left=0;
  for(t=0;t<6;t++){arp_count[t]=0;sustain[t]=0;applied_mode[t]=z_song.arp_mode[t];if(midi_out)midi_out(t,128,0,0);for(i=0;i<128;i++){arp_notes[t][i]=0;rec_active[t][i]=rec_live[t][i]=0;rec_skip[t][i]=0;}for(i=0;i<16;i++)arp_physical[t][i]=0;arp_time[t]=0;arp_index[t]=0;}
  for(i=0;i<8192;i++)delay_l[i]=delay_r[i]=0;
  for(i=0;i<1499;i++)comb_a[i]=0; for(i=0;i<1877;i++)comb_b[i]=0;
@@ -191,13 +192,19 @@ void z_init(void) {
  for(i=0;i<6;i++)z_sample(i,z_factory_pcm[i],z_factory_n[i],11025);
  for(i=0;i<4;i++)z_sample(10+i,z_drum_pcm[i],z_drum_n[i],11025);
 #endif
- sampler_init();z_sampler.tracks=Z_SAMPLER_EDITION?63:0;z_reset_audio();edition_defaults();if(!Z_SAMPLER_EDITION)z_dm_migrate();
+ sampler_init();z_sampler.tracks=Z_SAMPLER_EDITION?63:0;z_reset_audio();declick_l=declick_r=0;dc_xl=dc_xr=dc_yl=dc_yr=0;bus_gain=1;edition_defaults();if(!Z_SAMPLER_EDITION)z_dm_migrate();
 }
 void z_note(uint32_t t,uint32_t note,uint32_t vel,uint32_t on) {
  uint32_t i,best=0,oldest=0xffffffffu;voice *v;
  if(t>=Z_TRACKS||note>127)return;if(z_drum_track(t)){z_dm_key(note,vel,on);return;}
  if(!on||!vel){for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&voices[i].note==note){voices[i].released=1;if(!sustain[t]&&(voices[i].pad==255||voices[i].settings.mode))voices[i].stage=3;}return;}
- for(i=0;i<Z_VOICES;i++) { if(!voices[i].active){best=i;break;} if(voices[i].stamp<oldest){oldest=voices[i].stamp;best=i;} }
+ /* Free voice, else the same synth note (retrigger), else the quietest released voice, else the oldest. */
+ {float quiet=2;uint32_t found=Z_VOICES;
+  if(z_song.track[t].p[Z_MODEL]!=8)for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&voices[i].note==note&&voices[i].pad==255&&!voices[i].arp){found=i;break;}
+  if(found==Z_VOICES)for(i=0;i<Z_VOICES;i++)if(!voices[i].active){found=i;break;}
+  if(found==Z_VOICES)for(i=0;i<Z_VOICES;i++)if(voices[i].stage>=3&&voices[i].env<quiet){quiet=voices[i].env;found=i;}
+  if(found==Z_VOICES)for(i=0;i<Z_VOICES;i++)if(voices[i].stamp<oldest){oldest=voices[i].stamp;found=i;}
+  best=found;}
  v=&voices[best];
  if(z_song.track[t].p[Z_MODEL]==8&&(z_sampler.tracks>>t&1)){
   uint32_t start,end,slot;z_pad pad;if(note<36||note>=68)return;pad=z_sampler.pad[note-36];slot=pad.source;
@@ -207,8 +214,12 @@ void z_note(uint32_t t,uint32_t note,uint32_t vel,uint32_t on) {
   if(pad.choke)for(i=0;i<8;i++)if(voices[i].active&&voices[i].pad!=255&&voices[i].settings.choke==pad.choke){voices[i].stage=4;voices[i].gate=0;}
   v->pad=(uint8_t)(note-36);v->settings=pad;v->sample_start=start;v->sample_end=end;
  }else v->pad=255;
+ /* A sounding synth voice keeps its phase, filter and level: the new attack starts where it is, without a click. */
+ {uint32_t legato=v->active&&v->pad==255&&v->track==t&&z_song.track[t].p[Z_MODEL]<5&&v->env>0.0005f;
  v->track=(uint8_t)t;v->note=(uint8_t)note;v->stage=0;v->active=1;v->released=0;v->arp=0;v->stamp=++stamp;
- v->phase=0;v->phase2=0;v->env=0;v->lp1=v->lp2=v->inc=0;v->age=v->pos=0;v->velocity=(vel>127?127:vel)/127.0f;v->gate=0;
+ if(!legato&&v->active){declick_l+=v->out_l;declick_r+=v->out_r;} /* a stolen voice fades out instead of stopping dead */
+ v->out_l=v->out_r=0;
+ if(!legato){v->phase=0;v->phase2=0;v->env=0;v->lp1=v->lp2=0;}v->inc=0;v->age=v->pos=0;v->velocity=(vel>127?127:vel)/127.0f;v->gate=0;}
 }
 /* Panel, browser and external MIDI all enter through this same key path. */
 void z_key(uint32_t t,uint32_t n,uint32_t v,uint32_t on) {
@@ -272,7 +283,7 @@ static void arp_tick(void) {
 
 void z_bend(uint32_t t,uint32_t value){float pos,f;uint32_t i;if(t>=6)return;if(value>16383)value=16383;pos=69.0f+((int)value-8192)/4096.0f;i=(uint32_t)pos;f=pos-i;bend[t]=(z_frequency[i]*(1-f)+z_frequency[i+1]*f)/440.0f;}
 void z_sustain(uint32_t t,uint32_t on){uint32_t i;if(t>=6)return;sustain[t]=!!on;if(!on)for(i=0;i<8;i++)if(voices[i].active&&voices[i].track==t&&voices[i].released&&voices[i].stage!=4&&(voices[i].pad==255||voices[i].settings.mode))voices[i].stage=3;}
-void z_alloff(uint32_t t){uint32_t i;if(t>=6)return;if(z_drum_track(t))z_dm_panic();for(i=0;i<128;i++)record_finish(t,i);arp_count[t]=0;if(midi_out)midi_out(t,128,0,0);sustain[t]=0;for(i=0;i<8;i++)if(voices[i].track==t)voices[i].active=0;for(i=0;i<128;i++){arp_notes[t][i]=0;rec_skip[t][i]=0;}for(i=0;i<16;i++)arp_physical[t][i]=0;arp_index[t]=0;arp_time[t]=0;}
+void z_alloff(uint32_t t){uint32_t i;if(t>=6)return;if(z_drum_track(t))z_dm_panic();for(i=0;i<128;i++)record_finish(t,i);arp_count[t]=0;if(midi_out)midi_out(t,128,0,0);sustain[t]=0;for(i=0;i<8;i++)if(voices[i].track==t){if(voices[i].active){declick_l+=voices[i].out_l;declick_r+=voices[i].out_r;}voices[i].active=0;}for(i=0;i<128;i++){arp_notes[t][i]=0;rec_skip[t][i]=0;}for(i=0;i<16;i++)arp_physical[t][i]=0;arp_index[t]=0;arp_time[t]=0;}
 int z_arp_set(uint32_t t,uint32_t field,uint32_t value){uint32_t i;if(t>=6||field>3||z_drum_track(t))return -1;
  if(field==0){if(value>4)return -1;if(z_song.arp_mode[t]!=value)z_alloff(t);z_song.arp_mode[t]=(uint8_t)value;applied_mode[t]=(uint8_t)value;}
  else if(field==1){if(value>3)return -1;z_song.arp_rate[t]=(uint8_t)value;}
@@ -326,7 +337,7 @@ void z_step_set(uint32_t t,uint32_t i,uint32_t n,uint32_t v,uint32_t c,uint32_t 
 void z_render(float *out,uint32_t n) {
  uint32_t frame,k,t;float attack[6],decay[6],release[6],cut[6],lfo[6];
  for(t=0;t<6;t++){int16_t *p=z_song.track[t].p;
-  attack[t]=1.0f/(1+p[Z_ATTACK]*p[Z_ATTACK]*9.0f);decay[t]=1.0f/(20+p[Z_DECAY]*p[Z_DECAY]*5.0f);release[t]=1.0f/(20+p[Z_RELEASE]*p[Z_RELEASE]*6.0f);
+  attack[t]=1.0f/(1+p[Z_ATTACK]*p[Z_ATTACK]*9.0f);if(attack[t]>0.1f)attack[t]=0.1f; /* ATTACK 0 ramps like 1 (10 samples): no onset click */decay[t]=1.0f/(20+p[Z_DECAY]*p[Z_DECAY]*5.0f);release[t]=1.0f/(20+p[Z_RELEASE]*p[Z_RELEASE]*6.0f);
   /* Hats use a single audible decay instead of a sub-ms ADSR multiplied by another fade. */
   if(p[Z_MODEL]==7){decay[t]=1.0f/(441+p[Z_DECAY]*90.0f);release[t]=1.0f/(220+p[Z_RELEASE]*60.0f);}
   lfo_phase[t]+=(0.05f+p[Z_LFO_RATE]*0.12f)*n/44100.0f; if(lfo_phase[t]>=1)lfo_phase[t]-=(int)lfo_phase[t];
@@ -380,11 +391,12 @@ void z_render(float *out,uint32_t n) {
    else {ss=p[Z_SAMPLE];if(!pcm[ss]||v->pos>=pcm_n[ss]-1){v->active=0;continue;}uint32_t j=(uint32_t)v->pos;float f=v->pos-j;x=(pcm[ss][j]*(1-f)+pcm[ss][j+1]*f)/32768.0f;v->pos+=pcm_rate[ss]/44100.0f*z_frequency[note]/z_frequency[p[Z_ROOT]]*bend[t];}
    x=clampf(x-v->lp2*p[Z_RESONANCE]/100.0f,-3,3);v->lp1+=(x-v->lp1)*cut[t];v->lp2+=(v->lp1-v->lp2)*cut[t];x=v->lp2;
    a=1+p[Z_DRIVE]/20.0f;x=sat(x*a)*1.4f*e*v->velocity*p[Z_LEVEL]/127.0f*0.5f;
-   if(p[Z_MUTE]||(solo_track&&solo_track!=t+1))x=0;pan=clampf(p[Z_PAN]/128.0f+(v->pad==255?0:v->settings.pan/128.0f),-0.5f,0.5f);l+=x*(0.5f-pan);r+=x*(0.5f+pan);sendd+=x*p[Z_DELAY]/127.0f;sendr+=x*p[Z_REVERB]/127.0f;
+   if(p[Z_MUTE]||(solo_track&&solo_track!=t+1))x=0;pan=clampf(p[Z_PAN]/128.0f+(v->pad==255?0:v->settings.pan/128.0f),-0.5f,0.5f);v->out_l=x*(0.5f-pan);v->out_r=x*(0.5f+pan);l+=v->out_l;r+=v->out_r;sendd+=x*p[Z_DELAY]/127.0f;sendr+=x*p[Z_REVERB]/127.0f;
   }
+  l+=declick_l;r+=declick_r;declick_l*=0.996f;declick_r*=0.996f;
   if(!Z_SAMPLER_EDITION)z_dm_audio(&l,&r,&sendd,&sendr,cut[5]);
-  {uint32_t di=(delay_i+8192-6615)&8191;float dl=delay_l[di],dr=delay_r[di];delay_l[delay_i]=sendd+dr*0.36f;delay_r[delay_i]=sendd+dl*0.31f;l+=dl*0.5f;r+=dr*0.5f;delay_i=(delay_i+1)&8191;}
-  {uint32_t a=comb_i%1499,b=comb_i%1877;float ra=comb_a[a],rb=comb_b[b];comb_a[a]=sendr+ra*0.69f;comb_b[b]=sendr+rb*0.72f;l+=ra*0.24f;r+=rb*0.24f;comb_i++;}
+  {uint32_t di=(delay_i+8192-6615)&8191;float dl=delay_l[di],dr=delay_r[di];delay_l[delay_i]=sendd+dr*0.36f;delay_r[delay_i]=sendd+dl*0.31f;wet_l=dl*0.5f;wet_r=dr*0.5f;delay_i=(delay_i+1)&8191;}
+  {uint32_t a=comb_i%1499,b=comb_i%1877;float ra=comb_a[a],rb=comb_b[b];comb_a[a]=sendr+ra*0.69f;comb_b[b]=sendr+rb*0.72f;wet_l+=ra*0.24f;wet_r+=rb*0.24f;l+=wet_l;r+=wet_r;comb_i++;}
   if(click_left){float c=sine(click_phase)*0.13f*click_left/1100.0f;click_phase+=((pos&15)?1200:1800)/44100.0f;l+=c;r+=c;click_left--;}
   live_phase+=z_song.bpm/2646000.0f*(1u<<z_song.fx_rate);if(live_phase>=1)live_phase-=1;
   live_blend+=((live_requested?1.0f:0.0f)-live_blend)*0.008f;
@@ -411,6 +423,8 @@ void z_render(float *out,uint32_t n) {
    if(!live_requested&&live_blend<0.0001f){live_effect=0;live_blend=0;}
   }
   {float yl=l-dc_xl+0.99715f*dc_yl,yr=r-dc_xr+0.99715f*dc_yr;dc_xl=l;dc_xr=r;dc_yl=yl;dc_yr=yr;
+   /* Bus limiter: instant gain reduction above 0.9, ~120 ms recovery. Dense chords and drums duck instead of clipping. */
+   {float a=absf(yl)>absf(yr)?absf(yl):absf(yr),want=a*bus_gain>0.9f?0.9f/a:1;if(want<bus_gain)bus_gain=want;else bus_gain+=(want-bus_gain)*0.0002f;yl*=bus_gain;yr*=bus_gain;}
    out[2*frame]=clampf(yl,-0.98f,0.98f);out[2*frame+1]=clampf(yr,-0.98f,0.98f);}
  }
 }

@@ -1,6 +1,6 @@
 {
-  "version": "0.13.7",
-  "engine_sha256": "8e50da51a0b06b1314b70bf47ded30bb61820f0eb5942bf12640beaf90e8bafb",
+  "version": "0.14.0",
+  "engine_sha256": "8e803c3a96ec28a46cfe411f47d37861fa5e2d87a7262496960ddf48e457a72d",
   "presets": [
     {
       "slot": 65,
@@ -22,7 +22,7 @@
       "rms_db": -34.7,
       "brightness": 0.0105,
       "file": "idm-rubber-circuit.wav",
-      "hash": "d7c22413d43a16a5de72672293f95c0168a1bdb3d88ca5a82b8747afd8149041"
+      "hash": "be0fa714e0714a386f02ea28b8e38aab08a6ec519d057bb58fe741f9d3e3a07c"
     },
     {
       "slot": 67,
@@ -55,7 +55,7 @@
       "rms_db": -34.58,
       "brightness": 0.1205,
       "file": "idm-broken-reed.wav",
-      "hash": "ba761614e223471dee9880a674cd38cc1fc5d9bab3c057d7e487a4f288876f97"
+      "hash": "0e30ea0436ddd643566378882616193da38b4e209b9c3634a0449f5567b11c0a"
     },
     {
       "slot": 70,
@@ -99,7 +99,7 @@
       "rms_db": -41.13,
       "brightness": 0.9307,
       "file": "idm-tin-droplet.wav",
-      "hash": "03a48986a04f8f27e4be0f736ca8471130d43a3e2a9444d3d6fe664df320f2c8"
+      "hash": "3be451131cb65fdb3c115cfb063f668653b5cc83446c1f3a98601a2e940c22a9"
     },
     {
       "slot": 74,
@@ -110,7 +110,7 @@
       "rms_db": -38.03,
       "brightness": 0.9505,
       "file": "idm-ceramic-ping.wav",
-      "hash": "2618b6b78e91c820ec0f6b1714ffb72bc671a7ada2476e93158b5bf017b277f9"
+      "hash": "40d2c7ef0da0242a4f9306e7789a6a46d25fe5823e18817b2603cecaa35bf483"
     },
     {
       "slot": 75,
@@ -132,18 +132,18 @@
       "rms_db": -43.79,
       "brightness": 0.067,
       "file": "idm-pixel-marimba.wav",
-      "hash": "eb5407786f3d0f29cb0e8aac11d8f0ca7ed0f985ec1b2ac9827391360cb4c3c4"
+      "hash": "db884c3f96f69856545785c4260ba7be8f2b667fdc00bc273a09ede751c44b19"
     },
     {
       "slot": 77,
       "name": "IDM Relay Click",
       "category": "FM / MALLETS",
       "note": 60,
-      "peak": 0.0854,
-      "rms_db": -55.51,
-      "brightness": 0.9182,
+      "peak": 0.0885,
+      "rms_db": -55.37,
+      "brightness": 0.9224,
       "file": "idm-relay-click.wav",
-      "hash": "d9ae0a2239605982e4943a810fa0c7511e06eb90abaf411c1d3bae94bf1eb757"
+      "hash": "45391ac97fd81ce969f5e40a656722eef46efdf07c7ff69839de82da1e3aa004"
     },
     {
       "slot": 78,
@@ -154,7 +154,7 @@
       "rms_db": -46.02,
       "brightness": 1.1782,
       "file": "idm-glass-insects.wav",
-      "hash": "ad43df57bdfaa874599cf0ff0fe6f4354bb608b3ba227855a8fbfc5effc066fa"
+      "hash": "b724b7957872b8ddb0afe4a80868a1f74e21d84e657077f5e00c20502441d00f"
     },
     {
       "slot": 79,
@@ -165,7 +165,7 @@
       "rms_db": -37.14,
       "brightness": 0.0518,
       "file": "idm-bent-bell.wav",
-      "hash": "20aa47701244bfd044f7b134ab7fad8130a63d6f8b0a291005da672adf818749"
+      "hash": "f0caa4f89a4f9cabc2ec345064ce23b1ac4c524d8e4279048d9625ac4261d8a0"
     },
     {
       "slot": 80,
@@ -176,7 +176,7 @@
       "rms_db": -46.12,
       "brightness": 0.4613,
       "file": "idm-copper-grain.wav",
-      "hash": "867b5935e6910d1980b78aa635090454a77ed0670138680d585c566c0df5aa34"
+      "hash": "f8c6bd00545249c8c47a1caaa86f6171f91f5fdd546912ed4c3f78de1b43edd5"
     },
     {
       "slot": 81,
@@ -187,7 +187,7 @@
       "rms_db": -30.7,
       "brightness": 0.0487,
       "file": "idm-moss-choir.wav",
-      "hash": "f0082b8bf43d4779d4fb333cdf1ed5b2603cd4f3a0f5469f174e934890e387e0"
+      "hash": "6283f063bd385f84a82c49b7fe6abbeffc46464768cad6ea92dba54587306309"
     },
     {
       "slot": 82,
@@ -198,7 +198,7 @@
       "rms_db": -29.32,
       "brightness": 0.2238,
       "file": "idm-ice-lattice.wav",
-      "hash": "b757ecaac9416d05625cddcf7fefea4f334ae5815342a7dbdf9dad80122ddc5f"
+      "hash": "8e3b520c6afadb9ffcfae9d94f80af69709ffd45e4f3be8636bb0303eebfd7aa"
     },
     {
       "slot": 83,
@@ -209,7 +209,7 @@
       "rms_db": -32.28,
       "brightness": 0.039,
       "file": "idm-tape-orchard.wav",
-      "hash": "eda48f6d707a5484ec71b730e67891e02217ec125327a3796d93763e0f50404e"
+      "hash": "e08a5166906a464684e1b521a4ee0aa14fda65cb00a5a1a50c7ad16a08d54ef7"
     },
     {
       "slot": 84,
@@ -220,7 +220,7 @@
       "rms_db": -29.09,
       "brightness": 0.0385,
       "file": "idm-phase-aurora.wav",
-      "hash": "46305b9d764a2d01023643859f5302de3c8fbfacab62b073a1629e34d5f7b602"
+      "hash": "5c9fa69b9a1a79b8ea87591c5795e7ef4dace359b8da01abebcd8603cc0ab211"
     },
     {
       "slot": 85,
@@ -231,7 +231,7 @@
       "rms_db": -34.31,
       "brightness": 0.0741,
       "file": "idm-paper-clouds.wav",
-      "hash": "346e84aa9a686ad6e55d0787be0712c31eaaf85532f832d601269fa30366e4bc"
+      "hash": "e7a163b2f27d759e0ec990d847f102e2a4c94fb1517f18fb9676647697438d5f"
     },
     {
       "slot": 86,
@@ -253,7 +253,7 @@
       "rms_db": -37.37,
       "brightness": 0.1095,
       "file": "idm-submerged-fm.wav",
-      "hash": "679ee4fab4b0ed339f69cf50155cf6c78637b2265ac4290601e289c62cfb87b8"
+      "hash": "8ff1fd18542e65d6e38278de2393fd26c808a4bcef1220f5e2b1bff96b21fd10"
     },
     {
       "slot": 88,
@@ -264,7 +264,7 @@
       "rms_db": -34.23,
       "brightness": 0.0543,
       "file": "idm-warm-fracture.wav",
-      "hash": "2c5caff70f50c3fb6630b5efc41b2819e2fb7679a00c39906133ca7084cc0ec1"
+      "hash": "708f5d24a2f7678aae2299fd2bf37d0ef5b86cc493a52ef1f09d41269de69d58"
     },
     {
       "slot": 89,
@@ -275,7 +275,7 @@
       "rms_db": -46.51,
       "brightness": 1.1527,
       "file": "idm-data-sparrow.wav",
-      "hash": "2b212b4b04dfbb011aafb80e73f8d17b60b2cbdbe8175b049a4bebef858119f2"
+      "hash": "6b95a52ad16b04967b78f0d35492a11059397f2f5656d48eb8ae4365cc41c9e2"
     },
     {
       "slot": 90,
@@ -286,7 +286,7 @@
       "rms_db": -41.87,
       "brightness": 0.0856,
       "file": "idm-reso-shards.wav",
-      "hash": "e29cebf9763ac92a67cfb39ab0c2d7e3beb963e7dab07b65eb0ea70e269a0a4e"
+      "hash": "0b6ea2e5a6699899bca0f170b85b8e26970e2c3b1a9f502b80f956073a2b7bde"
     },
     {
       "slot": 91,
@@ -297,7 +297,7 @@
       "rms_db": -54.22,
       "brightness": 0.2819,
       "file": "idm-dust-morse.wav",
-      "hash": "c32db5b1da0edddb5f64528c2568b3b837a1359cc4a2b8b4ae64d2ef61f25275"
+      "hash": "bfdc26220f45c7faac475ebb1a5357363b5abaab5420b8b6ae4571d49264bec9"
     },
     {
       "slot": 92,
@@ -308,7 +308,7 @@
       "rms_db": -43.31,
       "brightness": 0.7263,
       "file": "idm-clockwork.wav",
-      "hash": "b63bf0cf991ea6477b690191dbc50e86163af5ef192414943a8cc8df94fc36a8"
+      "hash": "4487e322eae6719627ce532294248c90b9bdc2cbe42acf0dca50c8d7ef2693e5"
     },
     {
       "slot": 93,
@@ -330,7 +330,7 @@
       "rms_db": -40.99,
       "brightness": 0.3236,
       "file": "idm-prism-stab.wav",
-      "hash": "35f6adb55f81099a6dbcf5fca17c44a3a5ecdbfee67c870d18656c45b8aac649"
+      "hash": "cc3a662d8e2f8c6774864167a199482cbe57f25c9596fff7aabedd0fa3991a83"
     },
     {
       "slot": 95,
@@ -352,7 +352,7 @@
       "rms_db": -36.56,
       "brightness": 0.5317,
       "file": "idm-binary-bloom.wav",
-      "hash": "0334f80407048b33ebf832a585c7eb3aaf77f584d8ef64058343c4ae34396f97"
+      "hash": "7c0a740ef7ed2ffb0ea62b99149bfcaabc011cbee3d75f7add3027e20b011e1e"
     }
   ]
 }

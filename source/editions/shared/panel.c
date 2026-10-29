@@ -66,6 +66,7 @@ static uint32_t page_knob(uint32_t section,uint32_t pg,uint32_t k){
  return pages[section][pg%page_count[section]][k];
 }
 static const char *label(uint32_t id){if(id<Z_PARAMS)return z_song.language?z_desc[id].name:param_ru[id];return z_song.language?special_en[id-Z_PARAMS]:special_ru[id-Z_PARAMS];}
+static void note_text(uint32_t note,char *b){static const char *const names[12]={"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};const char *p=names[note%12];while(*p)*b++=*p++;number((int)note/12-1,b);}
 static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;int value=0;z_step *step=&z_song.track[t].steps[z_song.step_edit];
  if(id<Z_PARAMS){value=z_get(t,id);if(z_sys.midi_mode==2&&(id==Z_LEVEL||id==Z_PAN))value=id==Z_LEVEL?daw_values[t][4]:(int)daw_values[t][5]-64;
   if(id==Z_MODEL)return z_drum_track(t)?"DRUM KIT":z_models[value];
@@ -85,7 +86,7 @@ static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;
   case U_PAD_GAIN:value=z_sampler.pad[z_sampler.selected].gain;break;
   case U_PAD_MODE:return z_sampler.pad[z_sampler.selected].mode==0?"SHOT":z_sampler.pad[z_sampler.selected].mode==1?"GATE":"LOOP";
   case U_DURATION:value=z_song.duration[t][z_song.step_edit];if(!value)return "AUTO";break;
-  case U_CHORD1:case U_CHORD2:case U_CHORD3:value=z_song.chord[t][z_song.step_edit][id-U_CHORD1];if(!value)return "OFF";value--;break;
+  case U_CHORD1:case U_CHORD2:case U_CHORD3:value=z_song.chord[t][z_song.step_edit][id-U_CHORD1];if(!value)return word("ВЫКЛ","OFF");value--;if(z_drum_track(t))return z_drum_name(value);note_text(value,str);return str;
   case U_MIDI_MODE:return z_sys.midi_mode==2?"DAW CONTROL":z_sys.midi_mode==1?"DAW SYNTH":"STANDALONE";
   case U_DAW_TRANSPORT:return z_sys.transport?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
   case U_CORE:{static const char *const a[]={"CPU0","CPU1 ON","START FAIL","TEST FAIL","TIMEOUT","SIMULATED"};return core_pending?"WAIT...":a[core_status];}
@@ -112,7 +113,7 @@ static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;
   case U_ARP_OCT:value=z_song.arp_oct[t];break;
   case U_ARP_HOLD:return z_song.arp_hold[t]?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
   case U_STEP:value=z_song.step_edit+1;break;
-  case U_NOTE:if(z_drum_track(t))return z_drum_name(drum_choice);value=step->note;break;
+  case U_NOTE:if(z_drum_track(t))return z_drum_name(drum_choice);note_text(step->note,str);return str;
   case U_VELOCITY:value=step->velocity;break;
   case U_GATE:value=step->gate;break;
   case U_CHANCE:value=step->chance;break;
