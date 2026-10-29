@@ -25,7 +25,7 @@ const text={
   q5:'Как вернуть заводскую прошивку M-VAVE',q5a:'Воспользуйтесь официальным установщиком M-VAVE для FM-1 (V15). Сохранённые в Zombie проекты при этом не переносятся.',
   t1:'Эмулятор FM-1',t1a:'Экран, кнопки и звук на коде прошивки 0.15.1. Можно поиграть с клавиатуры ПК.',t2:'IDM-банк',t2a:'Послушайте 32 пресета до установки.',t3:'Профили FL Studio и Ableton',t3a:'Скрипты для режима DAW Controller, инструкции RU/EN.',
   k1:'<b>ALGO</b> выбирает дорожку, шестая — драмка. <b>SELECT</b> задаёт темп.',k2:'<b>SEQ</b>: 16 белых клавиш ставят и выбирают шаги. <b>SEQ + K1</b>: число шагов. <b>EDIT</b> удаляет ноту.',k3:'<b>PLAY</b> + <b>REC</b>: запись в ритм. Без PLAY запись идёт по шагам.',k4:'<b>EDIT + OCT−/OCT+</b>: отмена и повтор. <b>SAVE</b>: сохранить проект.',k5:'Драмка на SEQ: <b>OP1–OP6</b> выбирают звук, <b>PITCH/GLOBAL</b> листают группы.',k6:'<b>HOME + SEL</b>: Standalone → DAW Synth → DAW Controller.',
-  stall:'FM-1 не запрашивает данные уже 15 с. Не отключайте USB и не закрывайте вкладку: часто запись продолжается сама. Если ничего не изменится за 3 минуты, установщик предложит повторить.',stg_stall:'ожидание FM-1',stg_start:'подготовка',stg_verify:'проверка пакета',stg_loader:'загрузчик',stg_write:'запись',stg_reboot:'перезапуск',stg_done:'готово',tagrecommended:'рекомендуем',tagstable:'стабильная',tagbeta:'beta',tagarchive:'архив',archivePick:'— выбрать из архива —',
+  stall:'FM-1 не запрашивает данные уже 15 с. Не отключайте USB и не закрывайте вкладку: часто запись продолжается сама. Если ничего не изменится за 3 минуты, установщик предложит повторить.',stg_stall:'ожидание FM-1',resuming:'Связь с FM-1 прервалась. Установщик ждёт загрузчик и сам продолжит запись. Если USB отключился, подключите его снова. Не выключайте FM-1 и не закрывайте страницу.',stg_resume:'продолжение записи',stg_start:'подготовка',stg_verify:'проверка пакета',stg_loader:'загрузчик',stg_write:'запись',stg_reboot:'перезапуск',stg_done:'готово',tagrecommended:'рекомендуем',tagstable:'стабильная',tagbeta:'beta',tagarchive:'архив',archivePick:'— выбрать из архива —',
   checking:'Скачиваю и проверяю файл…',ready:'Файл проверен. Подключите FM-1 и нажмите «Найти FM-1».',finding:'Ищу FM-1 по USB MIDI…',
   found:'FM-1 найден. Отметьте подтверждение и нажмите «Установить».',same:'На FM-1 уже стоит эта версия. Её можно установить повторно.',
   start:'Подготовка устройства…',verify:'FM-1 проверяет пакет…',loader:'Перезапуск в загрузчик…',write:'Запись прошивки…',reboot:'Перезапуск и проверка версии…',
@@ -61,7 +61,7 @@ const text={
   q5:'Back to stock M-VAVE firmware',q5a:'Use M-VAVE’s official FM-1 updater (V15). Projects saved in Zombie are not carried over.',
   t1:'FM-1 emulator',t1a:'Screen, buttons and sound from the 0.15.1 firmware code. Playable from your PC keyboard.',t2:'IDM bank',t2a:'Listen to 32 presets before installing.',t3:'FL Studio & Ableton profiles',t3a:'Scripts for DAW Controller mode, RU/EN guide.',
   k1:'<b>ALGO</b> selects the track (6 = drums). <b>SELECT</b> sets tempo.',k2:'<b>SEQ</b>: 16 white keys place and select steps. <b>SEQ + K1</b>: step count. <b>EDIT</b> deletes a note.',k3:'<b>PLAY</b> + <b>REC</b>: live recording; without PLAY, step recording.',k4:'<b>EDIT + OCT−/OCT+</b>: undo / redo. <b>SAVE</b>: save the project.',k5:'Drums on SEQ: <b>OP1–OP6</b> choose the sound, <b>PITCH/GLOBAL</b> change group.',k6:'<b>HOME + SEL</b>: Standalone → DAW Synth → DAW Controller.',
-  stall:'FM-1 has not asked for data for 15 s. Keep USB connected and this tab open: writing often resumes by itself. If nothing changes within 3 minutes the installer will offer to retry.',stg_stall:'waiting for FM-1',stg_start:'preparing',stg_verify:'checking package',stg_loader:'loader',stg_write:'writing',stg_reboot:'restarting',stg_done:'done',tagrecommended:'recommended',tagstable:'stable',tagbeta:'beta',tagarchive:'archive',archivePick:'— pick from the archive —',
+  stall:'FM-1 has not asked for data for 15 s. Keep USB connected and this tab open: writing often resumes by itself. If nothing changes within 3 minutes the installer will offer to retry.',stg_stall:'waiting for FM-1',resuming:'The link to FM-1 dropped. The installer is waiting for the loader and will resume writing by itself. If USB came out, plug it back in. Keep FM-1 on and this page open.',stg_resume:'resuming the write',stg_start:'preparing',stg_verify:'checking package',stg_loader:'loader',stg_write:'writing',stg_reboot:'restarting',stg_done:'done',tagrecommended:'recommended',tagstable:'stable',tagbeta:'beta',tagarchive:'archive',archivePick:'— pick from the archive —',
   checking:'Downloading and checking the package…',ready:'Package verified. Connect FM-1 and click Find FM-1.',finding:'Looking for FM-1 over USB MIDI…',
   found:'FM-1 found. Tick the confirmation and click Install.',same:'FM-1 already runs this version. You can reinstall it.',
   start:'Preparing the device…',verify:'FM-1 is checking the package…',loader:'Restarting into the loader…',write:'Writing firmware…',reboot:'Restarting and verifying the version…',
@@ -164,17 +164,32 @@ async function detect(){
   }finally{await dev.link.close();}
  });}catch(e){showError(e);}finally{active=false;render();}
 }
+const RESUMABLE=new Set(['lost','stopped','noloader']);
 async function install(){
  if(active||!checked||!detected||!$('confirm').checked)return;active=true;progress=0;stage='start';say('start');let wake,success=false;
  try{await withDeviceLock(async()=>{
   ensureSingle();try{wake=await navigator.wakeLock?.request('screen');}catch{}
-  const up=new Updater(access,log);let last='';log('INSTALL '+checked.product);
-  await up.install(checked.image,checked.product,(key,count,address)=>{
+  const up=new Updater(access,log);let last='',loaderReached=false;log('INSTALL '+checked.product);
+  const report=(key,count,address)=>{
    if(key!==last){log(key+(typeof count==='string'?' '+count:''));last=key;}
+   if(key==='loader'||key==='write')loaderReached=true;
    const fixed={start:3,verify:10,loader:30,reboot:97,done:100};
    const amount=key==='write'?35+Math.min(1,(address||0)/checked.image.length)*60:fixed[key];
    if(amount!=null)progress=Math.max(progress,amount);stage=key;say(key,key==='done'?'ok':key==='stall'?'warn':'');
-  });
+  };
+  /* Once the loader runs, FM-1 stays in update mode until a write completes (black screen). A cut USB link or a
+   * stalled transfer is resumed here, so the page never leaves FM-1 waiting in the loader. */
+  try{await up.install(checked.image,checked.product,report);}
+  catch(e){
+   if(!loaderReached||!RESUMABLE.has(e?.code))throw e;
+   let error=e,resumed=false;
+   for(let attempt=1;attempt<=3&&!resumed;attempt++){
+    log('AUTO-RESUME '+attempt+' after '+error.code);progress=35;stage='resume';say('resuming','warn');
+    const ota=await up.waitFor(id=>/^ota-/i.test(id.model),90000);if(!ota)break;await ota.link.close();
+    try{ensureSingle();await up.resume(checked.image,checked.product,report);resumed=true;}catch(again){error=again;if(!RESUMABLE.has(again?.code))throw again;}
+   }
+   if(!resumed)throw error;
+  }
   success=true;
  });}catch(e){showError(e);}finally{await wake?.release().catch(()=>{});active=false;if(success){progress=100;stage='done';deviceText=checked.product+' · FM-1';say('done','ok');}detected=success?detected:null;if(!success)deviceText='';render();}
 }
