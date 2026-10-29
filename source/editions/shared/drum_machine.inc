@@ -26,6 +26,10 @@ void z_dm_authoritative(void){z_song.padding[1]=0xD1;for(uint32_t at=0;at<64;at+
 uint32_t z_dm_size(void){return sizeof z_dm;}
 uint32_t z_dm_snapshot(void){for(uint32_t i=0;i<sizeof z_dm;i++)transfer[i]=((const uint8_t*)&z_dm)[i];return (uint32_t)(uintptr_t)transfer;}
 int z_dm_apply(uint32_t n){const z_dm_state *s=(const z_dm_state*)transfer;if(n!=sizeof z_dm||!z_dm_valid(s))return -1;z_dm=*s;z_dm_transport(0);z_dm_history_reset();z_touch();return 0;}
+/* One length for the whole kit: every sound loops over the same number of steps. */
+int z_dm_length(uint32_t len){if(len<1||len>64)return -1;uint32_t d,changed=0;for(d=0;d<16;d++)if(z_dm.sound[d].length!=len)changed=1;if(!changed)return 0;dm_checkpoint();for(d=0;d<16;d++)z_dm.sound[d].length=(uint8_t)len;z_touch();return 0;}
+/* The shared length, or 0 when sounds were given different lengths. */
+uint32_t z_dm_common_length(void){for(uint32_t d=1;d<16;d++)if(z_dm.sound[d].length!=z_dm.sound[0].length)return 0;return z_dm.sound[0].length;}
 void z_dm_select(uint32_t d){if(d<16&&z_dm.selected!=d){z_dm.selected=(uint8_t)d;z_touch();}}
 int z_dm_param(uint32_t d,uint32_t field,int32_t value){if(d>=16||field>5)return -1;static const int16_t lo[]={0,1,-24,-64,0,1},hi[]={127,127,24,63,1,64};if(value<lo[field]||value>hi[field])return -1;z_dm_sound_t *p=&z_dm.sound[d];int32_t current=field==0?p->level:field==1?p->decay:field==2?p->tune:field==3?p->pan:field==4?p->mute:p->length;if(current==value)return 0;dm_checkpoint();if(field==0)p->level=value;else if(field==1)p->decay=value;else if(field==2)p->tune=value;else if(field==3)p->pan=value;else if(field==4){p->mute=value;if(value){dm_stop_voice(d);dm_left[d]=0;}}else p->length=value;z_touch();return 0;}
 int z_dm_step(uint32_t d,uint32_t at,uint32_t vel,uint32_t chance,uint32_t ratchet){if(d>=16||at>=64||vel>127||chance>127||ratchet<1||ratchet>4)return -1;if(z_dm.step[d][at].velocity==vel&&z_dm.step[d][at].chance==chance&&z_dm.step[d][at].ratchet==ratchet)return 0;if(z_song.recording)z_record(0);if(!vel&&at==z_dm_position(d))dm_left[d]=0;dm_checkpoint();z_dm.step[d][at]=(z_dm_step_t){vel,chance,ratchet};z_touch();return 0;}

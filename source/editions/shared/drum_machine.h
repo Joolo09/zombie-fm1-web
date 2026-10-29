@@ -15,6 +15,8 @@ uint32_t z_dm_size(void);
 uint32_t z_dm_snapshot(void);
 int z_dm_apply(uint32_t);
 int z_dm_param(uint32_t,uint32_t,int32_t);
+int z_dm_length(uint32_t);
+uint32_t z_dm_common_length(void);
 int z_dm_step(uint32_t,uint32_t,uint32_t,uint32_t,uint32_t);
 void z_dm_select(uint32_t);
 uint32_t z_dm_position(uint32_t);

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT
  * Device navigation, UTF-8 Cyrillic text and every printed panel button. */
 enum {U_TRACK=Z_PARAMS,U_PRESET,U_OCT,U_BPM,U_SWING,U_CLOCK,U_LANGUAGE,U_BANK,
-      U_ARP_MODE,U_ARP_RATE,U_ARP_OCT,U_ARP_HOLD,U_STEP,U_NOTE,U_VELOCITY,U_GATE,U_CHANCE,U_REC_MODE,U_REC_QUANT,U_CLICK,U_FX_AMOUNT,U_FX_RATE,U_CORE,U_TRIM,U_LIMITER,U_GLOW,U_CURVE,U_START,U_MIDI_MODE,U_DAW_TRANSPORT,U_DURATION,U_CHORD1,U_CHORD2,U_CHORD3,U_PAD_SOURCE,U_PAD_TUNE,U_PAD_GAIN,U_PAD_MODE,U_DRUM_SOUND,U_DRUM_LEVEL,U_DRUM_DECAY,U_DRUM_TUNE,U_DRUM_LENGTH,U_DRUM_MUTE,U_DRUM_PAN};
+      U_ARP_MODE,U_ARP_RATE,U_ARP_OCT,U_ARP_HOLD,U_STEP,U_NOTE,U_VELOCITY,U_GATE,U_CHANCE,U_REC_MODE,U_REC_QUANT,U_CLICK,U_FX_AMOUNT,U_FX_RATE,U_CORE,U_TRIM,U_LIMITER,U_GLOW,U_CURVE,U_START,U_MIDI_MODE,U_DAW_TRANSPORT,U_DURATION,U_CHORD1,U_CHORD2,U_CHORD3,U_PAD_SOURCE,U_PAD_TUNE,U_PAD_GAIN,U_PAD_MODE,U_DRUM_SOUND,U_DRUM_LEVEL,U_DRUM_DECAY,U_DRUM_TUNE,U_DRUM_LENGTH,U_DRUM_MUTE,U_DRUM_PAN,U_STEPS};
 static const char *word(const char *ru,const char *en){return z_song.language?en:ru;}
 static const uint8_t section_button[Z_SECTIONS]={B_HOME,B_FX,B_SEL,B_ENV,B_LFO,B_EDIT,B_GLO,B_ARP,B_SEQ};
 static uint8_t sampler_page,page_memory[Z_SECTIONS],layer_locked,roll_edit,roll_note_slot;
@@ -20,9 +20,9 @@ static const uint8_t pages[Z_SECTIONS][6][4]={
 };
 static const char *const section_ru[Z_SECTIONS]={"ГЛАВНАЯ","ЭФФЕКТЫ","ДОРОЖКА","ОГИБАЮЩАЯ","МОДУЛЯЦИЯ","СИНТЕЗ","НАСТРОЙКИ","АРПЕДЖИАТОР","ШАГИ"};
 static const char *const section_en[Z_SECTIONS]={"HOME","FX","TRACK","ENVELOPE","LFO","SYNTH","SETTINGS","ARPEGGIATOR","STEPS"};
-static const char *const param_ru[Z_PARAMS]={"ДВИЖОК","ФОРМА","СМЕСЬ","РАССТРОЙКА","СРЕЗ","РЕЗОНАНС","АТАКА","СПАД","УДЕРЖАНИЕ","ЗАТУХАНИЕ","ГЛУБИНА FM","FM ЧАСТОТА","ПЕРЕГРУЗ","ДИЛЕЙ","РЕВЕРБ","УРОВЕНЬ","ПАНОРАМА","LFO ЧАСТОТА","LFO ГЛУБИНА","СЭМПЛ","ОСНОВНАЯ НОТА","БЕЗ ЗВУКА","MIDI КАНАЛ","ДЛИНА","ДЛИНА НОТЫ","ТРАНСПОЗИЦИЯ","ВЕРОЯТНОСТЬ"};
-static const char *const special_ru[]={"ДОРОЖКА","ПРЕСЕТ","ОКТАВА","ТЕМП","СВИНГ","СИНХРОНИЗАЦИЯ","ЯЗЫК","СТРАНИЦА ШАГОВ","РЕЖИМ","СКОРОСТЬ","ОКТАВЫ","ЗАЩЕЛКА","ШАГ","НОТА","СИЛА","ДЛИНА НОТЫ","ВЕРОЯТНОСТЬ","ЗАПИСЬ","КВАНТИЗАЦИЯ","МЕТРОНОМ","СИЛА FX","РИТМ FX","CPU1 / ЭКСП.","ВЫХОД %","ЛИМИТЕР","ПОДСВЕТКА","КЛАВИШИ","ПРИ ЗАПУСКЕ","MIDI РЕЖИМ","DAW ТРАНСПОРТ","ДЛИНА","АККОРД 1","АККОРД 2","АККОРД 3","ИСТОЧНИК","СТРОЙ ПЭДА","УРОВЕНЬ","РЕЖИМ ПЭДА","ЗВУК","УРОВЕНЬ","ЗАТУХАНИЕ","ТОН","ДЛИНА ПАРТИИ","БЕЗ ЗВУКА","ПАНОРАМА"};
-static const char *const special_en[]={"TRACK","PRESET","OCTAVE","BPM","SWING","CLOCK","LANGUAGE","STEP PAGE","MODE","RATE","OCTAVES","HOLD","STEP","NOTE","VELOCITY","GATE","CHANCE","RECORD MODE","QUANTIZE","METRONOME","FX AMOUNT","FX RATE","CPU1 / EXP.","OUTPUT %","LIMITER","KEY GLOW","VELOCITY","START PAGE","MIDI MODE","DAW TRANSPORT","LENGTH","CHORD 1","CHORD 2","CHORD 3","SOURCE","PAD TUNE","PAD GAIN","PAD MODE","SOUND","LEVEL","DECAY","TUNE","PART LENGTH","PART MUTE","PART PAN"};
+static const char *const param_ru[Z_PARAMS]={"ДВИЖОК","ФОРМА","СМЕСЬ","РАССТРОЙКА","СРЕЗ","РЕЗОНАНС","АТАКА","СПАД","УДЕРЖАНИЕ","ЗАТУХАНИЕ","ГЛУБИНА FM","FM ЧАСТОТА","ПЕРЕГРУЗ","ДИЛЕЙ","РЕВЕРБ","УРОВЕНЬ","ПАНОРАМА","LFO ЧАСТОТА","LFO ГЛУБИНА","СЭМПЛ","ОСНОВНАЯ НОТА","БЕЗ ЗВУКА","MIDI КАНАЛ","ШАГОВ","ДЛИНА НОТЫ","ТРАНСПОЗИЦИЯ","ВЕРОЯТНОСТЬ"};
+static const char *const special_ru[]={"ДОРОЖКА","ПРЕСЕТ","ОКТАВА","ТЕМП","СВИНГ","СИНХРОНИЗАЦИЯ","ЯЗЫК","СТРАНИЦА ШАГОВ","РЕЖИМ","СКОРОСТЬ","ОКТАВЫ","ЗАЩЕЛКА","ШАГ","НОТА","СИЛА","ДЛИНА НОТЫ","ВЕРОЯТНОСТЬ","ЗАПИСЬ","КВАНТИЗАЦИЯ","МЕТРОНОМ","СИЛА FX","РИТМ FX","CPU1 / ЭКСП.","ВЫХОД %","ЛИМИТЕР","ПОДСВЕТКА","КЛАВИШИ","ПРИ ЗАПУСКЕ","MIDI РЕЖИМ","DAW ТРАНСПОРТ","ДЛИНА","АККОРД 1","АККОРД 2","АККОРД 3","ИСТОЧНИК","СТРОЙ ПЭДА","УРОВЕНЬ","РЕЖИМ ПЭДА","ЗВУК","УРОВЕНЬ","ЗАТУХАНИЕ","ТОН","ДЛИНА ЗВУКА","БЕЗ ЗВУКА","ПАНОРАМА","ШАГОВ"};
+static const char *const special_en[]={"TRACK","PRESET","OCTAVE","BPM","SWING","CLOCK","LANGUAGE","STEP PAGE","MODE","RATE","OCTAVES","HOLD","STEP","NOTE","VELOCITY","GATE","CHANCE","RECORD MODE","QUANTIZE","METRONOME","FX AMOUNT","FX RATE","CPU1 / EXP.","OUTPUT %","LIMITER","KEY GLOW","VELOCITY","START PAGE","MIDI MODE","DAW TRANSPORT","LENGTH","CHORD 1","CHORD 2","CHORD 3","SOURCE","PAD TUNE","PAD GAIN","PAD MODE","SOUND","LEVEL","DECAY","TUNE","SOUND LENGTH","PART MUTE","PART PAN","STEPS"};
 static void number(int n,char *s){char tmp[12];int i=0;if(n<0){*s++='-';n=-n;}do{tmp[i++]=(char)('0'+n%10);n/=10;}while(n);while(i)*s++=tmp[--i];*s=0;}
 /* Platform text is byte-oriented. Decode UTF-8 here and add the Cyrillic glyphs,
  * without changing the shared driver or replacing it with question marks. */
@@ -61,7 +61,7 @@ static uint32_t page_knob(uint32_t section,uint32_t pg,uint32_t k){
   static const uint8_t edit[3][4]={{U_DRUM_SOUND,U_DRUM_LEVEL,U_DRUM_DECAY,U_DRUM_TUNE},{Z_CUTOFF,Z_RESONANCE,Z_DRIVE,Z_REVERB},{U_DRUM_PAN,Z_DELAY,Z_CHANNEL,Z_PROBABILITY}};
   static const uint8_t lfo[2][4]={{Z_LFO_RATE,Z_LFO_DEPTH,Z_CUTOFF,Z_RESONANCE},{Z_CUTOFF,Z_RESONANCE,Z_DRIVE,Z_PAN}};
   static const uint8_t sel[2][4]={{U_TRACK,U_DRUM_SOUND,Z_MUTE,Z_PAN},{Z_CHANNEL,U_DRUM_TUNE,Z_PROBABILITY,Z_LEVEL}};
-  if(section==Z_HOME&&pg==0)return sound[k];if(section==Z_ENV)return env[pg%2][k];if(section==Z_EDIT)return edit[pg%3][k];if(section==Z_LFO)return lfo[pg%2][k];if(section==Z_SEL)return sel[pg%2][k];if(section==Z_GLO&&pg==2&&k==3)return U_DRUM_LENGTH;
+  if(section==Z_HOME&&pg==0)return sound[k];if(section==Z_ENV)return env[pg%2][k];if(section==Z_EDIT)return edit[pg%3][k];if(section==Z_LFO)return lfo[pg%2][k];if(section==Z_SEL)return sel[pg%2][k];if(section==Z_GLO&&pg==2&&k==3)return U_STEPS;
  }
  return pages[section][pg%page_count[section]][k];
 }
@@ -74,6 +74,7 @@ static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;
   if(id==Z_MUTE)return value?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
   if(id==Z_SAMPLE){static const char *const name[]={"MC ZOMBIE","MC HURT","MC DEATH","MC CREEPER","MC BOOM","MC XP","USR1","USR2","USR3","USR4","ZC KICK","ZC SNARE","ZC HAT","ZC CLAP"};return name[value];}
  }else switch(id){
+  case U_STEPS:if(!z_drum_track(t)){value=z_get(t,Z_LENGTH);break;}value=(int)z_dm_common_length();if(!value)return word("РАЗНАЯ","MIXED");break;
   case U_DRUM_LENGTH:value=z_dm.sound[z_dm.selected].length;break;
   case U_DRUM_MUTE:return z_dm.sound[z_dm.selected].mute?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
   case U_DRUM_PAN:value=z_dm.sound[z_dm.selected].pan;break;
@@ -124,6 +125,7 @@ static void edit_stop(void){if(z_song.recording){z_record(0);z_alloff(z_song.sel
 static void knob(uint32_t id,int delta){if(id==U_NOTE)roll_note_slot=0;else if(id>=U_CHORD1&&id<=U_CHORD3)roll_note_slot=id-U_CHORD1+1;if(id==U_NOTE||id==U_VELOCITY||id==U_GATE||id==U_DURATION||id==U_CHANCE||(id>=U_CHORD1&&id<=U_CHORD3))edit_stop();uint32_t t=z_song.selected;int value;z_step s=z_song.track[t].steps[z_song.step_edit];
  if(id<Z_PARAMS){if(z_sys.midi_mode==2&&(id==Z_LEVEL||id==Z_PAN)){uint32_t at=id==Z_LEVEL?4:5;daw_values[t][at]=(uint8_t)clamp((int)daw_values[t][at]+delta,0,127);daw_touch_at=plat_ms();midi_cc(z_get(t,Z_CHANNEL)-1,id==Z_LEVEL?7:10,daw_values[t][at]);redraw_at=0;return;}z_set(t,id,z_get(t,id)+delta);return;}
  switch(id){
+  case U_STEPS:{edit_stop();if(z_drum_track(t)){uint32_t len=z_dm_common_length();if(!len)len=z_dm.sound[z_dm.selected].length;z_dm_length(clamp((int)len+delta,1,64));}else z_set(t,Z_LENGTH,clamp(z_get(t,Z_LENGTH)+delta,1,64));redraw_at=0;break;}
   case U_DRUM_LENGTH:edit_stop();z_dm_param(z_dm.selected,5,clamp((int)z_dm.sound[z_dm.selected].length+delta,1,64));break;
   case U_DRUM_MUTE:z_dm_param(z_dm.selected,4,!z_dm.sound[z_dm.selected].mute);break;
   case U_DRUM_PAN:z_dm_param(z_dm.selected,3,clamp((int)z_dm.sound[z_dm.selected].pan+delta,-64,63));break;
@@ -216,6 +218,7 @@ static void roll_step_key(uint32_t j){
  if(z_drum_track(t)){z_dm_step_t v=z_dm.step[z_dm.selected][at];z_dm_step(z_dm.selected,at,v.velocity?0:100,v.chance,v.ratchet);}
  else if(!z_song.track[t].steps[at].velocity)z_step_set(t,at,pitch,100,127,z_get(t,Z_GATE));
  if(!z_playing())z_audition_step(t,at);redraw_at=0;
+ if(at>=(z_drum_track(t)?z_dm.sound[z_dm.selected].length:(uint32_t)z_get(t,Z_LENGTH)))app_say(word("ШАГ ЗА ДЛИНОЙ: SEQ+K1 = ШАГОВ","PAST THE LOOP: SEQ+K1 = STEPS"),0);
 }
 static void roll_delete(void){
  uint32_t t=z_song.selected,at=z_song.step_edit,slot=roll_note_slot;edit_stop();z_alloff(t);
@@ -243,7 +246,9 @@ static uint32_t layer_knob(uint32_t k){
  if(Z_SAMPLER_EDITION&&active_layer==Z_EDIT){static const uint8_t p[]={U_PAD_SOURCE,U_PAD_TUNE,U_PAD_GAIN,U_PAD_MODE,U_DRUM_SOUND,U_DRUM_LEVEL,U_DRUM_DECAY,U_DRUM_TUNE,U_DRUM_LENGTH,U_DRUM_MUTE,U_DRUM_PAN};return p[k];}
  if(active_layer==Z_HOME){static const uint8_t p[]={U_BPM,U_SWING,U_CLOCK,U_LANGUAGE};return p[k];}
  if(active_layer==Z_FX){static const uint8_t p[]={U_FX_AMOUNT,U_FX_RATE,Z_DELAY,Z_REVERB};return p[k];}
- if(active_layer==Z_SECTIONS){static const uint8_t p[]={U_REC_MODE,U_REC_QUANT,U_CLICK,Z_LENGTH};return k==3&&z_drum_track(z_song.selected)?U_DRUM_LENGTH:p[k];}
+ if(active_layer==Z_SECTIONS){static const uint8_t p[]={U_REC_MODE,U_REC_QUANT,U_CLICK,U_STEPS};return p[k];}
+ /* Holding SEQ turns K1 into the track's step count (the whole kit on track 6). */
+ if(active_layer==Z_SEQ&&k==0)return U_STEPS;
  return page_knob(active_layer,layer_page,k);
 }
 static const char *tile_name(uint32_t j,char *buf){
@@ -271,7 +276,7 @@ static void layer_action(uint32_t j,uint32_t on,uint32_t now){uint32_t t=z_song.
  if(active_layer==Z_LFO){if(j==0)z_set(t,Z_LFO_DEPTH,0);else if(j<4){z_set(t,Z_LFO_RATE,j==1?8:j==2?40:100);z_set(t,Z_LFO_DEPTH,64);}else{static const uint8_t p[]={Z_LFO_DEPTH,Z_LFO_RATE,Z_FM,Z_RATIO,Z_CUTOFF,Z_MIX};uint32_t p0=p[(j-4)/2];if(z_drum_track(t)){static const uint8_t drum[]={Z_LFO_DEPTH,Z_LFO_RATE,Z_DRIVE,Z_REVERB,Z_CUTOFF,Z_PAN};p0=drum[(j-4)/2];}z_set(t,p0,z_get(t,p0)+((j&1)?1:-1)*(p0==Z_RATIO?1:8));}return;}
  if(active_layer==Z_EDIT&&z_drum_track(t)){z_dm_select(j);drum_choice=z_drum_note(j);return;}
  if(active_layer==Z_EDIT){if(Z_SAMPLER_EDITION){if(j<14)z_sampler_set(z_sampler.selected,2,j);else if(j==14)z_sampler_set(z_sampler.selected,7,!z_sampler.pad[z_sampler.selected].reverse);else app_panic();}else{if(j<8)z_set(t,Z_MODEL,j);else if(j<13){static const uint8_t presets[5]={0,16,24,32,48};z_preset(t,presets[j-8]);}else if(j<15)panel_setting(0,clamp(z_song.octave+(j==13?-1:1),-3,3)+3);else app_panic();}return;}
- if(active_layer==Z_SECTIONS){if(j<2)panel_setting(9,j);else if(j<4)panel_setting(10,j-2);else if(j<6)panel_setting(11,j==4);else if(j<9){uint32_t length=j==6?16:j==7?32:64;if(z_drum_track(t)){edit_stop();z_dm_param(z_dm.selected,5,length);}else z_set(t,Z_LENGTH,length);}else if(j<13)panel_setting(3,j-9);else if(j<15)panel_setting(4,j==14);else app_panic();return;}
+ if(active_layer==Z_SECTIONS){if(j<2)panel_setting(9,j);else if(j<4)panel_setting(10,j-2);else if(j<6)panel_setting(11,j==4);else if(j<9){uint32_t length=j==6?16:j==7?32:64;edit_stop();if(z_drum_track(t))z_dm_length(length);else z_set(t,Z_LENGTH,length);}else if(j<13)panel_setting(3,j-9);else if(j<15)panel_setting(4,j==14);else app_panic();return;}
  if(active_layer==Z_SEQ){edit_stop();uint32_t at=z_song.step_bank*16+j;z_step *a=&z_song.track[t].steps[at];panel_setting(5,at);
   if(z_drum_track(t)){z_dm_step_t *v=&z_dm.step[z_dm.selected][at];z_dm_step(z_dm.selected,at,v->velocity?0:100,v->chance,v->ratchet);
   }else{z_checkpoint();a->velocity=a->velocity?0:100;}
@@ -385,7 +390,7 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
  d=plat_enc(EN_ALGO);if(d)panel_setting(7,(z_song.selected+6+d%6)%6);t=z_song.selected;
  d=plat_enc(EN_SELECT);if(d)select_tempo(d);
  d=plat_enc(EN_PRESET);if(d&&active_layer>=0){uint32_t count=active_layer==Z_EDIT?3:page_count[active_layer<Z_SECTIONS?active_layer:0];layer_page=(uint8_t)(layer_page+count+d%(int)count)%count;}else if(d&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){panel_setting(3,(z_song.step_bank+4+d%4)%4);}else if(d&&sampler_open()){sampler_page=(sampler_page+3+d%3)%3;}else if(d&&z_sys.midi_mode==2){daw_touch_at=now;daw_values[t][5]=(uint8_t)clamp((int)daw_values[t][5]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,10,daw_values[t][5]);}else if(d)knob(U_PRESET,d);
- for(k=0;k<4;k++){d=plat_enc(EN_K1+k);if(d&&z_drum_track(t)&&z_sys.midi_mode!=2&&(active_layer==Z_SEQ||(active_layer<0&&z_song.section==Z_SEQ)))dm_knob(k,d);else if(d&&active_layer<0&&sampler_open()&&z_sys.midi_mode!=2)sampler_knob(k,d);else if(d&&active_layer<0&&z_sys.midi_mode==2&&z_song.section!=Z_GLO){daw_values[t][k]=(uint8_t)clamp((int)daw_values[t][k]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,daw_cc[k],daw_values[t][k]);}else if(d)knob(active_layer>=0?layer_knob(k):page_knob(z_song.section,z_song.subpage,k),d);}
+ for(k=0;k<4;k++){d=plat_enc(EN_K1+k);if(d&&k==0&&active_layer==Z_SEQ&&z_sys.midi_mode!=2)knob(U_STEPS,d);else if(d&&z_drum_track(t)&&z_sys.midi_mode!=2&&(active_layer==Z_SEQ||(active_layer<0&&z_song.section==Z_SEQ)))dm_knob(k,d);else if(d&&active_layer<0&&sampler_open()&&z_sys.midi_mode!=2)sampler_knob(k,d);else if(d&&active_layer<0&&z_sys.midi_mode==2&&z_song.section!=Z_GLO){daw_values[t][k]=(uint8_t)clamp((int)daw_values[t][k]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,daw_cc[k],daw_values[t][k]);}else if(d)knob(active_layer>=0?layer_knob(k):page_knob(z_song.section,z_song.subpage,k),d);}
  for(t=0;t<6;t++)for(k=0;k<128;k++)if(off_deadline[t][k]&&(int32_t)(now-off_deadline[t][k])>=0){note_packet(t,k,0,0);off_deadline[t][k]=0;}
  if(now-editor_seen>3500&&editor_effect){editor_effect=0;z_live(0);}
  if(now-editor_seen>3500)for(t=0;t<6;t++)for(k=0;k<128;k++)if(editor_notes[t][k/8]>>(k&7)&1){z_key(t,k,0,0);note_packet(t,k,0,0);if(z_song.arp_hold[t])z_alloff(t);editor_notes[t][k/8]&=(uint8_t)~(1u<<(k&7));}

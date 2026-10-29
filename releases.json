@@ -1,7 +1,25 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63001400",
+  "current": "FM-1_63001500",
   "releases": [
+    {
+      "product": "FM-1_63001500",
+      "version": "0.15.0",
+      "label": {
+        "ru": "Groovebox 0.15.0 beta · число шагов",
+        "en": "Groovebox 0.15.0 beta · step count"
+      },
+      "notes": {
+        "ru": "Удерживай SEQ и крути K1: число шагов дорожки 1–64. На драмке одна общая длина для всех 16 звуков. На экране «ШАГОВ», затемнённые шаги после конца цикла и подсказка. Звук 0.14.0 и формат проектов сохранены. Физический FM-1 не проверен.",
+        "en": "Hold SEQ and turn K1: track step count 1–64. On drums one shared length for all 16 sounds. The screen shows STEPS, dims steps after the loop end and hints. 0.14.0 sound and project format kept. Physical FM-1 unverified."
+      },
+      "channel": "recommended",
+      "bytes": 610100,
+      "sha256": "67e06f64e90987b6cfd4d581ae6e2a6181fc7e381e24d7f259f2bbdac0929ad5",
+      "file": "downloads/zombie-groovebox-0.15.0.fwsc",
+      "editor": "webapp/groovebox-150/",
+      "source": "downloads/groovebox-source-0.15.0.zip"
+    },
     {
       "product": "FM-1_63000803",
       "version": "0.8.3",
@@ -37,6 +55,24 @@
       "channel": "stable"
     },
     {
+      "product": "FM-1_63001400",
+      "version": "0.14.0",
+      "label": {
+        "ru": "Groovebox 0.14.0 beta · чистый звук",
+        "en": "Groovebox 0.14.0 beta · clean sound"
+      },
+      "notes": {
+        "ru": "Без щелчков при STOP, смене дорожки и перехвате голосов. Лимитер на шине вместо жёсткого клиппинга. Повтор одной ноты не занимает все 8 голосов. ATTACK 0 без щелчка. Ноты и аккорды на экране названиями (C4, E4). Управление и формат проектов 0.13.7 сохранены. Физический FM-1 не проверен.",
+        "en": "No clicks on STOP, track cuts and voice stealing. Bus limiter instead of hard clipping. A repeated note no longer fills all 8 voices. Click-free ATTACK 0. Notes and chords shown by name (C4, E4). Controls and project format of 0.13.7 unchanged. Physical FM-1 unverified."
+      },
+      "channel": "beta",
+      "bytes": 610100,
+      "sha256": "7a6f8090d7cd37baf7664536835c47deb2f55731ab3ea3d60b755beee968e842",
+      "file": "downloads/zombie-groovebox-0.14.0.fwsc",
+      "editor": "webapp/groovebox-140/",
+      "source": "downloads/groovebox-source-0.14.0.zip"
+    },
+    {
       "product": "FM-1_63001307",
       "version": "0.13.7",
       "label": {
@@ -52,7 +88,7 @@
       "file": "downloads/zombie-groovebox-0.13.7.fwsc",
       "editor": "webapp/groovebox-137/",
       "source": "downloads/groovebox-source-0.13.7.zip",
-      "channel": "beta"
+      "channel": "archive"
     },
     {
       "product": "FM-1_63000802",
@@ -388,24 +424,6 @@
       "editor": "webapp/groovebox-136/",
       "source": "downloads/groovebox-source-0.13.6.zip",
       "channel": "archive"
-    },
-    {
-      "product": "FM-1_63001400",
-      "version": "0.14.0",
-      "label": {
-        "ru": "Groovebox 0.14.0 beta · чистый звук",
-        "en": "Groovebox 0.14.0 beta · clean sound"
-      },
-      "notes": {
-        "ru": "Без щелчков при STOP, смене дорожки и перехвате голосов. Лимитер на шине вместо жёсткого клиппинга. Повтор одной ноты не занимает все 8 голосов. ATTACK 0 без щелчка. Ноты и аккорды на экране названиями (C4, E4). Управление и формат проектов 0.13.7 сохранены. Физический FM-1 не проверен.",
-        "en": "No clicks on STOP, track cuts and voice stealing. Bus limiter instead of hard clipping. A repeated note no longer fills all 8 voices. Click-free ATTACK 0. Notes and chords shown by name (C4, E4). Controls and project format of 0.13.7 unchanged. Physical FM-1 unverified."
-      },
-      "channel": "recommended",
-      "bytes": 610100,
-      "sha256": "7a6f8090d7cd37baf7664536835c47deb2f55731ab3ea3d60b755beee968e842",
-      "file": "downloads/zombie-groovebox-0.14.0.fwsc",
-      "editor": "webapp/groovebox-140/",
-      "source": "downloads/groovebox-source-0.14.0.zip"
     }
   ]
 }
