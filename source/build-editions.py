@@ -197,7 +197,7 @@ def main():
             shutil.copy2(fw,OUT/fw.name)
         exports=json.loads((ED/'assets/wasm-exports.json').read_text())
         wasm=OUT/f'{kind}.wasm'
-        run([os.environ.get('ZIG',str(ROOT/'.tooling/zig-windows-x86_64-0.13.0/zig.exe')),'cc','-target','wasm32-freestanding','-O2','-ffp-contract=off','-ffreestanding','-nostdlib','-DZ_WASM','-I'+str(app/'build/gen'),app/'dsp.c',app/'output.c','-Wl,--no-entry','-Wl,--export-memory',*['-Wl,--export=z_'+n for n in exports],*(['-Wl,--export=z_dm_'+n for n in ['data','checkpoint','history_state','pattern','size','snapshot','apply','param','step','select','position','init','migrate']] if kind=='groovebox' else []),'-o',wasm],kind+'-wasm-build.log')
+        run([os.environ.get('ZIG',str(ROOT/'.tooling/zig-windows-x86_64-0.13.0/zig.exe')),'cc','-target','wasm32-freestanding','-O2','-ffp-contract=off','-ffreestanding','-nostdlib','-DZ_WASM','-I'+str(app/'build/gen'),app/'dsp.c',app/'output.c','-Wl,--no-entry','-Wl,--export-memory',*['-Wl,--export=z_'+n for n in exports],*(['-Wl,--export=z_dm_'+n for n in ['data','checkpoint','history_state','pattern','size','snapshot','apply','param','step','select','position','init','migrate','length','common_length']] if kind=='groovebox' else []),'-o',wasm],kind+'-wasm-build.log')
         (OUT/f'{kind}-presets.json').write_text(json.dumps(names),encoding='utf-8')
         if fw.exists():(OUT/(fw.name+'.sha256')).write_text(hashlib.sha256(fw.read_bytes()).hexdigest()+'  '+fw.name+'\n',encoding='utf-8')
     print('Edition builds ready; no physical FM-1 flashed.',flush=True)
