@@ -58,14 +58,14 @@
       "product": "FM-1_63001501",
       "version": "0.15.1",
       "label": {
-        "ru": "Groovebox 0.15.1 beta · исправления · ОТОЗВАНА",
-        "en": "Groovebox 0.15.1 beta · fixes · WITHDRAWN"
+        "ru": "Groovebox 0.15.1 beta · число шагов + исправления",
+        "en": "Groovebox 0.15.1 beta · step count + fixes"
       },
       "notes": {
-        "ru": "Отозвана: на одном FM-1 после установки устройство перестало включаться, причина выясняется. Не устанавливайте. Исправлены: переполнение буфера заголовка драмки (0.15.0), выход за таблицу синуса (щелчки в FM), «удвоить» на драмке теперь удваивает весь кит, импорт проекта с банком не по курсору. Найдено фаззингом под ASan/UBSan и проверкой секвенсора. Управление и проекты 0.15.0 без изменений. Физический FM-1 не проверен.",
-        "en": "Withdrawn: one FM-1 stopped starting after this install; under investigation. Do not install. Fixes: drum title buffer overflow (0.15.0), sine table overrun (FM clicks), drum DOUBLE doubles the whole kit, imported projects with a bank away from the cursor. Found by ASan/UBSan fuzzing and a sequencer differential check. 0.15.0 controls and projects unchanged. Physical FM-1 unverified."
+        "ru": "SEQ + K1: число шагов дорожки, общая длина драмки; исправления после фаззинга. Если раньше установка зависла и экран стал чёрным, это была ошибка установщика в фоновой вкладке, теперь исправлена. Во время установки держите вкладку открытой. Физический FM-1 не проверен.",
+        "en": "SEQ + K1: track step count, one drum kit length; fuzzing fixes. If an earlier install hung with a black screen, that was an installer bug in a background tab, now fixed. Keep the tab in front while installing. Physical FM-1 unverified."
       },
-      "channel": "archive",
+      "channel": "beta",
       "bytes": 610100,
       "sha256": "fc6ec599cfc0e2683cf4e59ed307d8c2f5fedbf91ffb4e28091692021af520c8",
       "file": "downloads/zombie-groovebox-0.15.1.fwsc",
@@ -80,8 +80,8 @@
         "en": "Groovebox 0.15.0 beta · step count · WITHDRAWN"
       },
       "notes": {
-        "ru": "Отозвана: на одном FM-1 после установки устройство перестало включаться, причина выясняется. Не устанавливайте. Удерживай SEQ и крути K1: число шагов дорожки 1–64. На драмке одна общая длина для всех 16 звуков. На экране «ШАГОВ», затемнённые шаги после конца цикла и подсказка. Звук 0.14.0 и формат проектов сохранены. Физический FM-1 не проверен.",
-        "en": "Withdrawn: one FM-1 stopped starting after this install; under investigation. Do not install. Hold SEQ and turn K1: track step count 1–64. On drums one shared length for all 16 sounds. The screen shows STEPS, dims steps after the loop end and hints. 0.14.0 sound and project format kept. Physical FM-1 unverified."
+        "ru": "Отозвана: переполнение буфера на экране драмки, исправлено в 0.15.1. Удерживай SEQ и крути K1: число шагов дорожки 1–64. На драмке одна общая длина для всех 16 звуков. На экране «ШАГОВ», затемнённые шаги после конца цикла и подсказка. Звук 0.14.0 и формат проектов сохранены. Физический FM-1 не проверен.",
+        "en": "Withdrawn: drum screen buffer overflow, fixed in 0.15.1. Hold SEQ and turn K1: track step count 1–64. On drums one shared length for all 16 sounds. The screen shows STEPS, dims steps after the loop end and hints. 0.14.0 sound and project format kept. Physical FM-1 unverified."
       },
       "channel": "archive",
       "bytes": 610100,
