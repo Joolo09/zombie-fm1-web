@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT — USB OTA simulation; never opens real MIDI. */
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {Updater, pack7, unpack7} from '../vendor/fm1ota.js';
+import {Updater, pack7, unpack7, pace} from '../vendor/fm1ota.js';
 import {checkPackage} from '../package-check.js';
 
 const base=new URL('../',import.meta.url);
@@ -16,8 +16,8 @@ function identity(text){const u=Array(34).fill(0);u[1]=89;u[2]=17;u.splice(6,tex
 function request(addr,len){const u=[0,89,48,8,0,0,0,addr&255,(addr>>>8)&255,(addr>>>16)&255,(addr>>>24)&255,len&255,(len>>8)&255,(len>>16)&255];u.push(~u.slice(6).reduce((a,b)=>a+b,0)&255);return frame(u);}
 
 class VirtualFM1 {
- constructor({resume=false,mismatch=false,wrongLoader=false,badRequest=false,disconnect=false,appReady=true}={}){
-  this.options={mismatch,wrongLoader,badRequest,disconnect,appReady};this.access={inputs:new Map(),outputs:new Map()};this.upgrades=0;this.blocks=0;this.closed=0;this.stage=resume?'write':'verify';this.switchTo(resume?(wrongLoader?'ota-Other_1':'ota-FM-1_1'):'FM-1_61000703');
+ constructor({resume=false,mismatch=false,wrongLoader=false,badRequest=false,disconnect=false,appReady=true,stall=false}={}){
+  this.options={mismatch,wrongLoader,badRequest,disconnect,appReady,stall};this.access={inputs:new Map(),outputs:new Map()};this.upgrades=0;this.blocks=0;this.closed=0;this.stage=resume?'write':'verify';this.switchTo(resume?(wrongLoader?'ota-Other_1':'ota-FM-1_1'):'FM-1_61000703');
  }
  switchTo(id){
   for(const p of [...this.access.inputs.values(),...this.access.outputs.values()])p.state='disconnected';
@@ -46,12 +46,13 @@ class VirtualFM1 {
   if(addr===0xF0000000){this.stage='done';this.switchTo(this.options.mismatch?'FM-1_61000703':meta.product);return;}
   const len=u[11]|u[12]<<8;assert.deepEqual(Uint8Array.from(u.slice(14,14+len)),checked.image.slice(addr,addr+len));this.blocks++;
   if(this.options.disconnect&&this.stage==='write'){input.state=output.state='disconnected';return;}
+  if(this.options.stall&&this.stage==='write'&&addr>=65536)return;   // the loader stops asking, the port stays up
   this.at=addr+len;
   if(this.stage==='verify')this.emit(input,request(0xE0000000,0));
   else if(this.at===checked.image.length)this.emit(input,request(0xF0000000,0));
   else this.emit(input,request(this.at,Math.min(512,checked.image.length-this.at)));
  }
- updater(){return new Updater(this.access,()=>{},{sleep:async()=>{}});}
+ updater(extra={}){return new Updater(this.access,()=>{},{sleep:async()=>{},...extra});}
 }
 
 await test('real current and rollback packages pass size/SHA/identity/loader checks',async()=>{
@@ -97,5 +98,16 @@ await test('Hortator-named ports are discovered by the FM-1 identity handshake',
 await test('partially opened MIDI ports are released after output open failure',async()=>{
  let closed=0;const input={name:'FM-1',state:'connected',open:async()=>{},close:async()=>{closed++;}},output={name:'FM-1',state:'connected',open:async()=>{throw Error('Busy');},close:async()=>{closed++;}};
  assert.equal(await new Updater({inputs:new Map([['in',input]]),outputs:new Map([['out',output]])}).find(),null);assert.equal(closed,2);
+});
+await test('a loader that stops asking warns the page, then fails as stopped instead of hanging',async()=>{
+ const device=new VirtualFM1({resume:true,stall:true}),steps=[];
+ await assert.rejects(device.updater({stallMs:60,loaderIdleMs:400}).install(checked.image,meta.product,k=>steps.push(k)),{code:'stopped'});
+ assert(steps.includes('stall'),'stall reported');assert(!steps.includes('done'));
+});
+await test('block pacing in a hidden tab does not wait on throttled timers',async()=>{
+ const realTimeout=globalThis.setTimeout;globalThis.document={hidden:true};
+ globalThis.setTimeout=(f,ms,...a)=>realTimeout(f,Math.max(ms,1000),...a);   // what a hidden Chrome tab does
+ try{const t=performance.now();for(let i=0;i<20;i++)await pace(10);const ms=performance.now()-t;assert(ms<1500,'20 blocks took '+Math.round(ms)+' ms');}
+ finally{globalThis.setTimeout=realTimeout;delete globalThis.document;}
 });
 console.log(`${passed} web-installer checks passed. USB device was simulated; no hardware was flashed.`);

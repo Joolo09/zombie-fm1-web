@@ -15,6 +15,15 @@ const HS_QUERY = [0xF0, 0x00, 0x32, 0x45, 0x00, 0x00, 0x00, 0x40, 0x7F, 0xF7];
 const UPGRADE = [0xF0, 0x22, 0x24, 0x35, 0x7F, 0xF7];
 const MAXDATA = 512;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Zombie: a hidden tab's timers are throttled to once a second (once a minute after 5 minutes), so a 10 ms
+// pause per 512-byte block stretched a write to hours and looked like a hang. MessageChannel callbacks are
+// not throttled: a hidden page paces its blocks with them instead.
+const yieldNow = () => new Promise((r) => { const c = new MessageChannel(); c.port1.onmessage = () => { c.port1.close(); r(); }; c.port2.postMessage(0); });
+export async function pace(ms) {
+  if (typeof document === "undefined" || !document.hidden || typeof MessageChannel === "undefined") return sleep(ms);
+  const end = performance.now() + ms;
+  while (performance.now() < end) await yieldNow();
+}
 const IS_OTA = (id) => /^ota-/i.test(id.model);
 
 // M-VAVE's FM1 Open firmware (V10, 2026-10): its updater takes only a package it has been told about
@@ -173,6 +182,9 @@ export class Updater {
     this.access = access;
     this.log = log || (() => {});
     this.sleep = options.sleep || sleep;
+    this.pace = options.sleep || pace;              // the pause between blocks (see pace)
+    this.stallMs = options.stallMs || 15000;        // no request this long while writing: tell the page
+    this.loaderIdleMs = options.loaderIdleMs || 180000;
   }
 
   // every in/out pair with the same port name that answers the handshake
@@ -204,15 +216,17 @@ export class Updater {
 
   // serve read requests until the device asks for one of the finish addresses; stops early
   // when the port disappears (lost: true) instead of waiting out idleMs
-  async serve(link, image, finishAddr, idleMs, onProgress) {
-    let served = 0, last = Date.now();
+  async serve(link, image, finishAddr, idleMs, onProgress, onStall) {
+    let served = 0, last = Date.now(), stalled = false;
     for (;;) {
-      const pkt = await link.read(1000);
+      const pkt = await link.read(Math.min(1000, this.stallMs));
       if (!pkt) {
         if (link.lost) return { served, finished: false, lost: true };
         if (Date.now() - last > idleMs) return { served, finished: false };
+        if (onStall && !stalled && Date.now() - last > this.stallMs) { stalled = true; onStall(Math.round((Date.now() - last) / 1000)); }
         continue;
       }
+      stalled = false;
       const r = parseRequest(pkt);
       if (!r) continue;
       last = Date.now();
@@ -224,7 +238,7 @@ export class Updater {
         continue;
       }
       if (!r.len || r.len > MAXDATA || r.addr + r.len > image.length) throw fail("badreq", `bad request ${r.addr.toString(16)}+${r.len}`);
-      await this.sleep(10);
+      await this.pace(10);
       if (!link.send(response(r.addr, Array.from(image.subarray(r.addr, r.addr + r.len)), r.fl))) {
         return { served, finished: false, lost: true };
       }
@@ -305,7 +319,7 @@ export class Updater {
       if (ota.id.model !== "ota-FM-1") throw fail("model", "The update loader is not for FM-1");
       if (!ota.link.send(UPGRADE)) throw fail("lost", "USB disconnected before write");
       await this.sleep(2000);
-      return await this.serve(ota.link, image, 0xF0000000, 180000, (n, addr) => step("write", n, addr));
+      return await this.serve(ota.link, image, 0xF0000000, this.loaderIdleMs, (n, addr) => step("write", n, addr), (s) => step("stall", s));
     } finally { await ota.link.close(); }
   }
 
