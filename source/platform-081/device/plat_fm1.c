@@ -88,14 +88,15 @@ void plat_lights(uint32_t buttons, uint32_t keys, uint32_t dim_buttons, uint32_t
 static uint8_t glow_on = 1, play_red;
 void plat_glow(int on) { glow_on = (uint8_t)(on != 0); }
 void plat_play_red(int red) { play_red = (uint8_t)(red != 0); }
-void plat_leds(uint32_t buttons, uint32_t keys)    /* PLAY green, unless red (recording); the unlit buttons glow */
+void plat_leds(uint32_t buttons, uint32_t keys) { plat_leds_dim(buttons, keys, 0); }
+void plat_leds_dim(uint32_t buttons, uint32_t keys, uint32_t dim_keys)   /* PLAY green, unless red (recording); the unlit buttons glow */
 {
     uint32_t play = 1u << B_PLAY, b = buttons, dim = glow_on ? ((1u << NB) - 1u) & ~buttons : 0u;
     if (!play_red) {
         b = (b & ~play) | (buttons & play ? LED_PLAY_GREEN : 0u);
         dim = (dim & ~play) | (dim & play ? LED_PLAY_GREEN : 0u);
     }
-    plat_lights(b, keys, dim, 0, glow_on ? 2 : 0);
+    plat_lights(b, keys, dim, glow_on ? dim_keys : 0u, glow_on ? 2 : 0);
 }
 
 /* the 1 kHz tick (app_tick) runs in the timer interrupt: the main loop locks it out around what they share. The lock

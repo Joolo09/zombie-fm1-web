@@ -15,11 +15,11 @@ const base=step(e,0)[0];e.tap('EDIT');assert.equal(step(e,0)[0],base);assert.equ
 console.log('PASS EDIT can remove a focused chord tone without deleting the other notes');
 
 e=create();e.turn(1,5);e.tap('SEQ');e.key(WHITE[0]);e.key(WHITE[4]);assert.equal(e.w.z_track_hits(5),2);e.turn(4,1);e.key(WHITE[0]);assert.equal(e.w.z_track_hits(5),3);e.tap('EDIT');assert.equal(e.w.z_track_hits(5),2);
-e.tap('REC');assert.equal(e.w.web_step_grid(),0);e.key(WHITE[2]);assert.equal(e.w.z_track_hits(5),3);e.tap('REC');assert.equal(e.w.web_step_grid(),1);
+e.rec();assert.equal(e.w.web_step_grid(),0);e.key(WHITE[2]);assert.equal(e.w.z_track_hits(5),3);e.rec();assert.equal(e.w.web_step_grid(),1);
 console.log('PASS direct drum steps edit only the selected sound; REC returns all sixteen keys to drum pads');
 
 // HOME shows generated pitches. SEQ shows the step position; both clear on STOP.
-e=create();e.tap('REC');e.key(WHITE[0]);e.tap('REC');e.root()[3060]=2;e.tap('HOME');e.tap('PLAY');e.run(30);assert(leds(e)&1);e.tap('PLAY');assert.equal(leds(e),0);
+e=create();e.rec();e.key(WHITE[0]);e.rec();e.root()[3060]=2;e.tap('HOME');e.tap('PLAY');e.run(30);assert(leds(e)&1);e.tap('PLAY');assert.equal(leds(e),0);
 e.tap('SEQ');e.tap('PLAY');e.run(20);assert(leds(e)&(1<<WHITE[0]));e.run(130);assert(leds(e)&(1<<WHITE[1]));
 console.log('PASS sequencer lights sound pitches on HOME and advances white step lights on SEQ');
 

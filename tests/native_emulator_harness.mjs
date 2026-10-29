@@ -8,6 +8,8 @@ function create(){let memory;const wasi=new Proxy({clock_time_get:(_id,_p,out)=>
  const root=()=>new Uint8Array(memory.buffer,w.z_snapshot(),w.z_state_size());
  const run=ms=>{let peak=0;for(let n=0;n<Math.ceil(ms*44.1);n+=128){w.web_render(128);for(const x of new Float32Array(memory.buffer,w.web_out_l(),128)){assert(Number.isFinite(x)&&Math.abs(x)<=1.001);peak=Math.max(peak,Math.abs(x));}}return peak;};
  const hold=name=>{buttons|=1<<B[name];w.web_buttons(buttons);run(35);};const up=name=>{buttons&=~(1<<B[name]);w.web_buttons(buttons);run(35);};const tap=name=>{hold(name);up(name);};const key=(k,ms=55)=>{w.web_key(k,100,0);run(ms);w.web_key(k,0,0);run(40);};const turn=(role,n)=>{w.web_enc(role,n);run(50);};
- return {w,memory,root,run,hold,up,tap,key,turn};}
+ /* 0.16: REC from stop records step by step only on the SEQ page (elsewhere it counts in and records live). */
+ const rec=()=>{if(root()[1873]!==8&&!root()[1906]&&!w.z_playing())tap('SEQ');tap('REC');};
+ return {w,memory,root,run,hold,up,tap,key,turn,rec};}
 
 export {create,B,WHITE,BLACK};

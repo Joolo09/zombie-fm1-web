@@ -51,7 +51,7 @@ static void ed_invariants(void){uint32_t t,i,j;inv_fail=0;
  if(inv_fail)exit(3);
 }
 static uint32_t stuck_skip;
-static void ed_stuck_prep(void){uint32_t t;stuck_skip=0;for(t=0;t<6;t++){if(z_song.arp_mode[t]&&z_song.arp_hold[t])stuck_skip=1;z_sustain(t,0);}if(z_playing())z_transport(0);if(z_song.recording)z_record(0);}
+static void ed_stuck_prep(void){uint32_t t;stuck_skip=0;for(t=0;t<6;t++){if(z_song.arp_mode[t]&&z_song.arp_hold[t])stuck_skip=1;z_sustain(t,0);}z_countin(0);if(z_playing())z_transport(0);if(z_song.recording)z_record(0);}
 static void ed_stuck_expect(void){if(stuck_skip||z_sys.midi_mode==1)return;inv_fail=0;{uint32_t z_held_voices(void);inv(z_held_voices()==0,"notes still held after every key, MIDI note and pedal released + STOP",z_held_voices(),0);}if(inv_fail)exit(4);}
 int app_host_cmd(const char *cmd,const char *a,const char *b,const char *c,const char *d){(void)b;(void)c;(void)d;
  if(!strcmp(cmd,"projectaudit")){ed_project_audit();return 1;}

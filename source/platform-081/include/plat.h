@@ -54,6 +54,8 @@ void plat_lights(uint32_t buttons, uint32_t keys, uint32_t dim_buttons, uint32_t
 /* the same, simpler: the lit buttons and keys, the unlit buttons glowing if plat_glow(1); PLAY lights green, red
  * while plat_play_red(1) */
 void plat_leds(uint32_t buttons, uint32_t keys);
+/* plat_leds, and dim_keys glowing softly (Zombie: beat marks on the step keys); off while plat_glow(0) */
+void plat_leds_dim(uint32_t buttons, uint32_t keys, uint32_t dim_keys);
 void plat_glow(int on);
 void plat_play_red(int red);
 

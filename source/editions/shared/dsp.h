@@ -36,6 +36,9 @@ int z_get(uint32_t track,uint32_t param);
 void z_preset(uint32_t track,uint32_t preset);
 void z_step_set(uint32_t track,uint32_t index,uint32_t note,uint32_t velocity,uint32_t chance,uint32_t gate);
 void z_transport(uint32_t on);
+void z_countin(uint32_t beats);       /* 0 cancels; else clicks that many beats, then starts playing and recording */
+uint32_t z_countin_state(void);       /* beats left in the count-in, 0 when none */
+void z_rec_click(uint32_t on);        /* metronome while recording */
 void z_clock(uint32_t status);
 void z_songpos(uint32_t sixteenths);
 void z_tempo(uint32_t bpm,uint32_t swing);
