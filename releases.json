@@ -1,6 +1,6 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63000803",
+  "current": "FM-1_63001400",
   "releases": [
     {
       "product": "FM-1_63000803",
@@ -16,55 +16,8 @@
       "bytes": 610100,
       "sha256": "3fe120e1bbecf1bde66679aee392677311236b2413c2bbff01ed25c025e54349",
       "file": "downloads/zombie-groovebox-0.8.3.fwsc",
-      "editor": "webapp/groovebox/"
-    },
-    {
-      "product": "FM-1_63000802",
-      "version": "0.8.2",
-      "label": {
-        "ru": "Groovebox 0.8.2 · SELECT=BPM / Зомби",
-        "en": "Groovebox 0.8.2 · SELECT=BPM / Zombie"
-      },
-      "notes": {
-        "ru": "SELECT всегда BPM, память страниц, быстрые удержания и LOCK через HOME. Драм-шаги сохраняют остальные удары. Возвращена заставка «Зомби ФМ-1». Для BPM в FL/Ableton обнови скрипты до 0.8.2. Проверено программно, аппаратный тест ожидается.",
-        "en": "SELECT always BPM, page memory, faster holds and HOME layer lock. Drum step edits preserve other hits. Zombie FM-1 splash restored. Update DAW scripts to 0.8.2 for BPM in FL/Ableton. Software-tested; hardware confirmation pending."
-      },
-      "bytes": 610100,
-      "sha256": "9547dd8a94b6a2bd797cd8d908b5ea6fc77a89c29d1fa67ce3a822e355da5909",
-      "file": "downloads/zombie-groovebox-0.8.2.fwsc",
-      "editor": "webapp/groovebox/"
-    },
-    {
-      "product": "FM-1_63000801",
-      "version": "0.8.1",
-      "label": {
-        "ru": "Groovebox 0.8.1 · 5 синтов + драм-кит",
-        "en": "Groovebox 0.8.1 · 5 synths + drum kit"
-      },
-      "notes": {
-        "ru": "Дорожка 6: 16 синтезированных ударных, барабанная сетка и GM MIDI. Полный сброс чипа после установки; результат нужно проверить на FM-1. Сохрани старый проект: шестая дорожка теперь играет драм-китом.",
-        "en": "Track 6: 16 synthesized drums, drum grid and GM MIDI. Full chip reset after install; physical FM-1 confirmation pending. Back up your old project: track six now plays the drum kit."
-      },
-      "bytes": 610100,
-      "sha256": "dbcee5eb623061c425277cc7a0cd118c40b67be92c52eb18509081e1b9e07dae",
-      "file": "downloads/zombie-groovebox-0.8.1.fwsc",
-      "editor": "webapp/groovebox-081/"
-    },
-    {
-      "product": "FM-1_63000800",
-      "version": "0.8.0",
-      "label": {
-        "ru": "Groovebox 0.8.0 · отдельная прошивка",
-        "en": "Groovebox 0.8.0 · dedicated firmware"
-      },
-      "notes": {
-        "ru": "Синтез, 64 пресета, пианоролл и стартовый грув. Standalone при запуске. Новая сборка: проверена в симуляторе, на железе пока нет.",
-        "en": "Synthesis, 64 presets, piano roll and starter groove. Standalone at startup. New build: simulator-tested, not hardware-verified."
-      },
-      "bytes": 610108,
-      "sha256": "4cef993f42ae73b47bed80f8aa15a34d65ddc1d0b746b3e1668d6053cdfb98af",
-      "file": "downloads/zombie-groovebox-0.8.0.fwsc",
-      "editor": "webapp/groovebox-080/"
+      "editor": "webapp/groovebox/",
+      "channel": "stable"
     },
     {
       "product": "FM-1_64000800",
@@ -80,275 +33,8 @@
       "bytes": 610108,
       "sha256": "d1f15450be7de13dd449be1d8c43e811ad33b2fbb7c0070aab9fe379c2603248",
       "file": "downloads/zombie-sampler-0.8.0.fwsc",
-      "editor": "webapp/sampler/"
-    },
-    {
-      "product": "FM-1_61000704",
-      "version": "0.7.4",
-      "label": {
-        "ru": "Core 0.7.4 · прежняя сборка",
-        "en": "Core 0.7.4 · previous build"
-      },
-      "notes": {
-        "ru": "Standalone при каждом запуске. KNOB 2 — фильтр. Обновлённые Closed / Open Hat.",
-        "en": "Standalone at every startup. KNOB 2 controls cutoff. Updated Closed / Open Hat."
-      },
-      "bytes": 610108,
-      "sha256": "6201f815845bfb91e59fffc349b519330c122700a88aff6d766b30a635d9ed07",
-      "file": "downloads/zombie-core-0.7.4.fwsc"
-    },
-    {
-      "product": "FM-1_61000701",
-      "version": "0.7.1",
-      "label": {
-        "ru": "Zombie Core 0.7.1 · возврат",
-        "en": "Zombie Core 0.7.1 · rollback"
-      },
-      "notes": {
-        "ru": "Возврат к прежней сборке. Старые настройки и режим запуска могут отличаться.",
-        "en": "Return to the earlier build. Settings and startup mode may differ."
-      },
-      "bytes": 610108,
-      "sha256": "b8bc4d5d7e6b34a8a6572856d990a8bb9344f94baae87cd7d5adaf7ce795231e",
-      "file": "downloads/Return-to-Core-0.7.1.fwsc"
-    },
-    {
-      "product": "FM-1_63000900",
-      "version": "0.9.0",
-      "label": {
-        "ru": "Groovebox 0.9.0 BETA · Hortator в дорожке 6",
-        "en": "Groovebox 0.9.0 BETA · Hortator on track 6"
-      },
-      "notes": {
-        "ru": "Тестовая сборка: 8 драм-партий Hortator внутри дорожки 6; пять синтезаторов сохранены. Проверено в симуляторе и браузере, на физическом FM-1 НЕ проверено. Драм-дилей использует 8-битное компандирование; SAMPLE-kit ZOMBIE. Сохрани прежний проект перед проверкой.",
-        "en": "Experimental: 8 Hortator drum lanes inside track 6; five synths preserved. Simulator/browser tested; physical FM-1 NOT tested. Drum delay uses 8-bit companding; original ZOMBIE sample kit. Back up the previous project before testing."
-      },
-      "bytes": 610100,
-      "sha256": "96d62df4009455de817252e89e1f284eb1754068550d91ad6df0edc37e5d8240",
-      "file": "downloads/zombie-groovebox-0.9.0.fwsc",
-      "editor": "webapp/groovebox-090/",
-      "source": "downloads/groovebox-source-0.9.0.zip"
-    },
-    {
-      "product": "FM-1_63000901",
-      "version": "0.9.1",
-      "label": {
-        "ru": "Groovebox 0.9.1 BETA · исправления драмки и сохранения",
-        "en": "Groovebox 0.9.1 BETA · drum and persistence fixes"
-      },
-      "notes": {
-        "ru": "Исправления после аудита: SAVE/слоты, темп импорта, motion, зависшие MIDI-ноты/клавиши, SEL + PRESET, сохранение при перезапуске звука ПК и гонки редактора. Пять синтезаторов сохранены. На физическом FM-1 не проверено.",
-        "en": "Audit fixes: SAVE/slots, imported tempo, motion, stuck MIDI notes/keys, SEL + PRESET, persistence across PC audio restart and editor races. Five synths preserved. Not tested on physical FM-1."
-      },
-      "bytes": 610100,
-      "sha256": "4869be48452e46a988c1e3307944bc40bb14eeb497a2d9de4df7756be69c7aaf",
-      "file": "downloads/zombie-groovebox-0.9.1.fwsc",
-      "editor": "webapp/groovebox-090/",
-      "source": "downloads/groovebox-source-0.9.1.zip"
-    },
-    {
-      "product": "FM-1_63001000",
-      "version": "0.10.0",
-      "label": {
-        "ru": "Groovebox 0.10.0 BETA · своя драмка в дорожке 6",
-        "en": "Groovebox 0.10.0 BETA · Zombie drums on track 6"
-      },
-      "notes": {
-        "ru": "Исправление концепции: драм-механика внутри Zombie, без переноса прошивки Hortator. 16 партий, отдельная длина, дробь, вероятность и настройки каждого звука. Пять синтезаторов и общее управление сохранены. Старые GM-шаги 0.8.x переносятся; киты Hortator 0.9.x не конвертируются. Проверено в симуляторе; физический FM-1 ещё не проверен.",
-        "en": "Corrected scope: original Zombie drum mechanics on track 6, without the Hortator firmware. 16 parts, per-part lengths, rolls, probability and sound controls. Five synth tracks and shared controls retained. Migrates 0.8.x GM steps; 0.9.x Hortator kits are not converted. Simulator tested; physical FM-1 not yet tested."
-      },
-      "bytes": 610100,
-      "sha256": "7a7923fa1c9d198fe08d639747316f9136d710af4bcb1c79f5117558ec168449",
-      "file": "downloads/zombie-groovebox-0.10.0.fwsc",
-      "editor": "webapp/groovebox-100/",
-      "source": "downloads/groovebox-source-0.10.0.zip"
-    },
-    {
-      "product": "FM-1_63001001",
-      "version": "0.10.1",
-      "label": {
-        "ru": "Groovebox 0.10.1 BETA · запись и удаление на FM-1",
-        "en": "Groovebox 0.10.1 BETA · device recording and editing"
-      },
-      "notes": {
-        "ru": "REC срабатывает сразу; быстрые касания сохраняются, пошаговые ноты имеют ровную длину, перезапись обновляет длительность. Исправлены повторные удары при квантовании и очистка шага/партии/дорожки с Undo. Удалён старый импорт Hortator. Проекты 0.10.0 совместимы. Проверено в симуляторе, на физическом FM-1 ещё не проверено.",
-        "en": "Immediate REC, preserved fast taps, consistent step gates and measured live overwrite. Fixes quantized duplicate hits and step/part/track erasure with undo. Removes the obsolete Hortator source import. Compatible with 0.10.0 projects. Simulator tested; physical FM-1 not yet tested."
-      },
-      "bytes": 610100,
-      "sha256": "877fd7db58015dc69c002bb0383443b51a45356a20f2768d8abe6c4f03814831",
-      "file": "downloads/zombie-groovebox-0.10.1.fwsc",
-      "editor": "webapp/groovebox-101/",
-      "source": "downloads/groovebox-source-0.10.1.zip"
-    },
-    {
-      "product": "FM-1_63001100",
-      "version": "0.11.0",
-      "label": {
-        "ru": "Groovebox 0.11.0 beta · зомби + эмулятор",
-        "en": "Groovebox 0.11.0 beta · zombie + emulator"
-      },
-      "notes": {
-        "ru": "Пустой старт без самопроизвольных барабанов, управление драмкой, анимированный зомби и полный эмулятор. Проверки записи, удаления, MIDI и сохранений пройдены программно; FM-1 ещё не проверен.",
-        "en": "Empty start, retired ghost drum state, working drum controls, animated zombie and full C emulator. Recording, editing, MIDI and persistence tested in software; physical FM-1 pending."
-      },
-      "bytes": 610100,
-      "sha256": "1f9f287a3e974be1b67cfb002e98425ca7ed3db8b61ca773e2acc5638ad7ec3f",
-      "file": "downloads/zombie-groovebox-0.11.0.fwsc",
-      "editor": "webapp/groovebox-110/",
-      "source": "downloads/groovebox-source-0.11.0.zip"
-    },
-    {
-      "product": "FM-1_63001101",
-      "version": "0.11.1",
-      "label": {
-        "ru": "Groovebox 0.11.1 beta · запись с клавиш + пианоролл",
-        "en": "Groovebox 0.11.1 beta · keyboard recording + piano roll"
-      },
-      "notes": {
-        "ru": "Правка выбранного шага через EDIT + клавиши, 16 барабанных пэдов, чёрные клавиши для шагов и пауз, заметный курсор. Исправлен порядок быстрых нажатий эмулятора. Проверено программно, физический FM-1 ожидается.",
-        "en": "EDIT + keys writes the focused step, sixteen drum pads, black-key step/rest shortcuts, visible cursor and ordered emulator input. Software tested; physical FM-1 pending."
-      },
-      "bytes": 610100,
-      "sha256": "1dc8dbcf66dc8438bfd7a7ebf758184baa6ed3ac5f561bbc762e358dac694bb2",
-      "file": "downloads/zombie-groovebox-0.11.1.fwsc",
-      "editor": "webapp/groovebox-111/",
-      "source": "downloads/groovebox-source-0.11.1.zip"
-    },
-    {
-      "product": "FM-1_63001200",
-      "version": "0.12.0",
-      "label": {
-        "ru": "Groovebox 0.12.0 beta · IDM-банк + исправления",
-        "en": "Groovebox 0.12.0 beta · IDM bank + fixes"
-      },
-      "notes": {
-        "ru": "32 оригинальных IDM-пресета в слотах 65–96, старые 64 сохранены. Исправлены запись вне лупа, преобразование драм-паттерна при REC и счётчик голосов. Есть аудиопримеры. Программные проверки пройдены; физический FM-1 ожидается.",
-        "en": "32 original IDM presets in slots 65–96, existing 64 preserved. Fixes out-of-loop recording, drum pattern transforms during REC and voice metering. Audio examples included; physical FM-1 pending."
-      },
-      "bytes": 610100,
-      "sha256": "edd307e899faddb826803b35e6c1adc886fa1b56ceac5c0a37eca2e8510c8870",
-      "file": "downloads/zombie-groovebox-0.12.0.fwsc",
-      "editor": "webapp/groovebox-120/",
-      "source": "downloads/groovebox-source-0.12.0.zip"
-    },
-    {
-      "product": "FM-1_63001300",
-      "version": "0.13.0",
-      "label": {
-        "ru": "Groovebox 0.13.0 beta · подсветка + клавиши шагов",
-        "en": "Groovebox 0.13.0 beta · playback LEDs + step keys"
-      },
-      "notes": {
-        "ru": "Подсветка нот секвенсора, арпеджиатора и MIDI; 16 клавиш шагов на SEQ без REC; короткий EDIT удаляет выбранную ноту. IDM-банк сохранён. Проверено программно, физический FM-1 ожидается.",
-        "en": "Playback, arp and MIDI note LEDs; direct sixteen-key step entry on SEQ; short EDIT deletes the focused note. IDM bank retained. Software tested; physical FM-1 pending."
-      },
-      "bytes": 610100,
-      "sha256": "6208a975b6b9a2cdc7282186ae581f29ee89579a90b9c9a812a985e4c90c7ae4",
-      "file": "downloads/zombie-groovebox-0.13.0.fwsc",
-      "editor": "webapp/groovebox-130/",
-      "source": "downloads/groovebox-source-0.13.0.zip"
-    },
-    {
-      "product": "FM-1_63001301",
-      "version": "0.13.1",
-      "label": {
-        "ru": "Groovebox 0.13.1 beta · MIDI + запись + отмена",
-        "en": "Groovebox 0.13.1 beta · MIDI + recording + undo"
-      },
-      "notes": {
-        "ru": "Повторные MIDI-удары снова срабатывают. REPLACE убирает старую дробь; пустые повороты ручек не стирают историю отмены; одинаковые высоты аккорда не дублируются. Проверено программно; физический FM-1 ожидается.",
-        "en": "Repeated MIDI attacks retrigger, REPLACE clears stale rolls, no-op knob turns preserve undo, duplicate chord pitches are rejected. Software tested; physical FM-1 pending."
-      },
-      "bytes": 610100,
-      "sha256": "69c787012d5925fb54490393a5c239d3c9c0f4ec53098f9d122bbc246c6a3785",
-      "file": "downloads/zombie-groovebox-0.13.1.fwsc",
-      "editor": "webapp/groovebox-131/",
-      "source": "downloads/groovebox-source-0.13.1.zip"
-    },
-    {
-      "product": "FM-1_63001302",
-      "version": "0.13.2",
-      "label": {
-        "ru": "Groovebox 0.13.2 beta · переходы и запись",
-        "en": "Groovebox 0.13.2 beta · track and recording transitions"
-      },
-      "notes": {
-        "ru": "Исправлены курсор после смены дорожки, REC из удерживаемых меню, удаление аккорда после смены банка и клавиши, зажатые до записи. Управление и IDM-банк сохранены. Проверено программно; физический FM-1 ожидается.",
-        "en": "Fixes late releases across tracks, REC from held menus, stale chord focus after bank changes and keys held before recording. Controls and IDM bank retained. Software tested; physical FM-1 pending."
-      },
-      "bytes": 610100,
-      "sha256": "8d96b3543e00910579200e8fa89090a49431a0c0d6f2aa44a704b62fc42a3ded",
-      "file": "downloads/zombie-groovebox-0.13.2.fwsc",
-      "editor": "webapp/groovebox-132/",
-      "source": "downloads/groovebox-source-0.13.2.zip"
-    },
-    {
-      "product": "FM-1_63001303",
-      "version": "0.13.3",
-      "label": {
-        "ru": "Groovebox 0.13.3 beta · отмена и длина драмки",
-        "en": "Groovebox 0.13.3 beta · undo and drum length"
-      },
-      "notes": {
-        "ru": "Исправлены потеря UNDO после повторной очистки, выключение REC недоступным REDO и длина драм-партии в меню записи. Проверено программно; физический FM-1 ожидается.",
-        "en": "Fixes undo loss after repeated clearing, unavailable redo stopping a drum take, and recording-menu drum length controls. Software tested; physical FM-1 pending."
-      },
-      "bytes": 610100,
-      "sha256": "cb2d88cbdd4837a481c7ec52c346e39ea6b947c7e8a5131556f96ea694f0eaf8",
-      "file": "downloads/zombie-groovebox-0.13.3.fwsc",
-      "editor": "webapp/groovebox-133/",
-      "source": "downloads/groovebox-source-0.13.3.zip"
-    },
-    {
-      "product": "FM-1_63001304",
-      "version": "0.13.4",
-      "label": {
-        "ru": "Groovebox 0.13.4 beta · MIDI Clock и импорт",
-        "en": "Groovebox 0.13.4 beta · MIDI clock and import"
-      },
-      "notes": {
-        "ru": "Исправлены зависшие ноты при запуске из редактора, завершение импорта проекта и драм-набора, старый фокус EDIT и таймер внешнего MIDI Clock. Расширены проверки протокола и управления. Физический FM-1 не проверен.",
-        "en": "Fixes stuck notes on editor PLAY, project/kit import finalization, stale EDIT focus and external MIDI clock timeout. Expanded protocol and control audit. Physical FM-1 unverified."
-      },
-      "bytes": 610100,
-      "sha256": "ad121665b1949f3a85a1d784b41e3cd738f8445b3ffa0acf274ca783b9947a6a",
-      "file": "downloads/zombie-groovebox-0.13.4.fwsc",
-      "editor": "webapp/groovebox-134/",
-      "source": "downloads/groovebox-source-0.13.4.zip"
-    },
-    {
-      "product": "FM-1_63001305",
-      "version": "0.13.5",
-      "label": {
-        "ru": "Groovebox 0.13.5 beta · правка во время REC",
-        "en": "Groovebox 0.13.5 beta · live editing and feedback"
-      },
-      "notes": {
-        "ru": "Исправлены правка зажатой записи, оставшиеся удары удалённой дроби, расход UNDO одинаковыми командами, подсветка крайних нот, признак несохранённых настроек и гонки дорожек/переподключения в редакторе. Физический FM-1 не проверен.",
-        "en": "Fixes held-take editing, deleted roll retriggers, no-op undo pollution, extreme-pitch LEDs, system dirty status and editor note/reconnect races. Physical FM-1 unverified."
-      },
-      "bytes": 610100,
-      "sha256": "2860c50060e55e4738a6c42928b34b069c5ae26faf2f906d6607160cf4feb5d9",
-      "file": "downloads/zombie-groovebox-0.13.5.fwsc",
-      "editor": "webapp/groovebox-135/",
-      "source": "downloads/groovebox-source-0.13.5.zip"
-    },
-    {
-      "product": "FM-1_63001306",
-      "version": "0.13.6",
-      "label": {
-        "ru": "Groovebox 0.13.6 beta · согласованное сохранение",
-        "en": "Groovebox 0.13.6 beta · paired project saves"
-      },
-      "notes": {
-        "ru": "Мелодии и драмка сохраняются согласованной парой: сбой не смешивает разные поколения проекта. Старые проекты загружаются; новая схема хранения требует экспорта JSON перед откатом на 0.13.5. Физический FM-1 не проверен.",
-        "en": "Commits melodies and drums as a verified pair, preventing mixed generations after a failed save. Legacy projects load; export JSON before downgrading to 0.13.5. Physical FM-1 unverified."
-      },
-      "bytes": 610100,
-      "sha256": "250cd44f2e40610986b2792f791b6720e4eba15c15770b57296d343a4646f76a",
-      "file": "downloads/zombie-groovebox-0.13.6.fwsc",
-      "editor": "webapp/groovebox-136/",
-      "source": "downloads/groovebox-source-0.13.6.zip"
+      "editor": "webapp/sampler/",
+      "channel": "stable"
     },
     {
       "product": "FM-1_63001307",
@@ -365,7 +51,361 @@
       "sha256": "3649786e2ae644a171a8e32acb7de79b95780dc4fdeafc72430ed49affcc7d60",
       "file": "downloads/zombie-groovebox-0.13.7.fwsc",
       "editor": "webapp/groovebox-137/",
-      "source": "downloads/groovebox-source-0.13.7.zip"
+      "source": "downloads/groovebox-source-0.13.7.zip",
+      "channel": "beta"
+    },
+    {
+      "product": "FM-1_63000802",
+      "version": "0.8.2",
+      "label": {
+        "ru": "Groovebox 0.8.2 · SELECT=BPM / Зомби",
+        "en": "Groovebox 0.8.2 · SELECT=BPM / Zombie"
+      },
+      "notes": {
+        "ru": "SELECT всегда BPM, память страниц, быстрые удержания и LOCK через HOME. Драм-шаги сохраняют остальные удары. Возвращена заставка «Зомби ФМ-1». Для BPM в FL/Ableton обнови скрипты до 0.8.2. Проверено программно, аппаратный тест ожидается.",
+        "en": "SELECT always BPM, page memory, faster holds and HOME layer lock. Drum step edits preserve other hits. Zombie FM-1 splash restored. Update DAW scripts to 0.8.2 for BPM in FL/Ableton. Software-tested; hardware confirmation pending."
+      },
+      "bytes": 610100,
+      "sha256": "9547dd8a94b6a2bd797cd8d908b5ea6fc77a89c29d1fa67ce3a822e355da5909",
+      "file": "downloads/zombie-groovebox-0.8.2.fwsc",
+      "editor": "webapp/groovebox/",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63000801",
+      "version": "0.8.1",
+      "label": {
+        "ru": "Groovebox 0.8.1 · 5 синтов + драм-кит",
+        "en": "Groovebox 0.8.1 · 5 synths + drum kit"
+      },
+      "notes": {
+        "ru": "Дорожка 6: 16 синтезированных ударных, барабанная сетка и GM MIDI. Полный сброс чипа после установки; результат нужно проверить на FM-1. Сохрани старый проект: шестая дорожка теперь играет драм-китом.",
+        "en": "Track 6: 16 synthesized drums, drum grid and GM MIDI. Full chip reset after install; physical FM-1 confirmation pending. Back up your old project: track six now plays the drum kit."
+      },
+      "bytes": 610100,
+      "sha256": "dbcee5eb623061c425277cc7a0cd118c40b67be92c52eb18509081e1b9e07dae",
+      "file": "downloads/zombie-groovebox-0.8.1.fwsc",
+      "editor": "webapp/groovebox-081/",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63000800",
+      "version": "0.8.0",
+      "label": {
+        "ru": "Groovebox 0.8.0 · отдельная прошивка",
+        "en": "Groovebox 0.8.0 · dedicated firmware"
+      },
+      "notes": {
+        "ru": "Синтез, 64 пресета, пианоролл и стартовый грув. Standalone при запуске. Новая сборка: проверена в симуляторе, на железе пока нет.",
+        "en": "Synthesis, 64 presets, piano roll and starter groove. Standalone at startup. New build: simulator-tested, not hardware-verified."
+      },
+      "bytes": 610108,
+      "sha256": "4cef993f42ae73b47bed80f8aa15a34d65ddc1d0b746b3e1668d6053cdfb98af",
+      "file": "downloads/zombie-groovebox-0.8.0.fwsc",
+      "editor": "webapp/groovebox-080/",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_61000704",
+      "version": "0.7.4",
+      "label": {
+        "ru": "Core 0.7.4 · прежняя сборка",
+        "en": "Core 0.7.4 · previous build"
+      },
+      "notes": {
+        "ru": "Standalone при каждом запуске. KNOB 2 — фильтр. Обновлённые Closed / Open Hat.",
+        "en": "Standalone at every startup. KNOB 2 controls cutoff. Updated Closed / Open Hat."
+      },
+      "bytes": 610108,
+      "sha256": "6201f815845bfb91e59fffc349b519330c122700a88aff6d766b30a635d9ed07",
+      "file": "downloads/zombie-core-0.7.4.fwsc",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_61000701",
+      "version": "0.7.1",
+      "label": {
+        "ru": "Zombie Core 0.7.1 · возврат",
+        "en": "Zombie Core 0.7.1 · rollback"
+      },
+      "notes": {
+        "ru": "Возврат к прежней сборке. Старые настройки и режим запуска могут отличаться.",
+        "en": "Return to the earlier build. Settings and startup mode may differ."
+      },
+      "bytes": 610108,
+      "sha256": "b8bc4d5d7e6b34a8a6572856d990a8bb9344f94baae87cd7d5adaf7ce795231e",
+      "file": "downloads/Return-to-Core-0.7.1.fwsc",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63000900",
+      "version": "0.9.0",
+      "label": {
+        "ru": "Groovebox 0.9.0 BETA · Hortator в дорожке 6",
+        "en": "Groovebox 0.9.0 BETA · Hortator on track 6"
+      },
+      "notes": {
+        "ru": "Тестовая сборка: 8 драм-партий Hortator внутри дорожки 6; пять синтезаторов сохранены. Проверено в симуляторе и браузере, на физическом FM-1 НЕ проверено. Драм-дилей использует 8-битное компандирование; SAMPLE-kit ZOMBIE. Сохрани прежний проект перед проверкой.",
+        "en": "Experimental: 8 Hortator drum lanes inside track 6; five synths preserved. Simulator/browser tested; physical FM-1 NOT tested. Drum delay uses 8-bit companding; original ZOMBIE sample kit. Back up the previous project before testing."
+      },
+      "bytes": 610100,
+      "sha256": "96d62df4009455de817252e89e1f284eb1754068550d91ad6df0edc37e5d8240",
+      "file": "downloads/zombie-groovebox-0.9.0.fwsc",
+      "editor": "webapp/groovebox-090/",
+      "source": "downloads/groovebox-source-0.9.0.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63000901",
+      "version": "0.9.1",
+      "label": {
+        "ru": "Groovebox 0.9.1 BETA · исправления драмки и сохранения",
+        "en": "Groovebox 0.9.1 BETA · drum and persistence fixes"
+      },
+      "notes": {
+        "ru": "Исправления после аудита: SAVE/слоты, темп импорта, motion, зависшие MIDI-ноты/клавиши, SEL + PRESET, сохранение при перезапуске звука ПК и гонки редактора. Пять синтезаторов сохранены. На физическом FM-1 не проверено.",
+        "en": "Audit fixes: SAVE/slots, imported tempo, motion, stuck MIDI notes/keys, SEL + PRESET, persistence across PC audio restart and editor races. Five synths preserved. Not tested on physical FM-1."
+      },
+      "bytes": 610100,
+      "sha256": "4869be48452e46a988c1e3307944bc40bb14eeb497a2d9de4df7756be69c7aaf",
+      "file": "downloads/zombie-groovebox-0.9.1.fwsc",
+      "editor": "webapp/groovebox-090/",
+      "source": "downloads/groovebox-source-0.9.1.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001000",
+      "version": "0.10.0",
+      "label": {
+        "ru": "Groovebox 0.10.0 BETA · своя драмка в дорожке 6",
+        "en": "Groovebox 0.10.0 BETA · Zombie drums on track 6"
+      },
+      "notes": {
+        "ru": "Исправление концепции: драм-механика внутри Zombie, без переноса прошивки Hortator. 16 партий, отдельная длина, дробь, вероятность и настройки каждого звука. Пять синтезаторов и общее управление сохранены. Старые GM-шаги 0.8.x переносятся; киты Hortator 0.9.x не конвертируются. Проверено в симуляторе; физический FM-1 ещё не проверен.",
+        "en": "Corrected scope: original Zombie drum mechanics on track 6, without the Hortator firmware. 16 parts, per-part lengths, rolls, probability and sound controls. Five synth tracks and shared controls retained. Migrates 0.8.x GM steps; 0.9.x Hortator kits are not converted. Simulator tested; physical FM-1 not yet tested."
+      },
+      "bytes": 610100,
+      "sha256": "7a7923fa1c9d198fe08d639747316f9136d710af4bcb1c79f5117558ec168449",
+      "file": "downloads/zombie-groovebox-0.10.0.fwsc",
+      "editor": "webapp/groovebox-100/",
+      "source": "downloads/groovebox-source-0.10.0.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001001",
+      "version": "0.10.1",
+      "label": {
+        "ru": "Groovebox 0.10.1 BETA · запись и удаление на FM-1",
+        "en": "Groovebox 0.10.1 BETA · device recording and editing"
+      },
+      "notes": {
+        "ru": "REC срабатывает сразу; быстрые касания сохраняются, пошаговые ноты имеют ровную длину, перезапись обновляет длительность. Исправлены повторные удары при квантовании и очистка шага/партии/дорожки с Undo. Удалён старый импорт Hortator. Проекты 0.10.0 совместимы. Проверено в симуляторе, на физическом FM-1 ещё не проверено.",
+        "en": "Immediate REC, preserved fast taps, consistent step gates and measured live overwrite. Fixes quantized duplicate hits and step/part/track erasure with undo. Removes the obsolete Hortator source import. Compatible with 0.10.0 projects. Simulator tested; physical FM-1 not yet tested."
+      },
+      "bytes": 610100,
+      "sha256": "877fd7db58015dc69c002bb0383443b51a45356a20f2768d8abe6c4f03814831",
+      "file": "downloads/zombie-groovebox-0.10.1.fwsc",
+      "editor": "webapp/groovebox-101/",
+      "source": "downloads/groovebox-source-0.10.1.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001100",
+      "version": "0.11.0",
+      "label": {
+        "ru": "Groovebox 0.11.0 beta · зомби + эмулятор",
+        "en": "Groovebox 0.11.0 beta · zombie + emulator"
+      },
+      "notes": {
+        "ru": "Пустой старт без самопроизвольных барабанов, управление драмкой, анимированный зомби и полный эмулятор. Проверки записи, удаления, MIDI и сохранений пройдены программно; FM-1 ещё не проверен.",
+        "en": "Empty start, retired ghost drum state, working drum controls, animated zombie and full C emulator. Recording, editing, MIDI and persistence tested in software; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "1f9f287a3e974be1b67cfb002e98425ca7ed3db8b61ca773e2acc5638ad7ec3f",
+      "file": "downloads/zombie-groovebox-0.11.0.fwsc",
+      "editor": "webapp/groovebox-110/",
+      "source": "downloads/groovebox-source-0.11.0.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001101",
+      "version": "0.11.1",
+      "label": {
+        "ru": "Groovebox 0.11.1 beta · запись с клавиш + пианоролл",
+        "en": "Groovebox 0.11.1 beta · keyboard recording + piano roll"
+      },
+      "notes": {
+        "ru": "Правка выбранного шага через EDIT + клавиши, 16 барабанных пэдов, чёрные клавиши для шагов и пауз, заметный курсор. Исправлен порядок быстрых нажатий эмулятора. Проверено программно, физический FM-1 ожидается.",
+        "en": "EDIT + keys writes the focused step, sixteen drum pads, black-key step/rest shortcuts, visible cursor and ordered emulator input. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "1dc8dbcf66dc8438bfd7a7ebf758184baa6ed3ac5f561bbc762e358dac694bb2",
+      "file": "downloads/zombie-groovebox-0.11.1.fwsc",
+      "editor": "webapp/groovebox-111/",
+      "source": "downloads/groovebox-source-0.11.1.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001200",
+      "version": "0.12.0",
+      "label": {
+        "ru": "Groovebox 0.12.0 beta · IDM-банк + исправления",
+        "en": "Groovebox 0.12.0 beta · IDM bank + fixes"
+      },
+      "notes": {
+        "ru": "32 оригинальных IDM-пресета в слотах 65–96, старые 64 сохранены. Исправлены запись вне лупа, преобразование драм-паттерна при REC и счётчик голосов. Есть аудиопримеры. Программные проверки пройдены; физический FM-1 ожидается.",
+        "en": "32 original IDM presets in slots 65–96, existing 64 preserved. Fixes out-of-loop recording, drum pattern transforms during REC and voice metering. Audio examples included; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "edd307e899faddb826803b35e6c1adc886fa1b56ceac5c0a37eca2e8510c8870",
+      "file": "downloads/zombie-groovebox-0.12.0.fwsc",
+      "editor": "webapp/groovebox-120/",
+      "source": "downloads/groovebox-source-0.12.0.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001300",
+      "version": "0.13.0",
+      "label": {
+        "ru": "Groovebox 0.13.0 beta · подсветка + клавиши шагов",
+        "en": "Groovebox 0.13.0 beta · playback LEDs + step keys"
+      },
+      "notes": {
+        "ru": "Подсветка нот секвенсора, арпеджиатора и MIDI; 16 клавиш шагов на SEQ без REC; короткий EDIT удаляет выбранную ноту. IDM-банк сохранён. Проверено программно, физический FM-1 ожидается.",
+        "en": "Playback, arp and MIDI note LEDs; direct sixteen-key step entry on SEQ; short EDIT deletes the focused note. IDM bank retained. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "6208a975b6b9a2cdc7282186ae581f29ee89579a90b9c9a812a985e4c90c7ae4",
+      "file": "downloads/zombie-groovebox-0.13.0.fwsc",
+      "editor": "webapp/groovebox-130/",
+      "source": "downloads/groovebox-source-0.13.0.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001301",
+      "version": "0.13.1",
+      "label": {
+        "ru": "Groovebox 0.13.1 beta · MIDI + запись + отмена",
+        "en": "Groovebox 0.13.1 beta · MIDI + recording + undo"
+      },
+      "notes": {
+        "ru": "Повторные MIDI-удары снова срабатывают. REPLACE убирает старую дробь; пустые повороты ручек не стирают историю отмены; одинаковые высоты аккорда не дублируются. Проверено программно; физический FM-1 ожидается.",
+        "en": "Repeated MIDI attacks retrigger, REPLACE clears stale rolls, no-op knob turns preserve undo, duplicate chord pitches are rejected. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "69c787012d5925fb54490393a5c239d3c9c0f4ec53098f9d122bbc246c6a3785",
+      "file": "downloads/zombie-groovebox-0.13.1.fwsc",
+      "editor": "webapp/groovebox-131/",
+      "source": "downloads/groovebox-source-0.13.1.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001302",
+      "version": "0.13.2",
+      "label": {
+        "ru": "Groovebox 0.13.2 beta · переходы и запись",
+        "en": "Groovebox 0.13.2 beta · track and recording transitions"
+      },
+      "notes": {
+        "ru": "Исправлены курсор после смены дорожки, REC из удерживаемых меню, удаление аккорда после смены банка и клавиши, зажатые до записи. Управление и IDM-банк сохранены. Проверено программно; физический FM-1 ожидается.",
+        "en": "Fixes late releases across tracks, REC from held menus, stale chord focus after bank changes and keys held before recording. Controls and IDM bank retained. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "8d96b3543e00910579200e8fa89090a49431a0c0d6f2aa44a704b62fc42a3ded",
+      "file": "downloads/zombie-groovebox-0.13.2.fwsc",
+      "editor": "webapp/groovebox-132/",
+      "source": "downloads/groovebox-source-0.13.2.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001303",
+      "version": "0.13.3",
+      "label": {
+        "ru": "Groovebox 0.13.3 beta · отмена и длина драмки",
+        "en": "Groovebox 0.13.3 beta · undo and drum length"
+      },
+      "notes": {
+        "ru": "Исправлены потеря UNDO после повторной очистки, выключение REC недоступным REDO и длина драм-партии в меню записи. Проверено программно; физический FM-1 ожидается.",
+        "en": "Fixes undo loss after repeated clearing, unavailable redo stopping a drum take, and recording-menu drum length controls. Software tested; physical FM-1 pending."
+      },
+      "bytes": 610100,
+      "sha256": "cb2d88cbdd4837a481c7ec52c346e39ea6b947c7e8a5131556f96ea694f0eaf8",
+      "file": "downloads/zombie-groovebox-0.13.3.fwsc",
+      "editor": "webapp/groovebox-133/",
+      "source": "downloads/groovebox-source-0.13.3.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001304",
+      "version": "0.13.4",
+      "label": {
+        "ru": "Groovebox 0.13.4 beta · MIDI Clock и импорт",
+        "en": "Groovebox 0.13.4 beta · MIDI clock and import"
+      },
+      "notes": {
+        "ru": "Исправлены зависшие ноты при запуске из редактора, завершение импорта проекта и драм-набора, старый фокус EDIT и таймер внешнего MIDI Clock. Расширены проверки протокола и управления. Физический FM-1 не проверен.",
+        "en": "Fixes stuck notes on editor PLAY, project/kit import finalization, stale EDIT focus and external MIDI clock timeout. Expanded protocol and control audit. Physical FM-1 unverified."
+      },
+      "bytes": 610100,
+      "sha256": "ad121665b1949f3a85a1d784b41e3cd738f8445b3ffa0acf274ca783b9947a6a",
+      "file": "downloads/zombie-groovebox-0.13.4.fwsc",
+      "editor": "webapp/groovebox-134/",
+      "source": "downloads/groovebox-source-0.13.4.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001305",
+      "version": "0.13.5",
+      "label": {
+        "ru": "Groovebox 0.13.5 beta · правка во время REC",
+        "en": "Groovebox 0.13.5 beta · live editing and feedback"
+      },
+      "notes": {
+        "ru": "Исправлены правка зажатой записи, оставшиеся удары удалённой дроби, расход UNDO одинаковыми командами, подсветка крайних нот, признак несохранённых настроек и гонки дорожек/переподключения в редакторе. Физический FM-1 не проверен.",
+        "en": "Fixes held-take editing, deleted roll retriggers, no-op undo pollution, extreme-pitch LEDs, system dirty status and editor note/reconnect races. Physical FM-1 unverified."
+      },
+      "bytes": 610100,
+      "sha256": "2860c50060e55e4738a6c42928b34b069c5ae26faf2f906d6607160cf4feb5d9",
+      "file": "downloads/zombie-groovebox-0.13.5.fwsc",
+      "editor": "webapp/groovebox-135/",
+      "source": "downloads/groovebox-source-0.13.5.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001306",
+      "version": "0.13.6",
+      "label": {
+        "ru": "Groovebox 0.13.6 beta · согласованное сохранение",
+        "en": "Groovebox 0.13.6 beta · paired project saves"
+      },
+      "notes": {
+        "ru": "Мелодии и драмка сохраняются согласованной парой: сбой не смешивает разные поколения проекта. Старые проекты загружаются; новая схема хранения требует экспорта JSON перед откатом на 0.13.5. Физический FM-1 не проверен.",
+        "en": "Commits melodies and drums as a verified pair, preventing mixed generations after a failed save. Legacy projects load; export JSON before downgrading to 0.13.5. Physical FM-1 unverified."
+      },
+      "bytes": 610100,
+      "sha256": "250cd44f2e40610986b2792f791b6720e4eba15c15770b57296d343a4646f76a",
+      "file": "downloads/zombie-groovebox-0.13.6.fwsc",
+      "editor": "webapp/groovebox-136/",
+      "source": "downloads/groovebox-source-0.13.6.zip",
+      "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001400",
+      "version": "0.14.0",
+      "label": {
+        "ru": "Groovebox 0.14.0 beta · чистый звук",
+        "en": "Groovebox 0.14.0 beta · clean sound"
+      },
+      "notes": {
+        "ru": "Без щелчков при STOP, смене дорожки и перехвате голосов. Лимитер на шине вместо жёсткого клиппинга. Повтор одной ноты не занимает все 8 голосов. ATTACK 0 без щелчка. Ноты и аккорды на экране названиями (C4, E4). Управление и формат проектов 0.13.7 сохранены. Физический FM-1 не проверен.",
+        "en": "No clicks on STOP, track cuts and voice stealing. Bus limiter instead of hard clipping. A repeated note no longer fills all 8 voices. Click-free ATTACK 0. Notes and chords shown by name (C4, E4). Controls and project format of 0.13.7 unchanged. Physical FM-1 unverified."
+      },
+      "channel": "recommended",
+      "bytes": 610100,
+      "sha256": "7a6f8090d7cd37baf7664536835c47deb2f55731ab3ea3d60b755beee968e842",
+      "file": "downloads/zombie-groovebox-0.14.0.fwsc",
+      "editor": "webapp/groovebox-140/",
+      "source": "downloads/groovebox-source-0.14.0.zip"
     }
   ]
 }
