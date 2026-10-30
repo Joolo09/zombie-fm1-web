@@ -57,22 +57,26 @@ static uint8_t rec_live[6][128];
 static uint32_t random32(void);
 /* Undo stores musical patterns only. Transport, language and live settings stay put. */
 typedef struct {z_step steps[6][64];uint8_t chord[6][64][3],duration[6][64];int16_t length[6];} z_pattern_snapshot;
-static Z_POOL z_pattern_snapshot undo_bank[4],redo_bank[4];
-static uint32_t undo_count,redo_count,solo_track;
+/* Undo is a ring of the last Z_HIST pattern states (0.17: 8, was 4). The ring moves a start index instead of copying
+ * the whole history, so a checkpoint, made with interrupts off, copies one snapshot only. */
+#define Z_HIST 8
+static Z_POOL z_pattern_snapshot undo_bank[Z_HIST],redo_bank[Z_HIST];
+static uint32_t undo_count,redo_count,undo_head,redo_head,solo_track;
 static void pattern_capture(z_pattern_snapshot *p){uint32_t t,i,j;for(t=0;t<6;t++){
  p->length[t]=z_song.track[t].p[Z_LENGTH];for(i=0;i<64;i++){p->steps[t][i]=z_song.track[t].steps[i];p->duration[t][i]=z_song.duration[t][i];for(j=0;j<3;j++)p->chord[t][i][j]=z_song.chord[t][i][j];}
 }}
 static void pattern_restore(const z_pattern_snapshot *p){uint32_t t,i,j;for(t=0;t<6;t++){
  z_song.track[t].p[Z_LENGTH]=p->length[t];for(i=0;i<64;i++){z_song.track[t].steps[i]=p->steps[t][i];z_song.duration[t][i]=p->duration[t][i];for(j=0;j<3;j++)z_song.chord[t][i][j]=p->chord[t][i][j];}
 }z_touch();}
-static void history_push(z_pattern_snapshot *bank,uint32_t *count){uint32_t i;if(*count==4){for(i=0;i<3;i++)bank[i]=bank[i+1];*count=3;}pattern_capture(&bank[(*count)++]);}
-void z_checkpoint(void){history_push(undo_bank,&undo_count);redo_count=0;}
+static void history_push(z_pattern_snapshot *bank,uint32_t *count,uint32_t *head){if(*count==Z_HIST){*head=(*head+1)%Z_HIST;(*count)--;}pattern_capture(&bank[(*head+(*count)++)%Z_HIST]);}
+static const z_pattern_snapshot *history_pop(const z_pattern_snapshot *bank,uint32_t *count,uint32_t head){return &bank[(head+--(*count))%Z_HIST];}
+void z_checkpoint(void){history_push(undo_bank,&undo_count,&undo_head);redo_count=0;}
 uint32_t z_history_state(void){if(z_drum_track(z_song.selected))return z_dm_history_state();return undo_count|(redo_count<<8);}
 void z_history_reset(void){z_dm_history_reset();undo_count=redo_count=0;}
 uint32_t z_history(uint32_t redo){if(z_drum_track(z_song.selected))return z_dm_history(redo);
  if(redo>1)return 0;
- if(redo){if(!redo_count)return 0;z_record(0);z_alloff(z_song.selected);history_push(undo_bank,&undo_count);pattern_restore(&redo_bank[--redo_count]);}
- else {if(!undo_count)return 0;z_record(0);z_alloff(z_song.selected);history_push(redo_bank,&redo_count);pattern_restore(&undo_bank[--undo_count]);}
+ if(redo){if(!redo_count)return 0;z_record(0);z_alloff(z_song.selected);history_push(undo_bank,&undo_count,&undo_head);pattern_restore(history_pop(redo_bank,&redo_count,redo_head));}
+ else {if(!undo_count)return 0;z_record(0);z_alloff(z_song.selected);history_push(redo_bank,&redo_count,&redo_head);pattern_restore(history_pop(undo_bank,&undo_count,undo_head));}
  return 1;
 }
 uint32_t z_solo_state(void){return solo_track;}

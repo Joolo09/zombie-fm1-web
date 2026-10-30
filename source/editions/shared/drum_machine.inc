@@ -9,14 +9,14 @@ static uint8_t dm_record_cursor,dm_record_length;
 static void dm_record_reset(void){dm_record_keys=0;dm_record_cursor=dm_record_length=0;}
 static uint32_t dm_skip[16];
 static uint8_t dm_left[16],dm_velocity[16];
-static Z_POOL z_dm_state dm_undo[4],dm_redo[4];
-static uint32_t dm_undo_count,dm_redo_count;
+static Z_POOL z_dm_state dm_undo[Z_HIST],dm_redo[Z_HIST];   /* Z_HIST: dsp.c */
+static uint32_t dm_undo_count,dm_redo_count,dm_undo_head,dm_redo_head;
 static uint32_t dm_random(void){uint32_t x=dm_rng;x^=x<<13;x^=x>>17;x^=x<<5;return dm_rng=x;}
-static void dm_history_push(z_dm_state *bank,uint32_t *n){if(*n==4){for(uint32_t i=0;i<3;i++)bank[i]=bank[i+1];*n=3;}bank[(*n)++]=z_dm;}
-static void dm_checkpoint(void){dm_history_push(dm_undo,&dm_undo_count);dm_redo_count=0;}
+static void dm_history_push(z_dm_state *bank,uint32_t *n,uint32_t *head){if(*n==Z_HIST){*head=(*head+1)%Z_HIST;(*n)--;}bank[(*head+(*n)++)%Z_HIST]=z_dm;}
+static void dm_checkpoint(void){dm_history_push(dm_undo,&dm_undo_count,&dm_undo_head);dm_redo_count=0;}
 void z_dm_history_reset(void){dm_undo_count=dm_redo_count=0;}
 uint32_t z_dm_history_state(void){return dm_undo_count|(dm_redo_count<<8);}
-uint32_t z_dm_history(uint32_t redo){if(redo>1||(redo?!dm_redo_count:!dm_undo_count))return 0;z_record(0);z_dm_panic();uint8_t selected=z_dm.selected;if(redo){if(!dm_redo_count)return 0;dm_history_push(dm_undo,&dm_undo_count);z_dm=dm_redo[--dm_redo_count];}else{if(!dm_undo_count)return 0;dm_history_push(dm_redo,&dm_redo_count);z_dm=dm_undo[--dm_undo_count];}z_dm.selected=selected;z_touch();return 1;}
+uint32_t z_dm_history(uint32_t redo){if(redo>1||(redo?!dm_redo_count:!dm_undo_count))return 0;z_record(0);z_dm_panic();uint8_t selected=z_dm.selected;if(redo){if(!dm_redo_count)return 0;dm_history_push(dm_undo,&dm_undo_count,&dm_undo_head);z_dm=dm_redo[(dm_redo_head+--dm_redo_count)%Z_HIST];}else{if(!dm_undo_count)return 0;dm_history_push(dm_redo,&dm_redo_count,&dm_redo_head);z_dm=dm_undo[(dm_undo_head+--dm_undo_count)%Z_HIST];}z_dm.selected=selected;z_touch();return 1;}
 int z_dm_valid(const z_dm_state *s){if(s->magic!=Z_DM_MAGIC||s->version!=1||s->selected>=16||s->reserved)return 0;for(uint32_t d=0;d<16;d++){const z_dm_sound_t *p=&s->sound[d];if(p->level>127||p->decay<1||p->decay>127||p->tune< -24||p->tune>24||p->pan< -64||p->pan>63||p->mute>1||!p->length||p->length>64||p->reserved[0]||p->reserved[1])return 0;for(uint32_t at=0;at<64;at++){const z_dm_step_t *v=&s->step[d][at];if(v->velocity>127||v->chance>127||v->ratchet<1||v->ratchet>4)return 0;}}return 1;}
 void z_dm_init(void){for(uint32_t i=0;i<sizeof z_dm;i++)((uint8_t*)&z_dm)[i]=0;z_dm.magic=Z_DM_MAGIC;z_dm.version=1;for(uint32_t d=0;d<16;d++){z_dm.sound[d].level=100;z_dm.sound[d].decay=64;z_dm.sound[d].length=32;for(uint32_t at=0;at<64;at++){z_dm.step[d][at].chance=127;z_dm.step[d][at].ratchet=1;}dm_voice[d].active=dm_left[d]=0;dm_wait[d]=dm_skip[d]=0;}dm_count=dm_keys=dm_record_keys=0;dm_rng=0x7a64c812u;z_dm_history_reset();}
 void z_dm_migrate(void){z_dm_init();for(uint32_t d=0;d<16;d++)z_dm.sound[d].length=(uint8_t)z_get(5,Z_LENGTH);for(uint32_t at=0;at<64;at++){const z_step *s=&z_song.track[5].steps[at];if(!s->velocity)continue;for(uint32_t j=0;j<4;j++){uint32_t n=j?z_song.chord[5][at][j-1]:s->note+1;if(n){uint32_t d=z_drum_index(n-1);z_dm.step[d][at].velocity=s->velocity;z_dm.step[d][at].chance=s->chance;}}}z_dm_authoritative();}
