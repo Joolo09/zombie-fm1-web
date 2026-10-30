@@ -48,7 +48,9 @@ static float arp_time[6];
 static uint32_t arp_index[6],revision;
 static void (*midi_out)(uint32_t,uint32_t,uint32_t,uint32_t);
 static uint32_t audio_frame,last_step_frame,live_effect,live_requested,click_left,clock_beat_frame,clock_pulses,clock_last_frame;
-static float click_phase,live_phase,live_blend;
+static float click_phase,live_phase,live_blend,click_hz=1200;
+/* Count-in before a live take (Felucca-style): clicks on each beat, then the transport and the take start together. */
+static uint32_t countin_left,countin_beat,rec_click=1;
 static uint8_t arp_count[6],rec_at[6][128],rec_active[6][128],applied_mode[6];
 static uint32_t rec_start[6][128],rec_skip[6][128];
 static uint8_t rec_live[6][128];
@@ -160,7 +162,7 @@ int z_get(uint32_t t,uint32_t p) { return t<Z_TRACKS&&p<Z_PARAMS?z_song.track[t]
 void z_reset_audio(void) {if(!Z_SAMPLER_EDITION)z_dm_transport(0);
  /* Stopping fades what was sounding (voices, echo and reverb) over ~25 ms instead of cutting it: no click on STOP. */
  uint32_t i,t;declick_l+=wet_l;declick_r+=wet_r;wet_l=wet_r=0;for(i=0;i<Z_VOICES;i++){if(voices[i].active){declick_l+=voices[i].out_l;declick_r+=voices[i].out_r;}voices[i].active=0;}
- live_effect=live_requested=0;live_blend=0;click_left=0;
+ live_effect=live_requested=0;live_blend=0;click_left=0;countin_left=0;
  for(t=0;t<6;t++){arp_count[t]=0;sustain[t]=0;applied_mode[t]=z_song.arp_mode[t];if(midi_out)midi_out(t,128,0,0);for(i=0;i<128;i++){arp_notes[t][i]=0;rec_active[t][i]=rec_live[t][i]=0;rec_skip[t][i]=0;}for(i=0;i<16;i++)arp_physical[t][i]=0;arp_time[t]=0;arp_index[t]=0;}
  for(i=0;i<8192;i++)delay_l[i]=delay_r[i]=0;
  for(i=0;i<1499;i++)comb_a[i]=0; for(i=0;i<1877;i++)comb_b[i]=0;
@@ -294,7 +296,7 @@ int z_arp_set(uint32_t t,uint32_t field,uint32_t value){uint32_t i;if(t>=6||fiel
  z_touch();return 0;
 }
 static void seq_step(void) {
- uint32_t t;pos++;last_step_frame=audio_frame;if(z_song.metronome&&!(pos&3)){click_left=1100;click_phase=0;}
+ uint32_t t;pos++;last_step_frame=audio_frame;if((z_song.metronome||(z_song.recording&&rec_click))&&!(pos&3)){click_left=1100;click_phase=0;click_hz=(pos&15)?1200.0f:1800.0f;}
  if(!Z_SAMPLER_EDITION)z_dm_clock();
  for(t=0;t<Z_TRACKS;t++) {
   if(z_drum_track(t))continue;
@@ -313,7 +315,10 @@ static void seq_step(void) {
   }
  }
 }
-void z_transport(uint32_t on) {if(on)clock_last_frame=audio_frame;if(on)for(uint32_t t=0;t<6;t++)for(uint32_t n=0;n<128;n++)rec_skip[t][n]=0;if(!Z_SAMPLER_EDITION)z_dm_transport(on); if(!on){z_record(0);z_reset_audio();solo_track=0;}playing=!!on;pos=0xffffffffu;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
+void z_countin(uint32_t beats){countin_left=0;if(!beats)return;if(external_clock){z_record(1);return;}countin_beat=(uint32_t)(2646000u/z_song.bpm);countin_left=beats*countin_beat;}
+uint32_t z_countin_state(void){return countin_left?(countin_left+countin_beat-1)/countin_beat:0;}
+void z_rec_click(uint32_t on){rec_click=!!on;}
+void z_transport(uint32_t on) {countin_left=0;if(on)clock_last_frame=audio_frame;if(on)for(uint32_t t=0;t<6;t++)for(uint32_t n=0;n<128;n++)rec_skip[t][n]=0;if(!Z_SAMPLER_EDITION)z_dm_transport(on); if(!on){z_record(0);z_reset_audio();solo_track=0;}playing=!!on;pos=0xffffffffu;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
 uint32_t z_external(uint32_t on) {if(on&&!external_clock){clock_last_frame=audio_frame;clock_pulses=0;clock_beat_frame=audio_frame;}external_clock=!!on;if(z_song.reserved!=(uint8_t)external_clock){z_song.reserved=(uint8_t)external_clock;z_touch();}return external_clock;}
 void z_clock(uint32_t status) {
  if(!external_clock)return;
@@ -398,7 +403,8 @@ void z_render(float *out,uint32_t n) {
   if(!Z_SAMPLER_EDITION)z_dm_audio(&l,&r,&sendd,&sendr,cut[5]);
   {uint32_t di=(delay_i+8192-6615)&8191;float dl=delay_l[di],dr=delay_r[di];delay_l[delay_i]=sendd+dr*0.36f;delay_r[delay_i]=sendd+dl*0.31f;wet_l=dl*0.5f;wet_r=dr*0.5f;delay_i=(delay_i+1)&8191;}
   {uint32_t a=comb_i%1499,b=comb_i%1877;float ra=comb_a[a],rb=comb_b[b];comb_a[a]=sendr+ra*0.69f;comb_b[b]=sendr+rb*0.72f;wet_l+=ra*0.24f;wet_r+=rb*0.24f;l+=wet_l;r+=wet_r;comb_i++;}
-  if(click_left){float c=sine(click_phase)*0.13f*click_left/1100.0f;click_phase+=((pos&15)?1200:1800)/44100.0f;l+=c;r+=c;click_left--;}
+  if(countin_left){if(countin_left%countin_beat==0){click_left=1100;click_phase=0;click_hz=countin_left/countin_beat%4==0?1800.0f:1200.0f;}if(--countin_left==0){z_transport(1);z_record(1);}}
+  if(click_left){float c=sine(click_phase)*0.13f*click_left/1100.0f;click_phase+=click_hz/44100.0f;l+=c;r+=c;click_left--;}
   live_phase+=z_song.bpm/2646000.0f*(1u<<z_song.fx_rate);if(live_phase>=1)live_phase-=1;
   live_blend+=((live_requested?1.0f:0.0f)-live_blend)*0.008f;
   if(live_effect){float dry_l=l,dry_r=r,a=z_song.fx_amount/127.0f,x=(l+r)*0.5f;

@@ -13,7 +13,7 @@
  <nav class="links" aria-label="Разделы">
   <a href="#install" data-t="navInstall">Установка</a>
   <a href="emulator/" data-t="navEmulator">Эмулятор</a>
-  <a id="editor-link" href="webapp/groovebox-151/" data-t="navEditor">Редактор</a>
+  <a id="editor-link" href="webapp/groovebox-160/" data-t="navEditor">Редактор</a>
   <a href="#new" data-t="navNew">Что нового</a>
   <a href="#help" data-t="navHelp">Помощь</a>
  </nav>
@@ -72,24 +72,24 @@
 <section class="block" id="new">
  <div class="grid2">
   <div>
-   <p class="eyebrow">0.15.1 beta</p>
-   <h2 data-t="newTitle">Что нового: число шагов</h2>
+   <p class="eyebrow">0.16.0 beta</p>
+   <h2 data-t="newTitle">Что нового в 0.16: запись и драмка как в Felucca</h2>
    <ul class="changes" id="changes">
-    <li data-t="c1">Удерживайте SEQ и крутите K1: число шагов дорожки от 1 до 64.</li>
-    <li data-t="c2">На драмке K1 задаёт одну длину сразу всем 16 звукам.</li>
-    <li data-t="c3">На экране «ШАГОВ 32», шаги после конца цикла затемнены, лишние банки приглушены.</li>
-    <li data-t="c4">LEN 16/32/64 в слое REC (REC + HOME) тоже меняют весь драм-кит.</li>
-    <li data-t="c5">Звук из 0.14.0 остался: STOP без щелчков, лимитер, ноты названиями.</li>
-    <li data-t="c6">0.15.1: исправлены 4 ошибки, найденные фаззингом и проверкой секвенсора (сбой экрана драмки, щелчки в FM, удвоение кита, импорт проекта).</li>
+    <li data-t="c1">REC с главной страницы: отсчёт 1 такт, потом петля сама пишет с наложением. На SEQ — запись по шагам, как раньше.</li>
+    <li data-t="c2">Слой REC (REC + HOME): отсчёт выкл / 1 / 2 такта, метроном при записи, очистка дорожки.</li>
+    <li data-t="c3">Драмка: шаг переключается при отпускании; зажми шаг и крути K2/K3/K4 — шанс, сила и дробь этого шага.</li>
+    <li data-t="c4">Доли 1, 5, 9, 13 подсвечены на клавишах; сила удара видна яркостью ячейки.</li>
+    <li data-t="c5">SAVE во время игры не останавливает музыку — проект сохранится после STOP.</li>
+    <li data-t="c6">Новый экран: огибающая, форма волны, микшер, эффекты, свинг и арпеджио в картинках. Попробуйте в эмуляторе до установки.</li>
    </ul>
-   <p class="small"><a href="source/GROOVEBOX-151-RU.md" data-t="notesLink">Подробно: что изменено и как проверено</a> · <a href="emulator/audit.json" data-t="auditLink">Отчёт тестов</a></p>
+   <p class="small"><a href="source/GROOVEBOX-160-RU.md" data-t="notesLink">Подробно: что изменено и как проверено</a> · <a href="emulator/audit.json" data-t="auditLink">Отчёт тестов</a></p>
   </div>
   <div>
    <h2 data-t="ctrlTitle">Главное управление</h2>
    <ul class="changes small">
     <li data-t="k1"><b>ALGO</b> выбирает дорожку, шестая — драмка. <b>SELECT</b> задаёт темп.</li>
     <li data-t="k2"><b>SEQ</b>: 16 белых клавиш ставят и выбирают шаги. <b>SEQ + K1</b>: число шагов. <b>EDIT</b> удаляет ноту.</li>
-    <li data-t="k3"><b>PLAY</b> + <b>REC</b>: запись в ритм. Без PLAY запись идёт по шагам.</li>
+    <li data-t="k3"><b>REC</b> с главной: отсчёт и живая запись по кругу. На <b>SEQ</b> — по шагам. <b>REC + HOME</b>: слой записи.</li>
     <li data-t="k4"><b>EDIT + OCT−/OCT+</b>: отмена и повтор. <b>SAVE</b>: сохранить проект.</li>
     <li data-t="k5">Драмка на SEQ: <b>OP1–OP6</b> выбирают звук, <b>PITCH/GLOBAL</b> листают группы.</li>
     <li data-t="k6"><b>HOME + SEL</b>: Standalone → DAW Synth → DAW Controller.</li>
@@ -105,14 +105,14 @@
  <details><summary data-t="q1">FM-1 не находится</summary><ol><li data-t="q1a">Нужен кабель с передачей данных: зарядный кабель не подойдёт.</li><li data-t="q1b">Закройте DAW и все вкладки редактора или эмулятора, подключённые к FM-1.</li><li data-t="q1c">Нажмите на значок замка в адресной строке, разрешите MIDI-устройства и обновите страницу.</li><li data-t="q1d">Оставьте подключённым только один FM-1.</li></ol></details>
  <details><summary data-t="q2">USB отключился во время записи</summary><p data-t="q2a">Не паникуйте: загрузчик FM-1 остаётся рабочим. Подключите кабель снова, выберите ту же версию, нажмите «Найти FM-1», затем «Установить». Запись начнётся заново, и результат проверится после перезапуска.</p></details>
  <details><summary data-t="q3">Установщик пишет «Open-прошивка»</summary><p data-t="q3a">На FM-1 стоит официальная Open-прошивка M-VAVE, и она принимает только штатную FM-1 V15. Сначала верните её официальным установщиком M-VAVE, затем установите Zombie.</p></details>
- <details><summary data-t="q4">Звук трещит или новая версия не нравится</summary><p data-t="q4a">Откройте «Другие версии» и установите 0.15.0 beta или стабильную 0.8.3. Перед откатом на 0.13.5 и старше экспортируйте проект в JSON в редакторе. 0.15.1 проверена в эмуляторе и тестах.</p></details>
+ <details><summary data-t="q4">Звук трещит или новая версия не нравится</summary><p data-t="q4a">Откройте «Другие версии» и установите 0.15.1 или стабильную 0.8.3. Перед откатом на 0.13.5 и старше экспортируйте проект в JSON в редакторе. 0.16.0 проверена в эмуляторе и тестах.</p></details>
  <details><summary data-t="q5">Как вернуть заводскую прошивку M-VAVE</summary><p data-t="q5a">Воспользуйтесь официальным установщиком M-VAVE для FM-1 (V15). Сохранённые в Zombie проекты при этом не переносятся.</p></details>
 </section>
 
 <section class="block">
  <h2 data-t="moreTitle">Ещё</h2>
  <div class="grid3">
-  <a class="card tile" href="emulator/"><img src="emulator/home.png" alt="" width="240" height="240"><h3 data-t="t1">Эмулятор FM-1</h3><p class="small muted" data-t="t1a">Экран, кнопки и звук на коде прошивки 0.15.1. Можно поиграть с клавиатуры ПК.</p></a>
+  <a class="card tile" href="emulator/"><img src="emulator/home.png" alt="" width="240" height="240"><h3 data-t="t1">Эмулятор FM-1</h3><p class="small muted" data-t="t1a">Экран, кнопки и звук на коде прошивки 0.16.0. Можно поиграть с клавиатуры ПК.</p></a>
   <a class="card tile" href="emulator/sounds/"><img src="previews/groovebox-piano.png" alt="" width="240" height="240"><h3 data-t="t2">IDM-банк</h3><p class="small muted" data-t="t2a">Послушайте 32 пресета до установки.</p></a>
   <a class="card tile" href="downloads/Zombie-FM1-DAW-Profiles-0.8.2.zip" download><img src="previews/groovebox-lock.png" alt="" width="240" height="240"><h3 data-t="t3">Профили FL Studio и Ableton</h3><p class="small muted" data-t="t3a">Скрипты для режима DAW Controller, инструкции RU/EN.</p></a>
  </div>
@@ -120,6 +120,6 @@
 </main>
 
 <footer class="bottom"><div class="wrap"><span>ZOMBIE FM-1 · WEB 2.0 · <span id="footer-version">GROOVEBOX 0.15.1</span></span><span><a href="licenses/THIRD-PARTY.txt" data-t="licenses">Лицензии</a> · <a href="lab/">Lab</a> · <a href="https://github.com/Joolo09/zombie-fm1-web" rel="noopener">GitHub</a></span></div></footer>
-<script type="module" src="installer.js?v=152"></script>
+<script type="module" src="installer.js?v=160"></script>
 </body>
 </html>

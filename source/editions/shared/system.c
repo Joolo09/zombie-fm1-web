@@ -51,6 +51,10 @@ static int system_valid(const z_system_settings *s){uint32_t i;
  for(i=0;i<32&&s->name[i];i++){}if(i==32||!system_text((const uint8_t *)s->name,i))return 0;
  for(i=0;i<64&&s->bio[i];i++){}return i<64&&system_text((const uint8_t *)s->bio,i);
 }
+/* padding[0] holds the recording options; 0 (every older settings file) means the defaults: count-in 1 bar, click on.
+ * bits 0-1: 0 = 1 bar, 1 = off, 2 = 2 bars; bit 2: click while recording off. Older firmware ignores the byte. */
+static uint32_t rec_countin_bars(void){uint32_t c=z_sys.padding[0]&3u;return c==0?1:c==1?0:2;}
+static uint32_t rec_click_on(void){return !(z_sys.padding[0]&4u);}
 static void system_init(void){
  z_system_settings defaults={Z_SYSTEM_MAGIC,2,0,100,1,1,0,0,"Мой FM-1","",0,1,{0,0}},saved;int n;
  core_status=Z_CORE_OFF;system_stop();core_pending=system_dirty=0;core_jobs=core_timeouts=output_peak=0;z_sys=defaults;
@@ -59,11 +63,13 @@ static void system_init(void){
  if((n==108||n==sizeof saved)&&system_valid(&saved))z_sys=saved;
  z_sys.midi_mode=0; /* Always boot as a local synth, including upgrades with saved DAW settings. */
  z_sys.dual=0; /* Experimental hardware mode always requires an explicit session opt-in. */
+ z_sys.padding[0]&=7u;z_rec_click(rec_click_on());
 }
 static int system_save(void){z_system_settings saved=z_sys;saved.dual=0;int rc=plat_store_save(OBJ_SYSTEM,&saved,sizeof saved);if(!rc)system_dirty=0;return rc;}
 static int system_set(uint32_t id,uint32_t value){
- static const uint8_t maximum[]={1,127,1,2,2,2,2,1};uint8_t *p;
- if(id>=8||value>maximum[id])return 0;p=id<6?&z_sys.dual+id:id==6?&z_sys.midi_mode:&z_sys.transport;
+ static const uint8_t maximum[]={1,127,1,2,2,2,2,1,2,1};uint8_t *p;
+ if(id>=10||value>maximum[id])return 0;
+ if(id>=8){uint8_t before=z_sys.padding[0];if(id==8)z_sys.padding[0]=(uint8_t)((z_sys.padding[0]&~3u)|(value==1?0u:value==0?1u:2u));else{z_sys.padding[0]=(uint8_t)(value?z_sys.padding[0]&~4u:z_sys.padding[0]|4u);z_rec_click(value);}if(before!=z_sys.padding[0])system_dirty=1;return 1;}p=id<6?&z_sys.dual+id:id==6?&z_sys.midi_mode:&z_sys.transport;
  if(id&&*p!=value)system_dirty=1;if(id==6&&*p!=value)midi_mode_changed(value);*p=(uint8_t)value;if(id==0)core_pending=1;return 1;
 }
 static uint32_t system_velocity(uint32_t v){if(v>127)v=127;

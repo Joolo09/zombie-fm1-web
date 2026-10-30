@@ -15,20 +15,20 @@ const text={
   confirm:'Я сохранил свои проекты (экспорт JSON в редакторе) и WAV. Пока идёт запись, не отключаю USB и не закрываю страницу.',
   install:'Установить',s4:'Готово',s4help:'FM-1 перезапустится. Установщик дождётся устройства и проверит новую версию.',
   details:'Файл и журнал',download:'Скачать .fwsc',source:'Исходники',
-  newTitle:'Что нового: число шагов',c1:'Удерживайте SEQ и крутите K1: число шагов дорожки от 1 до 64.',c2:'На драмке K1 задаёт одну длину сразу всем 16 звукам.',c3:'На экране «ШАГОВ 32», шаги после конца цикла затемнены, лишние банки приглушены.',c4:'LEN 16/32/64 в слое REC (REC + HOME) тоже меняют весь драм-кит.',c5:'Звук из 0.14.0 остался: STOP без щелчков, лимитер, ноты названиями.',c6:'0.15.1: исправлены 4 ошибки, найденные фаззингом и проверкой секвенсора (сбой экрана драмки, щелчки в FM, удвоение кита, импорт проекта).',
+  newTitle:'Что нового в 0.16: запись и драмка как в Felucca',c1:'REC с главной страницы: отсчёт 1 такт, потом петля сама пишет с наложением. На SEQ — запись по шагам, как раньше.',c2:'Слой REC (REC + HOME): отсчёт выкл / 1 / 2 такта, метроном при записи, очистка дорожки.',c3:'Драмка: шаг переключается при отпускании; зажми шаг и крути K2/K3/K4 — шанс, сила и дробь этого шага.',c4:'Доли 1, 5, 9, 13 подсвечены на клавишах; сила удара видна яркостью ячейки.',c5:'SAVE во время игры не останавливает музыку — проект сохранится после STOP.',c6:'Новый экран: огибающая, форма волны, микшер, эффекты, свинг и арпеджио в картинках. Попробуйте в эмуляторе до установки.',
   notesLink:'Подробно: что изменено и как проверено',auditLink:'Отчёт тестов',ctrlTitle:'Главное управление',ctrlLink:'Полное управление драмкой',ctrlLink2:'Страницы и сочетания',
   helpTitle:'Если что-то пошло не так',moreTitle:'Ещё',licenses:'Лицензии',
   q1:'FM-1 не находится',q1a:'Нужен кабель с передачей данных: зарядный кабель не подойдёт.',q1b:'Закройте DAW и все вкладки редактора или эмулятора, подключённые к FM-1.',q1c:'Нажмите на значок замка в адресной строке, разрешите MIDI-устройства и обновите страницу.',q1d:'Оставьте подключённым только один FM-1.',
   q2:'USB отключился во время записи',q2a:'Не паникуйте: загрузчик FM-1 остаётся рабочим. Подключите кабель снова, выберите ту же версию, нажмите «Найти FM-1», затем «Установить». Запись начнётся заново, и результат проверится после перезапуска.',
   q3:'Установщик пишет «Open-прошивка»',q3a:'На FM-1 стоит официальная Open-прошивка M-VAVE, и она принимает только штатную FM-1 V15. Сначала верните её официальным установщиком M-VAVE, затем установите Zombie.',
-  q4:'Звук трещит или новая версия не нравится',q4a:'Откройте «Другие версии» и установите 0.15.0 beta или стабильную 0.8.3. Перед откатом на 0.13.5 и старше экспортируйте проект в JSON в редакторе. 0.15.1 проверена в эмуляторе и тестах.',
+  q4:'Звук трещит или новая версия не нравится',q4a:'Откройте «Другие версии» и установите 0.15.1 или стабильную 0.8.3. Перед откатом на 0.13.5 и старше экспортируйте проект в JSON в редакторе. 0.16.0 проверена в эмуляторе и тестах.',
   q5:'Как вернуть заводскую прошивку M-VAVE',q5a:'Воспользуйтесь официальным установщиком M-VAVE для FM-1 (V15). Сохранённые в Zombie проекты при этом не переносятся.',
-  t1:'Эмулятор FM-1',t1a:'Экран, кнопки и звук на коде прошивки 0.15.1. Можно поиграть с клавиатуры ПК.',t2:'IDM-банк',t2a:'Послушайте 32 пресета до установки.',t3:'Профили FL Studio и Ableton',t3a:'Скрипты для режима DAW Controller, инструкции RU/EN.',
-  k1:'<b>ALGO</b> выбирает дорожку, шестая — драмка. <b>SELECT</b> задаёт темп.',k2:'<b>SEQ</b>: 16 белых клавиш ставят и выбирают шаги. <b>SEQ + K1</b>: число шагов. <b>EDIT</b> удаляет ноту.',k3:'<b>PLAY</b> + <b>REC</b>: запись в ритм. Без PLAY запись идёт по шагам.',k4:'<b>EDIT + OCT−/OCT+</b>: отмена и повтор. <b>SAVE</b>: сохранить проект.',k5:'Драмка на SEQ: <b>OP1–OP6</b> выбирают звук, <b>PITCH/GLOBAL</b> листают группы.',k6:'<b>HOME + SEL</b>: Standalone → DAW Synth → DAW Controller.',
-  stall:'FM-1 не запрашивает данные уже 15 с. Не отключайте USB и не закрывайте вкладку: часто запись продолжается сама. Если ничего не изменится за 3 минуты, установщик предложит повторить.',stg_stall:'ожидание FM-1',resuming:'Связь с FM-1 прервалась. Установщик ждёт загрузчик и сам продолжит запись. Если USB отключился, подключите его снова. Не выключайте FM-1 и не закрывайте страницу.',stg_resume:'продолжение записи',stg_start:'подготовка',stg_verify:'проверка пакета',stg_loader:'загрузчик',stg_write:'запись',stg_reboot:'перезапуск',stg_done:'готово',tagrecommended:'рекомендуем',tagstable:'стабильная',tagbeta:'beta',tagarchive:'архив',archivePick:'— выбрать из архива —',
+  t1:'Эмулятор FM-1',t1a:'Экран, кнопки и звук на коде прошивки 0.16.0. Можно поиграть с клавиатуры ПК.',t2:'IDM-банк',t2a:'Послушайте 32 пресета до установки.',t3:'Профили FL Studio и Ableton',t3a:'Скрипты для режима DAW Controller, инструкции RU/EN.',
+  k1:'<b>ALGO</b> выбирает дорожку, шестая — драмка. <b>SELECT</b> задаёт темп.',k2:'<b>SEQ</b>: 16 белых клавиш ставят и выбирают шаги. <b>SEQ + K1</b>: число шагов. <b>EDIT</b> удаляет ноту.',k3:'<b>REC</b> с главной: отсчёт и живая запись по кругу. На <b>SEQ</b> — по шагам. <b>REC + HOME</b>: слой записи.',k4:'<b>EDIT + OCT−/OCT+</b>: отмена и повтор. <b>SAVE</b>: сохранить проект.',k5:'Драмка на SEQ: <b>OP1–OP6</b> выбирают звук, <b>PITCH/GLOBAL</b> листают группы.',k6:'<b>HOME + SEL</b>: Standalone → DAW Synth → DAW Controller.',
+  stall:'FM-1 не запрашивает данные уже 15 с. Не отключайте USB и не закрывайте вкладку: часто запись продолжается сама. Если ничего не изменится за 3 минуты, установщик предложит повторить.',stg_stall:'ожидание FM-1',resuming:'Связь с FM-1 прервалась. Установщик ждёт загрузчик и сам продолжит запись. Если USB отключился, подключите его снова. Не выключайте FM-1 и не закрывайте страницу.',stg_resume:'продолжение записи',check:'FM-1 проверяет весь пакет перед записью: пока ничего не стирается. Потом начнётся запись.',stg_check:'проверка в FM-1',stg_start:'подготовка',stg_verify:'проверка пакета',stg_loader:'загрузчик',stg_write:'запись',stg_reboot:'перезапуск',stg_done:'готово',tagrecommended:'рекомендуем',tagstable:'стабильная',tagbeta:'beta',tagarchive:'архив',archivePick:'— выбрать из архива —',
   checking:'Скачиваю и проверяю файл…',ready:'Файл проверен. Подключите FM-1 и нажмите «Найти FM-1».',finding:'Ищу FM-1 по USB MIDI…',
   found:'FM-1 найден. Отметьте подтверждение и нажмите «Установить».',same:'На FM-1 уже стоит эта версия. Её можно установить повторно.',
-  start:'Подготовка устройства…',verify:'FM-1 проверяет пакет…',loader:'Перезапуск в загрузчик…',write:'Запись прошивки…',reboot:'Перезапуск и проверка версии…',
+  start:'Подготовка устройства…',verify:'FM-1 проверяет пакет…',loader:'Перезапуск в загрузчик…',write:'Запись прошивки во флеш FM-1: обычно 1–2 минуты. Счётчик блоков внизу показывает, что запись идёт. Не отключайте USB.',reboot:'Перезапуск и проверка версии…',
   done:'Готово! Прошивка установлена, FM-1 подтвердил версию. Проверьте звук и клавиши.',
   loadfail:'Файл не загрузился. Проверьте интернет и обновите страницу.',badpkg:'Проверка файла не прошла. В устройство ничего не отправлено. Обновите страницу.',
   nomidi:'Этот браузер не умеет Web MIDI. Откройте страницу в Chrome или Edge на компьютере (не на телефоне и не в Safari/Firefox).',nohttps:'Откройте страницу по HTTPS: без него браузер не даёт доступа к MIDI.',
@@ -51,20 +51,20 @@ const text={
   confirm:'I have saved my projects (JSON export in the editor) and WAVs. I will not unplug USB or close this page while writing.',
   install:'Install',s4:'Done',s4help:'FM-1 restarts; the installer waits for it and verifies the new version.',
   details:'Package and log',download:'Download .fwsc',source:'Source',
-  newTitle:'What\u2019s new: step count',c1:'Hold SEQ and turn K1: track step count from 1 to 64.',c2:'On the drum track K1 sets one length for all 16 sounds at once.',c3:'The screen shows STEPS 32, dims steps after the loop end and unused banks.',c4:'LEN 16/32/64 in the REC layer (REC + HOME) also set the whole drum kit.',c5:'The 0.14.0 sound stays: click-free STOP, limiter, note names.',c6:'0.15.1: 4 bugs found by fuzzing and a sequencer check are fixed (drum screen overflow, FM clicks, kit doubling, project import).',
+  newTitle:'What\u2019s new in 0.16: Felucca-style recording and drums',c1:'REC from the home page: a one-bar count-in, then the loop records with overdub. On SEQ: step entry as before.',c2:'REC layer (REC + HOME): count-in off / 1 / 2 bars, click while recording, clear track.',c3:'Drums: a step toggles on release; hold a step and turn K2/K3/K4 for that step\u2019s chance, velocity and roll.',c4:'Beats 1, 5, 9, 13 glow on the keys; a hit\u2019s velocity shows as cell brightness.',c5:'SAVE while playing keeps the music going: the project saves on STOP.',c6:'New screens: envelope, waveform, mixer, effects, swing and arpeggio drawn live. Try it in the emulator before installing.',
   notesLink:'Details: changes and how they were tested',auditLink:'Test report',ctrlTitle:'Key controls',ctrlLink:'Full drum controls',ctrlLink2:'Pages and shortcuts',
   helpTitle:'Troubleshooting',moreTitle:'More',licenses:'Licenses',
   q1:'FM-1 is not found',q1a:'Use a USB data cable: a charge-only cable will not work.',q1b:'Close your DAW and any editor or emulator tabs connected to FM-1.',q1c:'Click the lock icon in the address bar, allow MIDI devices and reload.',q1d:'Keep only one FM-1 connected.',
   q2:'USB disconnected while writing',q2a:'Don’t panic: the FM-1 loader stays intact. Reconnect, choose the same version, click Find FM-1, then Install. Writing restarts and the result is verified after reboot.',
   q3:'The installer says “Open firmware”',q3a:'Your FM-1 runs M-VAVE’s official Open firmware, which only accepts stock FM-1 V15. Restore stock with M-VAVE’s official updater first, then install Zombie.',
-  q4:'Crackling sound or you don’t like the new version',q4a:'Open “Other versions” and install 0.15.0 beta or the stable 0.8.3. Before rolling back to 0.13.5 or older, export your project to JSON in the editor. 0.15.1 was tested in the emulator and test suite.',
+  q4:'Crackling sound or you don’t like the new version',q4a:'Open “Other versions” and install 0.15.1 or the stable 0.8.3. Before rolling back to 0.13.5 or older, export your project to JSON in the editor. 0.16.0 was tested in the emulator and test suite.',
   q5:'Back to stock M-VAVE firmware',q5a:'Use M-VAVE’s official FM-1 updater (V15). Projects saved in Zombie are not carried over.',
-  t1:'FM-1 emulator',t1a:'Screen, buttons and sound from the 0.15.1 firmware code. Playable from your PC keyboard.',t2:'IDM bank',t2a:'Listen to 32 presets before installing.',t3:'FL Studio & Ableton profiles',t3a:'Scripts for DAW Controller mode, RU/EN guide.',
-  k1:'<b>ALGO</b> selects the track (6 = drums). <b>SELECT</b> sets tempo.',k2:'<b>SEQ</b>: 16 white keys place and select steps. <b>SEQ + K1</b>: step count. <b>EDIT</b> deletes a note.',k3:'<b>PLAY</b> + <b>REC</b>: live recording; without PLAY, step recording.',k4:'<b>EDIT + OCT−/OCT+</b>: undo / redo. <b>SAVE</b>: save the project.',k5:'Drums on SEQ: <b>OP1–OP6</b> choose the sound, <b>PITCH/GLOBAL</b> change group.',k6:'<b>HOME + SEL</b>: Standalone → DAW Synth → DAW Controller.',
-  stall:'FM-1 has not asked for data for 15 s. Keep USB connected and this tab open: writing often resumes by itself. If nothing changes within 3 minutes the installer will offer to retry.',stg_stall:'waiting for FM-1',resuming:'The link to FM-1 dropped. The installer is waiting for the loader and will resume writing by itself. If USB came out, plug it back in. Keep FM-1 on and this page open.',stg_resume:'resuming the write',stg_start:'preparing',stg_verify:'checking package',stg_loader:'loader',stg_write:'writing',stg_reboot:'restarting',stg_done:'done',tagrecommended:'recommended',tagstable:'stable',tagbeta:'beta',tagarchive:'archive',archivePick:'— pick from the archive —',
+  t1:'FM-1 emulator',t1a:'Screen, buttons and sound from the 0.16.0 firmware code. Playable from your PC keyboard.',t2:'IDM bank',t2a:'Listen to 32 presets before installing.',t3:'FL Studio & Ableton profiles',t3a:'Scripts for DAW Controller mode, RU/EN guide.',
+  k1:'<b>ALGO</b> selects the track (6 = drums). <b>SELECT</b> sets tempo.',k2:'<b>SEQ</b>: 16 white keys place and select steps. <b>SEQ + K1</b>: step count. <b>EDIT</b> deletes a note.',k3:'<b>REC</b> from home: count-in and a live loop. On <b>SEQ</b>: step entry. <b>REC + HOME</b>: the REC layer.',k4:'<b>EDIT + OCT−/OCT+</b>: undo / redo. <b>SAVE</b>: save the project.',k5:'Drums on SEQ: <b>OP1–OP6</b> choose the sound, <b>PITCH/GLOBAL</b> change group.',k6:'<b>HOME + SEL</b>: Standalone → DAW Synth → DAW Controller.',
+  stall:'FM-1 has not asked for data for 15 s. Keep USB connected and this tab open: writing often resumes by itself. If nothing changes within 3 minutes the installer will offer to retry.',stg_stall:'waiting for FM-1',resuming:'The link to FM-1 dropped. The installer is waiting for the loader and will resume writing by itself. If USB came out, plug it back in. Keep FM-1 on and this page open.',stg_resume:'resuming the write',check:'FM-1 checks the whole package before writing; nothing is erased yet. Writing starts next.',stg_check:'checking in FM-1',stg_start:'preparing',stg_verify:'checking package',stg_loader:'loader',stg_write:'writing',stg_reboot:'restarting',stg_done:'done',tagrecommended:'recommended',tagstable:'stable',tagbeta:'beta',tagarchive:'archive',archivePick:'— pick from the archive —',
   checking:'Downloading and checking the package…',ready:'Package verified. Connect FM-1 and click Find FM-1.',finding:'Looking for FM-1 over USB MIDI…',
   found:'FM-1 found. Tick the confirmation and click Install.',same:'FM-1 already runs this version. You can reinstall it.',
-  start:'Preparing the device…',verify:'FM-1 is checking the package…',loader:'Restarting into the loader…',write:'Writing firmware…',reboot:'Restarting and verifying the version…',
+  start:'Preparing the device…',verify:'FM-1 is checking the package…',loader:'Restarting into the loader…',write:'Writing the firmware into FM-1 flash: usually 1–2 minutes. The block counter below shows it is moving. Keep USB connected.',reboot:'Restarting and verifying the version…',
   done:'Done! Firmware installed and version confirmed by FM-1. Check sound and keys.',
   loadfail:'Could not download the package. Check your connection and reload.',badpkg:'Package verification failed. Nothing was sent to the device. Reload the page.',
   nomidi:'This browser has no Web MIDI. Use Chrome or Edge on a computer (not a phone, Safari or Firefox).',nohttps:'Open this page over HTTPS; browsers only allow MIDI on secure pages.',
@@ -81,7 +81,7 @@ const HTML_KEYS=/^k\d$/;
 let lang='ru';try{lang=localStorage.getItem('zcore-language')||(navigator.language||'ru').slice(0,2);}catch{}if(!text[lang])lang='ru';
 const tr=k=>text[lang][k]??text.ru[k]??k;
 let manifest,release,checked,access,detected,active=false,loading=false,generation=0,progress=0;
-let message='',tone='',stage='',deviceText='',sameVersion=false;
+let message='',tone='',stage='',stageNote=0,deviceText='',sameVersion=false;
 const midiSupported=()=>!!navigator.requestMIDIAccess;
 const secure=()=>window.isSecureContext&&!!crypto.subtle;
 
@@ -98,7 +98,7 @@ function render(){
  $('install-btn').disabled=active||loading||!checked||!detected||!$('confirm').checked;
  $('confirm').disabled=active;
  for(const el of document.querySelectorAll('#release-list input,#archive-select'))el.disabled=active||loading||!manifest;
- $('bar').style.width=progress+'%';$('pct').textContent=Math.round(progress)+'%';$('stage').textContent=stage?tr('stg_'+stage):'';
+ $('bar').style.width=progress+'%';$('pct').textContent=Math.round(progress)+'%';$('stage').textContent=stage?tr('stg_'+stage)+(stageNote?' · '+stageNote:''):'';
  const done=message==='done';
  setStep(1,checked?'done':'active');setStep(2,!checked?'locked':detected||done?'done':'active');setStep(3,!detected&&!done?'locked':done?'done':'active');setStep(4,done?'done':'locked');
  if(release){$('download').href=release.file;$('source').href=release.source||'downloads/groovebox-source-0.8.3.zip';$('editor-link').href=release.editor||'webapp/editor/';$('footer-version').textContent=release.label.en.split(' · ')[0].toUpperCase();}
@@ -169,13 +169,19 @@ async function install(){
  if(active||!checked||!detected||!$('confirm').checked)return;active=true;progress=0;stage='start';say('start');let wake,success=false;
  try{await withDeviceLock(async()=>{
   ensureSingle();try{wake=await navigator.wakeLock?.request('screen');}catch{}
-  const up=new Updater(access,log);let last='',loaderReached=false;log('INSTALL '+checked.product);
+  const up=new Updater(access,log);let last='',loaderReached=false,pass=1,far=0;log('INSTALL '+checked.product);
+  /* The loader reads flash.bin twice: pass 1 checks the whole package (nothing erased), pass 2 restarts at the app
+   * area and erases + writes sector by sector. Progress follows the pass, so the real write never sits at 94 %. */
+  const FL_END=0x400+0x93000,APP_START=0x400+0x4000;
   const report=(key,count,address)=>{
    if(key!==last){log(key+(typeof count==='string'?' '+count:''));last=key;}
    if(key==='loader'||key==='write')loaderReached=true;
+   if(key==='loader'){pass=1;far=0;}
+   if(key==='write'){address=address||0;if(pass===1&&far>APP_START+0x10000&&address<far-0x10000){pass=2;log('pass 2: erase + write');}far=Math.max(far,address);}
+   const shown=key==='write'&&pass===1?'check':key;
    const fixed={start:3,verify:10,loader:30,reboot:97,done:100};
-   const amount=key==='write'?35+Math.min(1,(address||0)/checked.image.length)*60:fixed[key];
-   if(amount!=null)progress=Math.max(progress,amount);stage=key;say(key,key==='done'?'ok':key==='stall'?'warn':'');
+   const amount=key!=='write'?fixed[key]:pass===1?35+Math.min(1,address/FL_END)*25:60+Math.min(1,Math.max(0,address-APP_START)/(FL_END-APP_START))*35;
+   if(amount!=null)progress=Math.max(progress,amount);stage=shown;stageNote=key==='write'?count:0;say(shown,key==='done'?'ok':key==='stall'?'warn':'');
   };
   /* Once the loader runs, FM-1 stays in update mode until a write completes (black screen). A cut USB link or a
    * stalled transfer is resumed here, so the page never leaves FM-1 waiting in the loader. */
@@ -184,7 +190,7 @@ async function install(){
    if(!loaderReached||!RESUMABLE.has(e?.code))throw e;
    let error=e,resumed=false;
    for(let attempt=1;attempt<=3&&!resumed;attempt++){
-    log('AUTO-RESUME '+attempt+' after '+error.code);progress=35;stage='resume';say('resuming','warn');
+    log('AUTO-RESUME '+attempt+' after '+error.code);progress=35;pass=1;far=0;stage='resume';say('resuming','warn');
     const ota=await up.waitFor(id=>/^ota-/i.test(id.model),90000);if(!ota)break;await ota.link.close();
     try{ensureSingle();await up.resume(checked.image,checked.product,report);resumed=true;}catch(again){error=again;if(!RESUMABLE.has(again?.code))throw again;}
    }

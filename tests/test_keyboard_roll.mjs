@@ -24,9 +24,9 @@ e.key(BLACK[1]);e.hold('EDIT');e.key(WHITE[0]);e.up('EDIT');assert.equal(kit(e)[
 e.turn(2,1);e.key(WHITE[1]);assert.equal(e.root()[1907],17);assert.equal(kit(e)[328+17*3],100);
 console.log('PASS OP keys select all sixteen drums; white steps toggle, EDIT erases, undo/redo and step banks work');
 
-e=create();e.turn(1,5);e.tap('REC');for(const k of WHITE)e.key(k);assert.equal(e.w.z_track_hits(5),16);assert.equal(e.root()[1907],16);
+e=create();e.turn(1,5);e.rec();for(const k of WHITE)e.key(k);assert.equal(e.w.z_track_hits(5),16);assert.equal(e.root()[1907],16);
 e.key(BLACK[10]);assert.equal(e.root()[1907],17);assert.equal(e.root()[1906],1);e.key(WHITE[0]);assert.equal(e.root()[1907],18);
-e.tap('REC');for(let page=0;page<3;page++){const old=e.root()[1907];e.turn(3,1);assert.equal(e.root()[1907],old+1);e.tap('SEQ');}
+e.rec();for(let page=0;page<3;page++){const old=e.root()[1907];e.turn(3,1);assert.equal(e.root()[1907],old+1);e.tap('SEQ');}
 console.log('PASS all sixteen drums record from physical keys, rest keeps REC armed, and K1 stays the step cursor on every drum page');
 
 e=create();e.tap('SEQ');for(let page=0;page<3;page++){const old=e.root()[1907];e.turn(3,1);assert.equal(e.root()[1907],old+1);e.tap('SEQ');}

@@ -32,7 +32,7 @@ static void panel_reset(void);
 static uint8_t upload_slot=255;
 static uint32_t upload_size,upload_at,upload_crc,upload_rate;
 static char message[96];
-static uint8_t save_requested;
+static uint8_t save_requested,save_after_stop; /* SAVE while playing waits for STOP: a flash write would stop the music */
 static uint32_t editor_seen;
 static uint8_t editor_effect;
 /* Explicit HOME+PLAY output check: 0.5 s, quiet ramped triangle, still at MASTER/trim.
@@ -101,7 +101,7 @@ void app_init(void){project_pair_boot();z_project saved;audio_test_left=0;audio_
  {z_sampler_state kit;int bytes=plat_store_load(OBJ_SAMPLER,&kit,sizeof kit);if(bytes==sizeof kit&&z_sampler_valid(&kit))z_sampler=kit;}
  if(!Z_SAMPLER_EDITION){z_dm_state kit;int bytes=project_store_load(OBJ_DRUM,&kit,sizeof kit);if(project_loaded&&drum_root_matches&&bytes==sizeof kit&&z_dm_valid(&kit))z_dm=kit;else if(project_loaded&&drum_root_matches&&z_song.padding[1]!=0xD1)z_dm_migrate();else z_dm_init();z_dm_authoritative();}
  z_apply_state();z_song.recording=0;for(t=0;t<6;t++)z_song.arp_hold[t]=0;z_external(z_song.reserved);load_samples();z_set_midi_out(seq_out);
- panel_keys_before=held_buttons=0;editor_effect=0;message[0]=0;message_until=0;redraw_at=0;save_requested=0;upload_slot=255;
+ panel_keys_before=held_buttons=0;editor_effect=0;message[0]=0;message_until=0;redraw_at=0;save_requested=save_after_stop=0;upload_slot=255;
  for(i=0;i<27;i++)key_action[i]=0;for(i=0;i<NB;i++)pulse_until[i]=0;
  for(t=0;t<6;t++){for(i=0;i<128;i++)off_deadline[t][i]=0;for(i=0;i<16;i++)editor_notes[t][i]=0;}
  for(t=0;t<6;t++){for(i=0;i<4;i++)daw_values[t][i]=(uint8_t)z_get(t,daw_params[i]);daw_values[t][4]=(uint8_t)z_get(t,Z_LEVEL);daw_values[t][5]=(uint8_t)(z_get(t,Z_PAN)+64);}daw_bpm=z_song.bpm;daw_host=0;
@@ -114,7 +114,10 @@ void app_say(const char *a,const char *b){uint32_t i;(void)b;for(i=0;i<95&&a&&a[
 #include "panel.c"
 
 void app_input_only(void){uint32_t f=plat_lock();input();plat_unlock(f);}
-void app_frame(void){app_input_only();system_service();if(save_requested){int rc;uint32_t f=plat_lock();save_requested=0;app_panic();flash_busy=1;plat_unlock(f);rc=project_save_all();flash_busy=0;if(!rc)saved_revision=z_revision();else saved_revision=0;app_say(rc?word("СБОЙ СОХРАНЕНИЯ","SAVE FAILED"):word("ПРОЕКТ СОХРАНЕН","PROJECT SAVED"),0);}if(plat_ms()-redraw_at>65||!redraw_at){draw_ui();redraw_at=plat_ms();}}
+void app_frame(void){app_input_only();system_service();
+ if(save_requested&&(z_playing()||z_countin_state())){save_requested=0;save_after_stop=1;app_say(word("СОХРАНЮ ПОСЛЕ STOP","SAVES WHEN STOPPED"),0);}
+ if(save_after_stop&&!z_playing()&&!z_countin_state()){save_after_stop=0;save_requested=1;}
+ if(save_requested){int rc;uint32_t f=plat_lock();save_requested=0;app_panic();flash_busy=1;plat_unlock(f);rc=project_save_all();flash_busy=0;if(!rc)saved_revision=z_revision();else saved_revision=0;app_say(rc?word("СБОЙ СОХРАНЕНИЯ","SAVE FAILED"):word("ПРОЕКТ СОХРАНЕН","PROJECT SAVED"),0);}if(plat_ms()-redraw_at>65||!redraw_at){draw_ui();redraw_at=plat_ms();}}
 void app_ui_init(void){palette_set(0);draw_ui();}
 void app_splash(void){edition_splash();}
 /* Independent ZC protocol: F0 7D 5A 43 request-id command pack7(payload) F7.

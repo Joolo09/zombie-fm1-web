@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: MIT — 0.14.0 mixer regressions: no clicks on STOP/steal, no clipping, no voice pile-up. */
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
-const editor=process.argv[2]||'groovebox-151';
+const editor=process.argv[2]||'groovebox-160';
 const module=new WebAssembly.Module(readFileSync(new URL('../webapp/'+editor+'/zombie-core.wasm',import.meta.url)));
 const fresh=()=>{const w=new WebAssembly.Instance(module,{}).exports;w.z_init();w.z_dm_init();return w;};
 /* Render n frames; report peak, largest sample-to-sample jump and hard-clamped samples. */
