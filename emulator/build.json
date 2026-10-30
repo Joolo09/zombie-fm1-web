@@ -1,6 +1,6 @@
 {
-  "version": "0.16.0",
-  "product": "FM-1_63001600",
-  "wasm_sha256": "2eb03e5048dd2021d42838e89385c5101f214f55efe220bc141634a4f8fb8e51",
-  "source_sha256": "206e6b202a5b27ef97eb0ddf0573ad05833c36663513f17b81b9766e49e2353f"
+  "version": "0.17.0",
+  "product": "FM-1_63001700",
+  "wasm_sha256": "6d82d4c1509396f001a240e25fdbe0ca5511b3fdd5694ab4f5743431b6ee5cfe",
+  "source_sha256": "a4e28a97ec1709642853a1db6e2c3f1582260277d8d467710234f37edc1ceb73"
 }
