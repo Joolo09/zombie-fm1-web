@@ -48,6 +48,7 @@ uint32_t z_position(void);
 uint32_t z_playing(void);
 uint32_t z_external(uint32_t on);
 void z_set_midi_out(void (*callback)(uint32_t,uint32_t,uint32_t,uint32_t));
+void z_set_clock_out(void (*callback)(uint32_t status));   /* 0xF8 clock, 0xFA start, 0xFC stop */
 uint32_t z_snapshot(void);
 float *z_buffer(void);
 uint8_t *z_transfer(void);
