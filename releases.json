@@ -55,6 +55,24 @@
       "channel": "stable"
     },
     {
+      "product": "FM-1_63001700",
+      "version": "0.17.0",
+      "label": {
+        "ru": "Groovebox 0.17.0 beta · лад, правка шагов, SEQ-инструменты",
+        "en": "Groovebox 0.17.0 beta · scale, step editing, SEQ tools"
+      },
+      "notes": {
+        "ru": "Лад и тоника: клавиши попадают в тональность, ноты лада подсвечены. Зажми шаг мелодии и крути K1–K4. SEQ-инструменты: Эвклид, бит, половина, COOK. MIDI clock наружу (выкл по умолчанию). Отмена на 8 шагов. Физический FM-1 не проверен.",
+        "en": "Scale and root: keys snap to the key and its notes glow. Hold a melodic step and turn K1-K4. SEQ tools: Euclid, beat, half, COOK. MIDI clock out (off by default). Eight undo steps. Physical FM-1 unverified."
+      },
+      "channel": "beta",
+      "bytes": 610100,
+      "sha256": "c2b0c3e72643f1b7a5c3962d8f20ecf7260f5fc50ec4cc1b4b3803c548ca7418",
+      "file": "downloads/zombie-groovebox-0.17.0.fwsc",
+      "editor": "webapp/groovebox-170/",
+      "source": "downloads/groovebox-source-0.17.0.zip"
+    },
+    {
       "product": "FM-1_63001600",
       "version": "0.16.0",
       "label": {
@@ -65,7 +83,7 @@
         "ru": "REC с главной: отсчёт 1 такт, затем запись по кругу; на SEQ — по шагам. Драмка: шаг переключается при отпускании, зажатый шаг + K2/K3/K4 = шанс/сила/дробь, подсветка долей. SAVE во время игры сохраняет после STOP. Новый экран: огибающая, волна, микшер, эффекты. Сначала попробуйте в эмуляторе. Физический FM-1 не проверен.",
         "en": "REC from home: one-bar count-in, then a live loop; on SEQ: step entry. Drums: steps toggle on release, a held step + K2/K3/K4 = chance/velocity/roll, beat LEDs. SAVE while playing saves on STOP. New screens: envelope, waveform, mixer, effects. Try it in the emulator first. Physical FM-1 unverified."
       },
-      "channel": "beta",
+      "channel": "archive",
       "bytes": 610100,
       "sha256": "ece990c672ff4672d2ed2b79fb0b5c352d3410c09a8cc43c6d79293b787ad741",
       "file": "downloads/zombie-groovebox-0.16.0.fwsc",
