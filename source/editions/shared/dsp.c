@@ -79,9 +79,21 @@ uint32_t z_solo_state(void){return solo_track;}
 void z_solo(uint32_t t){uint32_t i;if(t>6)return;solo_track=t;if(t&&midi_out)for(i=0;i<6;i++)if(i+1!=t)midi_out(i,128,0,0);}
 int z_pattern(uint32_t t,uint32_t action,uint32_t target){
  uint32_t i,j,len;z_step step;uint8_t chord[3],duration;
- if(t>=6||action>6)return -1;if(action==0)return z_erase(t,0,1);if(z_drum_track(t))return z_dm_pattern(action);if(action==4&&z_drum_track(target))return -1;len=z_song.track[t].p[Z_LENGTH];
- if(action==1&&len>32)return -1;if(action==4&&(target>=6||target==t))return -1;
+ if(t>=6||action>9)return -1;if(action==0)return z_erase(t,0,1);if(z_drum_track(t))return z_dm_pattern(action,target);if(action==4&&z_drum_track(target))return -1;len=z_song.track[t].p[Z_LENGTH];
+ if(action==1&&len>32)return -1;if(action==4&&(target>=6||target==t))return -1;if(action==7&&len<2)return -1;
  z_record(0);z_checkpoint();
+ if(action==7){z_song.track[t].p[Z_LENGTH]=(int16_t)(len/2);z_touch();return 0;}   /* HALF: the loop cut to its first half */
+ if(action==8){/* COOK: two small changes: a step switched on (with the pitch of another active step, so it stays in key) or off, or an accent */
+  for(j=0;j<2;j++){z_step *s;uint32_t r=random32();i=r%len;s=&z_song.track[t].steps[i];r=random32();
+   if(!s->velocity){uint32_t k,n=0,pick=r%7;uint8_t note=s->note;for(k=0;k<len;k++)if(z_song.track[t].steps[k].velocity){if(n++==pick%(len))note=z_song.track[t].steps[k].note;}s->note=note;s->velocity=(uint8_t)(80+(r>>8&31));s->chance=127;s->gate=70;z_song.duration[t][i]=0;}
+   else if(r&1)s->velocity=0;else{int x=s->velocity+((r&2)?22:-22);s->velocity=(uint8_t)(x<20?20:x>127?127:x);}}
+  z_touch();return 0;}
+ if(action==9){/* EUCLID: HITS spread evenly over the steps (target = hits | rotation << 8); new hits take the cursor step's pitch */
+  uint32_t hits=target&255,rot=(target>>8)&255;uint8_t pitch=z_song.track[t].steps[z_song.step_edit%len].velocity?z_song.track[t].steps[z_song.step_edit%len].note:60;
+  if(hits>len)hits=len;for(i=0;i<len;i++){uint32_t k=(i+len-rot%len)%len,hit=hits&&((k*hits)%len)<hits;z_step *s=&z_song.track[t].steps[i];
+   if(hit){if(!s->velocity){s->note=pitch;s->velocity=100;s->chance=127;s->gate=(uint8_t)z_get(t,Z_GATE);z_song.duration[t][i]=0;for(j=0;j<3;j++)z_song.chord[t][i][j]=0;}}
+   else{s->velocity=0;z_song.duration[t][i]=0;for(j=0;j<3;j++)z_song.chord[t][i][j]=0;}}
+  z_touch();return 0;}
  if(action==1||action==4){uint32_t dst=action==4?target:t,offset=action==4?0:len;
   for(i=0;i<(action==4?64:len);i++){z_song.track[dst].steps[offset+i]=z_song.track[t].steps[i];z_song.duration[dst][offset+i]=z_song.duration[t][i];for(j=0;j<3;j++)z_song.chord[dst][offset+i][j]=z_song.chord[t][i][j];}
   z_song.track[dst].p[Z_LENGTH]=(int16_t)(action==4?len:len*2);
