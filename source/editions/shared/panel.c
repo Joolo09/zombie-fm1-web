@@ -224,12 +224,13 @@ static void drum_grid_operator(uint32_t j){
 }
 /* Drum grid, Felucca-style: a step key toggles its hit when let go; held, K3/K4 (page 2: K2) edit that step instead
  * and the hit stays. Pressing plays the selected sound, so the beat is heard at once. */
-static struct {int8_t key;uint8_t at,sound,edited;} grid_hold={-1,0,0,0};
-static void grid_release(void){uint32_t d=grid_hold.sound,at=grid_hold.at;grid_hold.key=-1;z_dm_key(z_drum_note(d),0,0);
+static struct {int8_t key;uint8_t at,sound,edited,drum;} grid_hold={-1,0,0,0,0};   /* drum: the step belongs to the drum kit, else to the selected melodic track */
+static void grid_release(void){uint32_t d=grid_hold.sound,at=grid_hold.at;if(!grid_hold.drum){grid_hold.key=-1;return;}grid_hold.key=-1;z_dm_key(z_drum_note(d),0,0);
  if(!grid_hold.edited){z_dm_step_t v=z_dm.step[d][at];z_dm_step(d,at,v.velocity?0:100,v.chance,v.ratchet);}redraw_at=0;}
 static void roll_step_key(uint32_t j){
  uint32_t t=z_song.selected,at=z_song.step_bank*16+j;uint32_t pitch=z_song.track[t].steps[z_song.step_edit].note;edit_stop();panel_setting(5,at);
- if(z_drum_track(t)){if(grid_hold.key>=0)grid_release();grid_hold.at=(uint8_t)at;grid_hold.sound=z_dm.selected;grid_hold.edited=0;z_dm_key(z_drum_note(z_dm.selected),z_dm.step[z_dm.selected][at].velocity?z_dm.step[z_dm.selected][at].velocity:100,1);}
+ if(grid_hold.key>=0)grid_release();grid_hold.at=(uint8_t)at;grid_hold.edited=0;grid_hold.drum=(uint8_t)z_drum_track(t);
+ if(z_drum_track(t)){grid_hold.sound=z_dm.selected;z_dm_key(z_drum_note(z_dm.selected),z_dm.step[z_dm.selected][at].velocity?z_dm.step[z_dm.selected][at].velocity:100,1);}
  else if(!z_song.track[t].steps[at].velocity)z_step_set(t,at,pitch,100,127,z_get(t,Z_GATE));
  if(!z_drum_track(t)&&!z_playing())z_audition_step(t,at);redraw_at=0;
  if(at>=(z_drum_track(t)?z_dm.sound[z_dm.selected].length:(uint32_t)z_get(t,Z_LENGTH)))app_say(word("ШАГ ЗА ДЛИНОЙ: SEQ+K1 = ШАГОВ","PAST THE LOOP: SEQ+K1 = STEPS"),0);
@@ -405,7 +406,7 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
    if(drum_operator_panel()){static const uint8_t black[11]=PLAT_BLACK_KEYS;uint32_t j;for(j=0;j<11;j++)if(black[j]==k){key_action[k]=2;drum_grid_operator(j);break;}if(j<11)continue;}
    int note=clamp(53+(int)k+12*z_song.octave,0,127);if(!Z_SAMPLER_EDITION&&!z_drum_track(t))note=scale_snap(note);held_notes[k]=(uint8_t)note;held_tracks[k]=(uint8_t)t;key_action[k]=0;
    if(drum_grid_keys(buttons)){static const uint8_t white[16]=PLAT_WHITE_KEYS,black[11]=PLAT_BLACK_KEYS;uint32_t j;key_action[k]=2;for(j=0;j<16;j++)if(white[j]==k){if(buttons>>B_EDIT&1){panel_setting(5,z_song.step_bank*16+j);z_erase(t,z_song.step_edit,0);redraw_at=0;}else{roll_step_key(j);grid_hold.key=(int8_t)k;}break;}if(j==16)for(j=0;j<11;j++)if(black[j]==k){drum_grid_operator(j);break;}}
-   else if(roll_grid()){static const uint8_t white[16]=PLAT_WHITE_KEYS,black[11]=PLAT_BLACK_KEYS;uint32_t j;key_action[k]=2;for(j=0;j<16;j++)if(white[j]==k){roll_step_key(j);break;}if(j==16)for(j=0;j<11;j++)if(black[j]==k){drum_shortcut(j);break;}}
+   else if(roll_grid()){static const uint8_t white[16]=PLAT_WHITE_KEYS,black[11]=PLAT_BLACK_KEYS;uint32_t j;key_action[k]=2;for(j=0;j<16;j++)if(white[j]==k){roll_step_key(j);grid_hold.key=(int8_t)k;break;}if(j==16)for(j=0;j<11;j++)if(black[j]==k){drum_shortcut(j);break;}}
    else if(active_layer>=0){static const uint8_t white[16]=PLAT_WHITE_KEYS;uint32_t j;key_action[k]=2;for(j=0;j<16;j++)if(white[j]==k){key_action[k]=(uint8_t)(j+3);key_layer[k]=(uint8_t)active_layer;layer_action(j,1,now);break;}if(key_action[k]==2){static const uint8_t black[11]=PLAT_BLACK_KEYS;for(j=0;j<11;j++)if(black[j]==k){black_action(j);break;}}}
    else {
     if(sampler_open()||((z_sampler.tracks>>t&1)&&z_get(t,Z_MODEL)==8)){static const uint8_t white[16]=PLAT_WHITE_KEYS,black[11]=PLAT_BLACK_KEYS;uint32_t j;
@@ -425,6 +426,13 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
  d=plat_enc(EN_PRESET);if(d&&active_layer>=0){uint32_t count=active_layer==Z_EDIT?3:page_count[active_layer<Z_SECTIONS?active_layer:0];layer_page=(uint8_t)(layer_page+count+d%(int)count)%count;}else if(d&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){panel_setting(3,(z_song.step_bank+4+d%4)%4);}else if(d&&sampler_open()){sampler_page=(sampler_page+3+d%3)%3;}else if(d&&z_sys.midi_mode==2){daw_touch_at=now;daw_values[t][5]=(uint8_t)clamp((int)daw_values[t][5]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,10,daw_values[t][5]);}else if(d)knob(U_PRESET,d);
  for(k=0;k<4;k++){d=plat_enc(EN_K1+k);
   /* a held step: K2 chance, K3 velocity, K4 roll of that step, on every SEQ page; the hit stays when let go */
+  /* a held melodic step: K1 note, K2 velocity, K3 length, K4 gate of that step; one undo step for the whole hold */
+  if(d&&grid_hold.key>=0&&!grid_hold.drum&&!z_drum_track(t)&&z_sys.midi_mode!=2){uint32_t at=grid_hold.at;z_step *s=&z_song.track[t].steps[at];z_step n=*s;int dur=z_song.duration[t][at];
+   if(!n.velocity){n.velocity=100;n.chance=127;n.gate=(uint8_t)z_get(t,Z_GATE);}
+   if(k==0){int note=clamp((int)n.note+d,0,127);if(!Z_SAMPLER_EDITION)note=d>0?scale_snap_up(note):scale_snap(note);n.note=(uint8_t)note;}
+   else if(k==1)n.velocity=(uint8_t)clamp((int)n.velocity+d,1,127);else if(k==2)dur=clamp(dur+d,0,63);else n.gate=(uint8_t)clamp((int)n.gate+d,1,127);
+   if(n.note!=s->note||n.velocity!=s->velocity||n.gate!=s->gate||dur!=z_song.duration[t][at]){edit_stop();if(!grid_hold.edited){z_checkpoint();grid_hold.edited=1;}*s=n;z_song.duration[t][at]=(uint8_t)dur;z_touch();if(k==0&&!z_playing())z_audition_step(t,at);redraw_at=0;}
+   continue;}
   if(d&&k&&grid_hold.key>=0&&z_drum_track(t)&&z_sys.midi_mode!=2){z_dm_step_t v=z_dm.step[grid_hold.sound][grid_hold.at];grid_hold.edited=1;if(!v.velocity)v.velocity=100;
    if(k==1)v.chance=(uint8_t)clamp((int)v.chance+d,0,127);else if(k==2)v.velocity=(uint8_t)clamp((int)v.velocity+d,1,127);else v.ratchet=(uint8_t)clamp((int)v.ratchet+d,1,4);
    z_dm_step(grid_hold.sound,grid_hold.at,v.velocity,v.chance,v.ratchet);redraw_at=0;continue;}

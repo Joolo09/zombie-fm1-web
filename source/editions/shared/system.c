@@ -62,6 +62,7 @@ static uint32_t scale_index(void){uint32_t s=z_sys.padding[1]&15u;return s<Z_SCA
 static uint32_t scale_root(void){uint32_t r=z_sys.padding[1]>>4;return r<12?r:0;}
 static uint32_t scale_has(int note){uint32_t s=scale_index();return !s||(scale_mask[s]>>(((note+240)-(int)scale_root())%12)&1u);}
 /* a key's note moved to the nearest note of the scale (a tie goes down) */
+static int scale_snap_up(int note){int d;if(scale_has(note))return note;for(d=1;d<7;d++){if(note+d<=127&&scale_has(note+d))return note+d;if(note-d>=0&&scale_has(note-d))return note-d;}return note;}
 static int scale_snap(int note){int d;if(scale_has(note))return note;for(d=1;d<7;d++){if(note-d>=0&&scale_has(note-d))return note-d;if(note+d<=127&&scale_has(note+d))return note+d;}return note;}
 static void system_init(void){
  z_system_settings defaults={Z_SYSTEM_MAGIC,2,0,100,1,1,0,0,"Мой FM-1","",0,1,{0,0}},saved;int n;
