@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT — independent device settings, separate from project JSON. */
-export const systemDefaults=()=>({dual:0,trim:100,limiter:1,glow:1,velocity:0,start:0,midiMode:0,transport:1,countin:1,recClick:1,scale:0,root:0,clockOut:0,saver:1,saverStyle:0,name:'Мой FM-1',bio:'',status:0,peak:0,jobs:0,timeouts:0});
+export const systemDefaults=()=>({dual:0,trim:100,limiter:1,glow:1,velocity:0,start:0,midiMode:0,transport:1,countin:1,recClick:1,scale:0,root:0,clockOut:0,saver:1,saverStyle:0,name:'My FM-1',bio:'',status:0,peak:0,jobs:0,timeouts:0});
 export function profileBytes(value,field){const bytes=new TextEncoder().encode(value);if(bytes.length>=(field?64:32)||!/^[\x20-\x7e\u0400-\u045f]*$/u.test(value))throw Error('Русский / латиница: имя ≤31 байт, подпись ≤63 байт. / ASCII or Cyrillic only.');return bytes;}
 /* the settings the device keeps in ids 0-12 of command 29, in id order */
 export const SYSTEM_KEYS=['dual','trim','limiter','glow','velocity','start','midiMode','transport','countin','recClick','scale','root','clockOut','saver','saverStyle'];

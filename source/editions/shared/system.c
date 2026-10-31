@@ -71,7 +71,7 @@ static uint32_t scale_has(int note){uint32_t s=scale_index();return !s||(scale_m
 static int scale_snap_up(int note){int d;if(scale_has(note))return note;for(d=1;d<7;d++){if(note+d<=127&&scale_has(note+d))return note+d;if(note-d>=0&&scale_has(note-d))return note-d;}return note;}
 static int scale_snap(int note){int d;if(scale_has(note))return note;for(d=1;d<7;d++){if(note-d>=0&&scale_has(note-d))return note-d;if(note+d<=127&&scale_has(note+d))return note+d;}return note;}
 static void system_init(void){
- z_system_settings defaults={Z_SYSTEM_MAGIC,2,0,100,1,1,0,0,"Мой FM-1","",0,1,{0,0}},saved;int n;
+ z_system_settings defaults={Z_SYSTEM_MAGIC,2,0,100,1,1,0,0,"My FM-1","",0,1,{0,0}},saved;int n;
  core_status=Z_CORE_OFF;system_stop();core_pending=system_dirty=0;core_jobs=core_timeouts=output_peak=0;z_sys=defaults;
  saved=defaults;n=plat_store_load(OBJ_SYSTEM,&saved,sizeof saved);
  if(n==108&&saved.version==1)saved.version=2;

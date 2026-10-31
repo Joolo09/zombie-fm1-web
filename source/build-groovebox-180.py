@@ -4,7 +4,7 @@ from pathlib import Path
 p=Path(__file__).resolve().parent
 spec=importlib.util.spec_from_file_location('edbuild',p/'build-editions.py')
 b=importlib.util.module_from_spec(spec);spec.loader.exec_module(b)
-b.OUT=p/'output/editions-0.18.1';b.VERSION='0.18.1'
+b.OUT=p/'output/editions-0.18.2';b.VERSION='0.18.2'
 old_script=b.script
 def keyboard_script(kind):
  path=old_script(kind)
