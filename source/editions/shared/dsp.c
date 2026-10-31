@@ -202,7 +202,7 @@ void z_sample(uint32_t s,const int16_t *data,uint32_t n,uint32_t rate) { if(s<14
 #include "edition_dsp.inc"
 void z_init(void) {
  uint32_t t,i;undo_count=redo_count=solo_track=0;for(i=0;i<sizeof z_song;i++)((uint8_t *)&z_song)[i]=0;revision=1; rng_state=0x51f15e37;stamp=0;playing=0;pos=0xffffffffu;step_time=0;external_clock=0;clock_ticks=0;
- z_song.magic=0x31434f5a;z_song.version=3;z_song.fx_amount=90;audio_frame=last_step_frame=0;live_phase=0;z_song.bpm=120;z_song.swing=0;z_song.selected=0;z_song.language=0;z_song.reserved=0;
+ z_song.magic=0x31434f5a;z_song.version=3;z_song.fx_amount=90;audio_frame=last_step_frame=0;live_phase=0;z_song.bpm=120;z_song.swing=0;z_song.selected=0;z_song.language=1;z_song.reserved=0; /* 0.18.2: English unless the project says otherwise */
  for(t=0;t<Z_TRACKS;t++){
   for(i=0;i<Z_PARAMS;i++)z_song.track[t].p[i]=z_desc[i].def;
   z_song.track[t].p[Z_CHANNEL]=(int16_t)(t+1);
@@ -478,7 +478,7 @@ int z_erase(uint32_t t,uint32_t at,uint32_t scope){
 
 uint32_t z_track_hits(uint32_t t){uint32_t n=0;if(t>=6)return 0;if(z_drum_track(t)){for(uint32_t d=0;d<16;d++)for(uint32_t at=0;at<64;at++)n+=z_dm.step[d][at].velocity!=0;}else for(uint32_t at=0;at<64;at++)n+=z_song.track[t].steps[at].velocity!=0;return n;}
 
-void z_new_project(void){uint32_t previous=revision;z_transport(0);z_init();revision=previous;z_touch();}
+void z_new_project(void){uint32_t previous=revision,language=z_song.language;z_transport(0);z_init();z_song.language=(uint8_t)language;revision=previous;z_touch();} /* a new project keeps the player's language */
 
 /* Display-only query of sounding attacks/gates; release tails do not latch LEDs. */
 uint32_t z_note_lights(uint32_t t,int32_t base){

@@ -67,7 +67,8 @@ static uint32_t page_knob(uint32_t section,uint32_t pg,uint32_t k){
 }
 /* the selected track's loop length in steps (on the drum track: the selected sound's) */
 static uint32_t seq_steps(void){uint32_t t=z_song.selected;return z_drum_track(t)?z_dm.sound[z_dm.selected].length:(uint32_t)z_get(t,Z_LENGTH);}
-static const char *label(uint32_t id){if(id<Z_PARAMS)return z_song.language?z_desc[id].name:param_ru[id];return z_song.language?special_en[id-Z_PARAMS]:special_ru[id-Z_PARAMS];}
+static const char *const param_en[Z_PARAMS]={"ENGINE","WAVE","MIX","DETUNE","CUTOFF","RESONANCE","ATTACK","DECAY","SUSTAIN","RELEASE","FM DEPTH","FM RATIO","DRIVE","DELAY","REVERB","LEVEL","PAN","LFO RATE","LFO DEPTH","SAMPLE","ROOT NOTE","MUTE","MIDI CHANNEL","STEPS","NOTE LENGTH","TRANSPOSE","CHANCE"};
+static const char *label(uint32_t id){if(id<Z_PARAMS)return z_song.language?param_en[id]:param_ru[id];return z_song.language?special_en[id-Z_PARAMS]:special_ru[id-Z_PARAMS];}
 static void note_text(uint32_t note,char *b){static const char *const names[12]={"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};const char *p=names[note%12];while(*p)*b++=*p++;number((int)note/12-1,b);}
 static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;int value=0;z_step *step=&z_song.track[t].steps[z_song.step_edit];
  if(id<Z_PARAMS){value=z_get(t,id);if(z_sys.midi_mode==2&&(id==Z_LEVEL||id==Z_PAN))value=id==Z_LEVEL?daw_values[t][4]:(int)daw_values[t][5]-64;
