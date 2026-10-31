@@ -30,7 +30,7 @@ uint32_t z_dm_history_state(void);
 void z_dm_history_reset(void);
 
 void z_dm_panic(void);
-int z_dm_pattern(uint32_t);
+int z_dm_pattern(uint32_t,uint32_t);
 
 void z_dm_checkpoint(void);
 

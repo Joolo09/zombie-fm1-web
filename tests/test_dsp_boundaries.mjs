@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-const mod=new WebAssembly.Module(readFileSync('webapp/groovebox-160/zombie-core.wasm'));
+const mod=new WebAssembly.Module(readFileSync('webapp/groovebox-180/zombie-core.wasm'));
 const fresh=()=>{const w=new WebAssembly.Instance(mod,{}).exports;w.z_init();return w;};
 let blocks=0;function render(w,n){w.z_render(w.z_buffer(),n);for(const x of new Float32Array(w.memory.buffer,w.z_buffer(),n*2))assert(Number.isFinite(x)&&Math.abs(x)<=.981);w.z_post(127,1,w.z_buffer(),n);for(const x of new Float32Array(w.memory.buffer,w.z_buffer(),n*2))assert(Number.isFinite(x)&&Math.abs(x)<=1);blocks++;}
 for(let model=0;model<8;model++)for(const cutoff of [0,127])for(const resonance of [0,127])for(const bend of [0,16383]){const w=fresh();w.z_set(0,0,model);for(const [id,value] of [[4,cutoff],[5,resonance],[10,127],[11,16],[12,127],[13,127],[14,127],[15,127],[17,127],[18,127],[25,24]])w.z_set(0,id,value);w.z_bend(0,bend);for(const note of [0,1,36,48,60,84,126,127])w.z_key(0,note,127,1);for(const n of [1,17,128,256,256,256])render(w,n);w.z_transport(0);assert.equal(w.z_voice_count(),0);}
@@ -11,7 +11,7 @@ for(let effect=1;effect<=16;effect++){const w=fresh();w.z_set(0,6,0);w.z_set(0,8
 console.log('PASS all 16 live effects and releases keep stereo output finite and bounded');
 const w=fresh();w.z_set(0,6,0);w.z_set(0,8,127);w.z_set(0,9,0);for(let note=0;note<128;note++)w.z_key(0,note,127,1);assert.equal(w.z_voice_count(),8);for(let note=0;note<128;note++)w.z_key(0,note,0,0);for(let i=0;i<20;i++)render(w,256);assert.equal(w.z_voice_count(),0);
 console.log('PASS all 128 held MIDI pitches release after voice stealing; '+blocks+' actual DSP blocks checked');
-import {CoreDSP} from '../webapp/groovebox-160/worklet.js';
+import {CoreDSP} from '../webapp/groovebox-180/worklet.js';
 const dsps=[new CoreDSP(mod),new CoreDSP(mod)];
 for(const dsp of dsps){const w=dsp.w;w.z_tempo(120,0);w.z_dm_step(0,0,100,127,4);const kit=new Uint8Array(w.memory.buffer,w.z_dm_data(),3208).slice();dsp.drums(kit);w.z_transport(1);w.z_render(w.z_buffer(),256);w.z_render(w.z_buffer(),185);}
 const [preview,reference]=dsps,kit=new Uint8Array(preview.w.memory.buffer,preview.w.z_dm_data(),3208).slice();kit[136]=0;preview.drums(kit);reference.w.z_dm_step(0,0,0,127,4);

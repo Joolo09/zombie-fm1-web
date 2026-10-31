@@ -57,6 +57,8 @@ static void wr32(uint8_t *p,uint32_t x){uint32_t i;for(i=0;i<4;i++)p[i]=(uint8_t
 static void note_packet(uint32_t t,uint32_t note,uint32_t vel,uint32_t on){if(on&&(z_get(t,Z_MUTE)||(z_solo_state()&&z_solo_state()!=t+1)))return;uint32_t status=(on?0x90:0x80)|(z_get(t,Z_CHANNEL)-1);plat_midi_out((on?9:8)|status<<8|note<<16|vel<<24);}
 static void seq_out(uint32_t t,uint32_t n,uint32_t v,uint32_t ms){uint32_t i;if(z_sys.midi_mode)return;if(n==128){for(i=0;i<128;i++)if(off_deadline[t][i]&&(!v||off_arp[t][i])){note_packet(t,i,0,0);off_deadline[t][i]=0;}if(!v){uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(120u<<16));}return;}off_arp[t][n]=ms>>31;ms&=0x7fffffffu;if(off_deadline[t][n])note_packet(t,n,0,0);note_packet(t,n,v,1);off_deadline[t][n]=plat_ms()+ms+1;}
 static void all_off(void){uint32_t t,n;for(t=0;t<27;t++)if(key_action[t]==1){if(held_raw[t])raw_note(held_channels[t],held_notes[t],0,0);key_action[t]=held_local[t]=0;}for(t=0;t<6;t++)for(n=0;n<128;n++)if(off_deadline[t][n]){note_packet(t,n,0,0);off_deadline[t][n]=0;}for(t=0;t<6;t++){z_alloff(t);uint32_t ch=z_get(t,Z_CHANNEL)-1;plat_midi_out(11|((0xb0|ch)<<8)|(64u<<16));plat_midi_out(11|((0xb0|ch)<<8)|(123u<<16));for(n=0;n<16;n++)editor_notes[t][n]=0;}}
+/* MIDI clock out, SETTINGS > CLOCK OUT (padding[0] bit 3, default off): standalone mode only. */
+static void clock_out_cb(uint32_t status){if(z_sys.midi_mode==0&&(z_sys.padding[0]&8u))plat_midi_out(0x0fu|status<<8);}
 static void midi_mode_changed(uint32_t mode){app_panic();midi_local=mode==0;daw_bpm=z_song.bpm;daw_playing=daw_recording=0;daw_seen=0;daw_host=0;daw_name[0]=0;}
 /* External MIDI Note On is an attack, including repeated percussion hits without Note Off.
  * Keep physical/editor key deduplication in z_key unchanged. */
@@ -100,7 +102,7 @@ void app_init(void){project_pair_boot();z_project saved;audio_test_left=0;audio_
  z_song.padding[0]=Z_SAMPLER_EDITION?2:1;
  {z_sampler_state kit;int bytes=plat_store_load(OBJ_SAMPLER,&kit,sizeof kit);if(bytes==sizeof kit&&z_sampler_valid(&kit))z_sampler=kit;}
  if(!Z_SAMPLER_EDITION){z_dm_state kit;int bytes=project_store_load(OBJ_DRUM,&kit,sizeof kit);if(project_loaded&&drum_root_matches&&bytes==sizeof kit&&z_dm_valid(&kit))z_dm=kit;else if(project_loaded&&drum_root_matches&&z_song.padding[1]!=0xD1)z_dm_migrate();else z_dm_init();z_dm_authoritative();}
- z_apply_state();z_song.recording=0;for(t=0;t<6;t++)z_song.arp_hold[t]=0;z_external(z_song.reserved);load_samples();z_set_midi_out(seq_out);
+ z_apply_state();z_song.recording=0;for(t=0;t<6;t++)z_song.arp_hold[t]=0;z_external(z_song.reserved);load_samples();z_set_midi_out(seq_out);z_set_clock_out(clock_out_cb);
  panel_keys_before=held_buttons=0;editor_effect=0;message[0]=0;message_until=0;redraw_at=0;save_requested=save_after_stop=0;upload_slot=255;
  for(i=0;i<27;i++)key_action[i]=0;for(i=0;i<NB;i++)pulse_until[i]=0;
  for(t=0;t<6;t++){for(i=0;i<128;i++)off_deadline[t][i]=0;for(i=0;i<16;i++)editor_notes[t][i]=0;}
