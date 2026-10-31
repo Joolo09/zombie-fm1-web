@@ -1,18 +1,20 @@
 /* SPDX-License-Identifier: MIT — independent device settings, separate from project JSON. */
-export const systemDefaults=()=>({dual:0,trim:100,limiter:1,glow:1,velocity:0,start:0,midiMode:0,transport:1,countin:1,recClick:1,scale:0,root:0,clockOut:0,saver:1,saverStyle:0,name:'My FM-1',bio:'',status:0,peak:0,jobs:0,timeouts:0});
+export const systemDefaults=()=>({dual:0,trim:100,limiter:1,glow:1,velocity:0,start:0,midiMode:0,transport:1,countin:1,recClick:1,scale:0,root:0,clockOut:0,saver:1,saverStyle:0,midiOmni:0,midiThru:0,pcIn:1,ccIn:1,coreBoot:0,name:'My FM-1',bio:'',status:0,peak:0,jobs:0,timeouts:0});
 export function profileBytes(value,field){const bytes=new TextEncoder().encode(value);if(bytes.length>=(field?64:32)||!/^[\x20-\x7e\u0400-\u045f]*$/u.test(value))throw Error('Русский / латиница: имя ≤31 байт, подпись ≤63 байт. / ASCII or Cyrillic only.');return bytes;}
 /* the settings the device keeps in ids 0-12 of command 29, in id order */
-export const SYSTEM_KEYS=['dual','trim','limiter','glow','velocity','start','midiMode','transport','countin','recClick','scale','root','clockOut','saver','saverStyle'];
-export const SYSTEM_MAX=[1,127,1,2,2,2,2,1,2,1,9,11,1,1,3];
+export const SYSTEM_KEYS=['dual','trim','limiter','glow','velocity','start','midiMode','transport','countin','recClick','scale','root','clockOut','saver','saverStyle','midiOmni','midiThru','pcIn','ccIn','coreBoot'];
+export const SYSTEM_MAX=[1,127,1,2,2,2,2,1,2,1,9,11,1,1,3,1,1,1,1,1];
 export function decodeSystem(bytes){
  const v=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength),version=bytes.length>=6?v.getUint16(4,true):0;
- if(!((bytes.length===118&&version===1)||(bytes.length===122&&version===2)))throw Error('System reply size/version');
+ if(!((bytes.length===118&&version===1)||((bytes.length===122||bytes.length===130)&&version===2)))throw Error('System reply size/version');
  if(v.getUint32(0,true)!==0x3153595a)throw Error('System identity');const s=systemDefaults();
  ['dual','trim','limiter','glow','velocity','start'].forEach((key,i)=>{const n=bytes[6+i];if(n>[1,127,1,2,2,2][i])throw Error('System range');s[key]=n;});
  for(const [key,start,size] of [['name',12,32],['bio',44,64]]){const a=bytes.slice(start,start+size),end=a.indexOf(0);if(end<0)throw Error('Unterminated profile');s[key]=new TextDecoder('utf-8',{fatal:true}).decode(a.slice(0,end));profileBytes(s[key],key==='bio');}
  const off=version===2?112:108;if(version===2){s.midiMode=bytes[108];s.transport=bytes[109];if(s.midiMode>2||s.transport>1)throw Error('MIDI range');
   /* 0.16+: recording options (count-in bars, click while recording, MIDI clock out) and 0.17+: the scale lock; older files hold zeros = the defaults */
   const rec=bytes[110]&127,lock=bytes[111];s.countin=(rec&3)===0?1:(rec&3)===1?0:2;s.recClick=rec&4?0:1;s.clockOut=rec&8?1:0;s.saver=rec&16?0:1;s.saverStyle=rec>>5&3;s.scale=(lock&15)<10?lock&15:0;s.root=(lock>>4)<12?lock>>4:0;}else{s.midiMode=0;s.transport=0;}
+ /* 0.19+: the SYSTEM tab's settings after the status (omni, TRS thru, program change off, CC off, CPU1 at boot) */
+ if(bytes.length===130){const x=bytes.slice(122,127);if(x.some(n=>n>1))throw Error('System range');s.midiOmni=x[0];s.midiThru=x[1];s.pcIn=x[2]?0:1;s.ccIn=x[3]?0:1;s.coreBoot=x[4];}
  s.status=bytes[off];if(s.status>5||bytes[off+1]>100)throw Error('System status');s.peak=bytes[off+1];s.jobs=v.getUint32(off+2,true);s.timeouts=v.getUint32(off+6,true);return s;
 }
 export function initSystem({link,audio,perform,language}){

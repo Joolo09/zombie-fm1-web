@@ -30,5 +30,5 @@ e=create();e.turn(1,5);e.w.web_key(WHITE[0],100,0);e.run(40);e.w.web_key(WHITE[0
 e=create();e.w.web_midi_in(0,9|(0x90<<8)|(60<<16)|(100<<24));e.run(40);assert(leds(e)&(1<<7));e.w.web_midi_in(0,8|(0x80<<8)|(60<<16));e.run(40);assert.equal(leds(e),0);
 console.log('PASS drum tails illuminate their white pad briefly; external MIDI note-on/off updates the same LEDs');
 
-e=create();e.tap('GLO');e.tap('GLO');e.tap('GLO');e.tap('GLO');e.turn(6,-1);e.w.web_key(0,100,0);e.run(60);assert.equal(leds(e),0);
+e=create();for(let i=0;i<4;i++){e.tap('GLO');e.run(400);}e.turn(6,-1);e.w.web_key(0,100,0);e.run(60);assert.equal(leds(e),0);
 console.log('PASS glow OFF suppresses key LEDs instead of leaving bright physical-key lights');

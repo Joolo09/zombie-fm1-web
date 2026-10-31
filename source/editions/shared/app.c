@@ -65,15 +65,16 @@ static void midi_mode_changed(uint32_t mode){app_panic();midi_local=mode==0;daw_
 static void midi_key(uint32_t t,uint32_t n,uint32_t v,uint32_t on){if(on&&v)z_key(t,n,0,0);z_key(t,n,v,on);}
 static void midi_receive(void){uint32_t pkt;int port;while(plat_midi_in(&pkt,&port)){
  uint32_t status=(pkt>>8)&255,n=(pkt>>16)&127,v=(pkt>>24)&127,t;
+ if(z_ext.thru&&port==PORT_TRS)plat_midi_out(pkt); /* SYSTEM > TRS THRU: a DIN keyboard on the jack reaches the computer */
  if(status>=0xf8){if(z_sys.midi_mode!=2)z_clock(status);continue;}
  if(status==0xf2){if(z_sys.midi_mode!=2)z_songpos(n|(v<<7));continue;}
- for(t=0;t<6;t++)if((status&15)+1==(uint32_t)z_get(t,Z_CHANNEL)){
+ for(t=0;t<6;t++)if(z_ext.omni&&z_sys.midi_mode!=2?t==z_song.selected:(status&15)+1==(uint32_t)z_get(t,Z_CHANNEL)){ /* omni: every channel plays the selected track */
   if(z_sys.midi_mode==2){if((status&0xf0)==0xb0){uint32_t k;for(k=0;k<4;k++)if(n==daw_cc[k])daw_values[t][k]=v;if(n==7)daw_values[t][4]=v;else if(n==10)daw_values[t][5]=v;else if(n==120||n==123)z_alloff(t);}continue;}
   if((status&0xf0)==0x90){edition_note(t,n,v,v!=0);midi_key(t,n,v,v!=0);}
   else if((status&0xf0)==0x80)z_key(t,n,0,0);
-  else if((status&0xf0)==0xb0){if(n==123||n==120)z_alloff(t);else if(n==121){z_bend(t,8192);z_sustain(t,0);}else if(n==122&&z_sys.midi_mode==0)midi_local=v>=64;else if(n==73)z_set(t,Z_ATTACK,v);else if(n==72)z_set(t,Z_RELEASE,v);else if(n==64)z_sustain(t,v>=64);else if(n==74)z_set(t,Z_CUTOFF,v);else if(n==71)z_set(t,Z_RESONANCE,v);else if(n==1)z_set(t,Z_FM,v);else if(n==7)z_set(t,Z_LEVEL,v);else if(n==10)z_set(t,Z_PAN,(int)v-64);}
+  else if((status&0xf0)==0xb0){if(n==123||n==120)z_alloff(t);else if(z_ext.no_cc){}else if(n==121){z_bend(t,8192);z_sustain(t,0);}else if(n==122&&z_sys.midi_mode==0)midi_local=v>=64;else if(n==73)z_set(t,Z_ATTACK,v);else if(n==72)z_set(t,Z_RELEASE,v);else if(n==64)z_sustain(t,v>=64);else if(n==74)z_set(t,Z_CUTOFF,v);else if(n==71)z_set(t,Z_RESONANCE,v);else if(n==1)z_set(t,Z_FM,v);else if(n==7)z_set(t,Z_LEVEL,v);else if(n==10)z_set(t,Z_PAN,(int)v-64);}
   else if((status&0xf0)==0xe0)z_bend(t,n|(v<<7));
-  else if((status&0xf0)==0xc0)z_preset(t,n%Z_PRESETS);
+  else if((status&0xf0)==0xc0){if(!z_ext.no_pc)z_preset(t,n%Z_PRESETS);}
  }
 }}
 void app_render(int32_t *lr,uint32_t n,uint32_t master){uint32_t i;float *buf=z_buffer();if(flash_busy){for(i=0;i<n*2;i++)lr[i]=0;return;}midi_receive();z_render(buf,n);if(z_sys.midi_mode==2)for(i=0;i<n*2;i++)buf[i]=0;
@@ -180,7 +181,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  else if(cmd==25&&n==1&&a[0]<=1){out[0]=(uint8_t)z_history(a[0]);count=1;}
  else if(cmd==26&&n==3){if(z_pattern(a[0],a[1],a[2]))status=1;}
  else if(cmd==27&&n==1&&a[0]<=6)z_solo(a[0]);
- else if(cmd==28&&n==0){const uint8_t *p=(const uint8_t *)&z_sys;for(j=0;j<sizeof z_sys;j++)out[j]=p[j];out[112]=core_status;out[113]=output_peak;wr32(out+114,core_jobs);wr32(out+118,core_timeouts);count=122;}
+ else if(cmd==28&&n==0){const uint8_t *p=(const uint8_t *)&z_sys;for(j=0;j<sizeof z_sys;j++)out[j]=p[j];out[112]=core_status;out[113]=output_peak;wr32(out+114,core_jobs);wr32(out+118,core_timeouts);{const uint8_t *e=(const uint8_t *)&z_ext;for(j=0;j<8;j++)out[122+j]=e[j];}count=130;}
  else if(cmd==33&&n==1&&a[0]<=2){daw_host=a[0];}
  else if(cmd==34&&n==0){plat_unlock(f);reply(seq,cmd,0,(const uint8_t *)&z_sampler,sizeof z_sampler);return 1;}
  else if(cmd==35&&n==4){int value=a[2]|a[3]<<8;if(a[1]!=0&&a[1]!=1)value=(int16_t)value;if(z_sampler_set(a[0],a[1],value))status=1;}

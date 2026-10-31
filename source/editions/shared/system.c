@@ -51,6 +51,10 @@ static int system_valid(const z_system_settings *s){uint32_t i;
  for(i=0;i<32&&s->name[i];i++){}if(i==32||!system_text((const uint8_t *)s->name,i))return 0;
  for(i=0;i<64&&s->bio[i];i++){}return i<64&&system_text((const uint8_t *)s->bio,i);
 }
+/* 0.19: the System tab's own settings, saved after the 112-byte settings (older files load the defaults).
+ * Zero is the default for each: MIDI by channel, no TRS thru, program change and CC received, CPU1 off at boot. */
+typedef struct {uint8_t omni,thru,no_pc,no_cc,core_boot,reserved[3];} z_sys_ext_t;
+static z_sys_ext_t z_ext;
 /* padding[0] holds the recording options; 0 (every older settings file) means the defaults: count-in 1 bar, click on.
  * bits 0-1: 0 = 1 bar, 1 = off, 2 = 2 bars; bit 2: click while recording off. Older firmware ignores the byte. */
 static uint32_t rec_countin_bars(void){uint32_t c=z_sys.padding[0]&3u;return c==0?1:c==1?0:2;}
@@ -73,17 +77,23 @@ static int scale_snap(int note){int d;if(scale_has(note))return note;for(d=1;d<7
 static void system_init(void){
  z_system_settings defaults={Z_SYSTEM_MAGIC,2,0,100,1,1,0,0,"My FM-1","",0,1,{0,0}},saved;int n;
  core_status=Z_CORE_OFF;system_stop();core_pending=system_dirty=0;core_jobs=core_timeouts=output_peak=0;z_sys=defaults;
- saved=defaults;n=plat_store_load(OBJ_SYSTEM,&saved,sizeof saved);
+ {struct {z_system_settings s;z_sys_ext_t e;} buf;uint32_t i;buf.s=defaults;for(i=0;i<sizeof buf.e;i++)((uint8_t *)&buf.e)[i]=0;n=plat_store_load(OBJ_SYSTEM,&buf,sizeof buf);saved=buf.s;
+  for(i=0;i<sizeof z_ext;i++)((uint8_t *)&z_ext)[i]=0;
+  if(n==(int)sizeof buf&&buf.e.omni<=1&&buf.e.thru<=1&&buf.e.no_pc<=1&&buf.e.no_cc<=1&&buf.e.core_boot<=1){z_ext=buf.e;z_ext.reserved[0]=z_ext.reserved[1]=z_ext.reserved[2]=0;}
+  if(n==(int)sizeof buf)n=sizeof saved;}
  if(n==108&&saved.version==1)saved.version=2;
  if((n==108||n==sizeof saved)&&system_valid(&saved))z_sys=saved;
  z_sys.midi_mode=0; /* Always boot as a local synth, including upgrades with saved DAW settings. */
- z_sys.dual=0; /* Experimental hardware mode always requires an explicit session opt-in. */
+ z_sys.dual=0; /* Experimental hardware mode always requires an explicit session opt-in... */
+ if(z_ext.core_boot){z_sys.dual=1;core_pending=1;} /* ...or SYSTEM > CORE 2 AT BOOT; a failed start or self-test turns that off again */
  z_sys.padding[0]&=127u;z_rec_click(rec_click_on());if((z_sys.padding[1]&15u)>=Z_SCALES||(z_sys.padding[1]>>4)>=12)z_sys.padding[1]=0;
 }
-static int system_save(void){z_system_settings saved=z_sys;saved.dual=0;int rc=plat_store_save(OBJ_SYSTEM,&saved,sizeof saved);if(!rc)system_dirty=0;return rc;}
+static int system_save(void){struct {z_system_settings s;z_sys_ext_t e;} buf;buf.s=z_sys;buf.s.dual=0;buf.e=z_ext;int rc=plat_store_save(OBJ_SYSTEM,&buf,sizeof buf);if(!rc)system_dirty=0;return rc;}
 static int system_set(uint32_t id,uint32_t value){
- static const uint8_t maximum[]={1,127,1,2,2,2,2,1,2,1,9,11,1,1,3};uint8_t *p;
- if(id>=15||value>maximum[id])return 0;
+ static const uint8_t maximum[]={1,127,1,2,2,2,2,1,2,1,9,11,1,1,3,1,1,1,1,1};uint8_t *p;
+ if(id>=20||value>maximum[id])return 0;
+ /* 15 MIDI in omni, 16 TRS thru to USB, 17 program change in, 18 CC in, 19 CPU1 at boot */
+ if(id>=15){uint8_t *q=id==15?&z_ext.omni:id==16?&z_ext.thru:id==17?&z_ext.no_pc:id==18?&z_ext.no_cc:&z_ext.core_boot,v=(uint8_t)(id==17||id==18?!value:value);if(*q!=v){*q=v;system_dirty=1;}return 1;}
  if(id==14){uint8_t before=z_sys.padding[0];z_sys.padding[0]=(uint8_t)((before&~0x60u)|(value<<5));if(before!=z_sys.padding[0])system_dirty=1;return 1;}
  if(id==13){uint8_t before=z_sys.padding[0];z_sys.padding[0]=(uint8_t)(value?before&~16u:before|16u);if(before!=z_sys.padding[0])system_dirty=1;return 1;}
  if(id==12){uint8_t before=z_sys.padding[0];z_sys.padding[0]=(uint8_t)(value?before|8u:before&~8u);if(before!=z_sys.padding[0])system_dirty=1;return 1;}
@@ -94,6 +104,7 @@ static int system_set(uint32_t id,uint32_t value){
 static uint32_t system_velocity(uint32_t v){if(v>127)v=127;
  if(z_sys.velocity==1)v=127-(127-v)*(127-v)/127;else if(z_sys.velocity==2)v=100;return v?v:1;}
 static void system_service(void){
+ if(z_ext.core_boot&&(core_status==Z_CORE_START_FAILED||core_status==Z_CORE_TEST_FAILED||core_status==Z_CORE_TIMEOUT)){z_ext.core_boot=0;system_dirty=1;}
  if(core_pending){uint32_t i,peak;int32_t expected[16],actual[16];
   static const float probe[16]={0,0.2f,-0.2f,0.9f,-0.9f,1.5f,-1.5f,0.01f,0,0.5f,-0.5f,0.85f,-0.85f,0.999f,-0.999f,0};
   core_pending=0;core_status=Z_CORE_OFF;system_stop();if(!z_sys.dual)return;
