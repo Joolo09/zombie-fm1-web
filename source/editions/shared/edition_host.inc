@@ -47,6 +47,8 @@ static void ed_invariants(void){uint32_t t,i,j;inv_fail=0;
  if(!Z_SAMPLER_EDITION){inv(z_dm.selected<16,"drum selected",z_dm.selected,0);
   for(i=0;i<16;i++){z_dm_sound_t *p=&z_dm.sound[i];inv(p->level<=127&&p->decay>=1&&p->decay<=127&&p->tune>=-24&&p->tune<=24&&p->pan>=-64&&p->pan<=63&&p->mute<=1&&p->length>=1&&p->length<=64,"drum sound",i,p->length);
    for(j=0;j<64;j++){z_dm_step_t *s=&z_dm.step[i][j];inv(s->velocity<=127&&s->chance<=127&&s->ratchet>=1&&s->ratchet<=4,"drum step",i,j);}}}
+ inv((z_sys.padding[1]&15u)<Z_SCALES&&(z_sys.padding[1]>>4)<12,"scale nibbles",z_sys.padding[1]&15,z_sys.padding[1]>>4);inv(!(z_sys.padding[0]&~15u),"recording option bits",z_sys.padding[0],0);
+ inv(eu_hits<=64&&eu_rot<64,"euclid knobs",eu_hits,eu_rot);inv(grid_hold.key<27,"held grid key",grid_hold.key,0);inv(z_countin_state()<=8,"count-in beats",z_countin_state(),0);
  inv(z_voice_count()<=24,"voices",z_voice_count(),0);{uint32_t z_dsp_finite(void);inv(z_dsp_finite(),"DSP state finite (no NaN/inf)",0,0);}inv(z_sys.midi_mode<=2,"midi mode",z_sys.midi_mode,0);
  if(inv_fail)exit(3);
 }

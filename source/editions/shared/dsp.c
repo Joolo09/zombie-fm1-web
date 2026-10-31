@@ -57,31 +57,47 @@ static uint8_t rec_live[6][128];
 static uint32_t random32(void);
 /* Undo stores musical patterns only. Transport, language and live settings stay put. */
 typedef struct {z_step steps[6][64];uint8_t chord[6][64][3],duration[6][64];int16_t length[6];} z_pattern_snapshot;
-static Z_POOL z_pattern_snapshot undo_bank[4],redo_bank[4];
-static uint32_t undo_count,redo_count,solo_track;
+/* Undo is a ring of the last Z_HIST pattern states (0.17: 8, was 4). The ring moves a start index instead of copying
+ * the whole history, so a checkpoint, made with interrupts off, copies one snapshot only. */
+#define Z_HIST 8
+static Z_POOL z_pattern_snapshot undo_bank[Z_HIST],redo_bank[Z_HIST];
+static uint32_t undo_count,redo_count,undo_head,redo_head,solo_track;
 static void pattern_capture(z_pattern_snapshot *p){uint32_t t,i,j;for(t=0;t<6;t++){
  p->length[t]=z_song.track[t].p[Z_LENGTH];for(i=0;i<64;i++){p->steps[t][i]=z_song.track[t].steps[i];p->duration[t][i]=z_song.duration[t][i];for(j=0;j<3;j++)p->chord[t][i][j]=z_song.chord[t][i][j];}
 }}
 static void pattern_restore(const z_pattern_snapshot *p){uint32_t t,i,j;for(t=0;t<6;t++){
  z_song.track[t].p[Z_LENGTH]=p->length[t];for(i=0;i<64;i++){z_song.track[t].steps[i]=p->steps[t][i];z_song.duration[t][i]=p->duration[t][i];for(j=0;j<3;j++)z_song.chord[t][i][j]=p->chord[t][i][j];}
 }z_touch();}
-static void history_push(z_pattern_snapshot *bank,uint32_t *count){uint32_t i;if(*count==4){for(i=0;i<3;i++)bank[i]=bank[i+1];*count=3;}pattern_capture(&bank[(*count)++]);}
-void z_checkpoint(void){history_push(undo_bank,&undo_count);redo_count=0;}
+static void history_push(z_pattern_snapshot *bank,uint32_t *count,uint32_t *head){if(*count==Z_HIST){*head=(*head+1)%Z_HIST;(*count)--;}pattern_capture(&bank[(*head+(*count)++)%Z_HIST]);}
+static const z_pattern_snapshot *history_pop(const z_pattern_snapshot *bank,uint32_t *count,uint32_t head){return &bank[(head+--(*count))%Z_HIST];}
+void z_checkpoint(void){history_push(undo_bank,&undo_count,&undo_head);redo_count=0;}
 uint32_t z_history_state(void){if(z_drum_track(z_song.selected))return z_dm_history_state();return undo_count|(redo_count<<8);}
 void z_history_reset(void){z_dm_history_reset();undo_count=redo_count=0;}
 uint32_t z_history(uint32_t redo){if(z_drum_track(z_song.selected))return z_dm_history(redo);
  if(redo>1)return 0;
- if(redo){if(!redo_count)return 0;z_record(0);z_alloff(z_song.selected);history_push(undo_bank,&undo_count);pattern_restore(&redo_bank[--redo_count]);}
- else {if(!undo_count)return 0;z_record(0);z_alloff(z_song.selected);history_push(redo_bank,&redo_count);pattern_restore(&undo_bank[--undo_count]);}
+ if(redo){if(!redo_count)return 0;z_record(0);z_alloff(z_song.selected);history_push(undo_bank,&undo_count,&undo_head);pattern_restore(history_pop(redo_bank,&redo_count,redo_head));}
+ else {if(!undo_count)return 0;z_record(0);z_alloff(z_song.selected);history_push(redo_bank,&redo_count,&redo_head);pattern_restore(history_pop(undo_bank,&undo_count,undo_head));}
  return 1;
 }
 uint32_t z_solo_state(void){return solo_track;}
 void z_solo(uint32_t t){uint32_t i;if(t>6)return;solo_track=t;if(t&&midi_out)for(i=0;i<6;i++)if(i+1!=t)midi_out(i,128,0,0);}
 int z_pattern(uint32_t t,uint32_t action,uint32_t target){
  uint32_t i,j,len;z_step step;uint8_t chord[3],duration;
- if(t>=6||action>6)return -1;if(action==0)return z_erase(t,0,1);if(z_drum_track(t))return z_dm_pattern(action);if(action==4&&z_drum_track(target))return -1;len=z_song.track[t].p[Z_LENGTH];
- if(action==1&&len>32)return -1;if(action==4&&(target>=6||target==t))return -1;
+ if(t>=6||action>9)return -1;if(action==0)return z_erase(t,0,1);if(z_drum_track(t))return z_dm_pattern(action,target);if(action==4&&z_drum_track(target))return -1;len=z_song.track[t].p[Z_LENGTH];
+ if(action==1&&len>32)return -1;if(action==4&&(target>=6||target==t))return -1;if(action==7&&len<2)return -1;
  z_record(0);z_checkpoint();
+ if(action==7){z_song.track[t].p[Z_LENGTH]=(int16_t)(len/2);z_touch();return 0;}   /* HALF: the loop cut to its first half */
+ if(action==8){/* COOK: two small changes: a step switched on (with the pitch of another active step, so it stays in key) or off, or an accent */
+  for(j=0;j<2;j++){z_step *s;uint32_t r=random32();i=r%len;s=&z_song.track[t].steps[i];r=random32();
+   if(!s->velocity){uint32_t k,n=0,pick=r%7;uint8_t note=s->note;for(k=0;k<len;k++)if(z_song.track[t].steps[k].velocity){if(n++==pick%(len))note=z_song.track[t].steps[k].note;}s->note=note;s->velocity=(uint8_t)(80+(r>>8&31));s->chance=127;s->gate=70;z_song.duration[t][i]=0;}
+   else if(r&1)s->velocity=0;else{int x=s->velocity+((r&2)?22:-22);s->velocity=(uint8_t)(x<20?20:x>127?127:x);}}
+  z_touch();return 0;}
+ if(action==9){/* EUCLID: HITS spread evenly over the steps (target = hits | rotation << 8); new hits take the cursor step's pitch */
+  uint32_t hits=target&255,rot=(target>>8)&255;uint8_t pitch=z_song.track[t].steps[z_song.step_edit%len].velocity?z_song.track[t].steps[z_song.step_edit%len].note:60;
+  if(hits>len)hits=len;for(i=0;i<len;i++){uint32_t k=(i+len-rot%len)%len,hit=hits&&((k*hits)%len)<hits;z_step *s=&z_song.track[t].steps[i];
+   if(hit){if(!s->velocity){s->note=pitch;s->velocity=100;s->chance=127;s->gate=(uint8_t)z_get(t,Z_GATE);z_song.duration[t][i]=0;for(j=0;j<3;j++)z_song.chord[t][i][j]=0;}}
+   else{s->velocity=0;z_song.duration[t][i]=0;for(j=0;j<3;j++)z_song.chord[t][i][j]=0;}}
+  z_touch();return 0;}
  if(action==1||action==4){uint32_t dst=action==4?target:t,offset=action==4?0:len;
   for(i=0;i<(action==4?64:len);i++){z_song.track[dst].steps[offset+i]=z_song.track[t].steps[i];z_song.duration[dst][offset+i]=z_song.duration[t][i];for(j=0;j<3;j++)z_song.chord[dst][offset+i][j]=z_song.chord[t][i][j];}
   z_song.track[dst].p[Z_LENGTH]=(int16_t)(action==4?len:len*2);
@@ -145,6 +161,10 @@ static uint32_t dm_random(void);
 #include "drums.inc"
 #include "drum_machine.inc"
 void z_set_midi_out(void (*cb)(uint32_t,uint32_t,uint32_t,uint32_t)) { midi_out=cb; }
+/* MIDI clock out (24 per quarter note): a pulse on each 16th step and five more evenly inside it, so the clock follows
+ * tempo and swing. Start before the first step, stop when the transport stops. Never while the clock is external. */
+static void (*clock_out)(uint32_t);static uint32_t clk_left;static float clk_gap,clk_wait;
+void z_set_clock_out(void (*cb)(uint32_t)){clock_out=cb;}
 void z_touch(void) { if(++revision==0)revision=1; }
 uint32_t z_revision(void) { return revision; }
 uint32_t z_state_size(void) { return sizeof z_song; }
@@ -296,7 +316,7 @@ int z_arp_set(uint32_t t,uint32_t field,uint32_t value){uint32_t i;if(t>=6||fiel
  z_touch();return 0;
 }
 static void seq_step(void) {
- uint32_t t;pos++;last_step_frame=audio_frame;if((z_song.metronome||(z_song.recording&&rec_click))&&!(pos&3)){click_left=1100;click_phase=0;click_hz=(pos&15)?1200.0f:1800.0f;}
+ uint32_t t;pos++;last_step_frame=audio_frame;if(clock_out&&!external_clock){clock_out(0xF8);clk_gap=44100.0f*15/z_song.bpm*(1+((pos&1)?-1:1)*z_song.swing/200.0f)/6;clk_wait=clk_gap;clk_left=5;}if((z_song.metronome||(z_song.recording&&rec_click))&&!(pos&3)){click_left=1100;click_phase=0;click_hz=(pos&15)?1200.0f:1800.0f;}
  if(!Z_SAMPLER_EDITION)z_dm_clock();
  for(t=0;t<Z_TRACKS;t++) {
   if(z_drum_track(t))continue;
@@ -318,7 +338,7 @@ static void seq_step(void) {
 void z_countin(uint32_t beats){countin_left=0;if(!beats)return;if(external_clock){z_record(1);return;}countin_beat=(uint32_t)(2646000u/z_song.bpm);countin_left=beats*countin_beat;}
 uint32_t z_countin_state(void){return countin_left?(countin_left+countin_beat-1)/countin_beat:0;}
 void z_rec_click(uint32_t on){rec_click=!!on;}
-void z_transport(uint32_t on) {countin_left=0;if(on)clock_last_frame=audio_frame;if(on)for(uint32_t t=0;t<6;t++)for(uint32_t n=0;n<128;n++)rec_skip[t][n]=0;if(!Z_SAMPLER_EDITION)z_dm_transport(on); if(!on){z_record(0);z_reset_audio();solo_track=0;}playing=!!on;pos=0xffffffffu;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
+void z_transport(uint32_t on) {countin_left=0;clk_left=0;if(clock_out&&!external_clock&&(on?!playing:playing))clock_out(on?0xFA:0xFC);if(on)clock_last_frame=audio_frame;if(on)for(uint32_t t=0;t<6;t++)for(uint32_t n=0;n<128;n++)rec_skip[t][n]=0;if(!Z_SAMPLER_EDITION)z_dm_transport(on); if(!on){z_record(0);z_reset_audio();solo_track=0;}playing=!!on;pos=0xffffffffu;step_time=0;clock_ticks=0;last_step_frame=audio_frame; }
 uint32_t z_external(uint32_t on) {if(on&&!external_clock){clock_last_frame=audio_frame;clock_pulses=0;clock_beat_frame=audio_frame;}external_clock=!!on;if(z_song.reserved!=(uint8_t)external_clock){z_song.reserved=(uint8_t)external_clock;z_touch();}return external_clock;}
 void z_clock(uint32_t status) {
  if(!external_clock)return;
@@ -354,6 +374,7 @@ void z_render(float *out,uint32_t n) {
   audio_frame++;
   if(external_clock&&playing&&audio_frame-clock_last_frame>110250)z_transport(0);
   arp_tick();
+  if(clk_left&&--clk_wait<=0){if(clock_out)clock_out(0xF8);clk_left--;clk_wait+=clk_gap;}
   float l=0,r=0,sendd=0,sendr=0;
   if(playing&&!external_clock){if(step_time<=0){seq_step();step_time+=44100.0f*15/z_song.bpm*(1+((pos&1)?-1:1)*z_song.swing/200.0f);}step_time-=1;}
   for(k=0;k<8;k++){
