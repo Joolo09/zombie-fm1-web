@@ -16,7 +16,7 @@ py=[sys.executable,'-X','utf8'];node=os.environ.get('NODE','node')
 if args.build:
  run('groovebox-build',py+['source/build-groovebox-180.py'])
  run('native-emulator-build',py+['source/build-emulator.py'])
-shutil.copy2(ROOT/'source/output/editions-0.18.0/groovebox.wasm',ROOT/'webapp/groovebox-180/zombie-core.wasm')
+shutil.copy2(ROOT/'source/output/editions-0.18.1/groovebox.wasm',ROOT/'webapp/groovebox-180/zombie-core.wasm')
 for name,test,extra in [('drum-operator-labels','test_drum_operator_labels.mjs',[]),('drum-key-workflow','test_drum_key_workflow.mjs',[]),('paired-project-application','test_project_pair_app.mjs',[]),('full-panel','test_full_emulator.mjs',[]),('keyboard-roll','test_keyboard_roll.mjs',[]),('dsp-boundaries','test_dsp_boundaries.mjs',[]),('live-edit-feedback','test_live_edit_feedback.mjs',[]),('editor-link-sessions','test_editor_link_sessions.mjs',[]),('editor-key-queue','test_editor_key_queue.mjs',[]),('protocol-clock','test_protocol_clock_audit.mjs',[]),('protocol-integrity','test_protocol_integrity.mjs',[]),('history-and-length','test_history_length_audit.mjs',[]),('transition-regressions','test_transition_audit.mjs',[]),('followup-regressions','test_followup_audit.mjs',[]),('playback-lights-and-grid','test_lights_grid.mjs',[]),('idm-regressions','test_idm_regressions.mjs',[]),('native-performance','test_native_performance.mjs',[]),('native-worklet','test_native_worklet.mjs',[]),('pattern-recording','test_pattern_recording.mjs',['groovebox-180']),('synth-and-drums','test_zombie_drums.mjs',['groovebox-180']),('audio-lifecycle','test_audio_engine.mjs',['groovebox-180']),('sound-quality','test_sound_quality.mjs',['groovebox-180']),('step-length','test_step_length.mjs',[]),('bugfix-151','test_bugfix_151.mjs',[]),('recording-160','test_recording_160.mjs',[]),('drums-160','test_drums_160.mjs',[]),('scale-170','test_scale_170.mjs',[]),('melody-hold-170','test_melody_hold_170.mjs',[]),('clock-170','test_clock_170.mjs',[]),('tools-170','test_tools_170.mjs',[]),('editor-system-170','test_editor_system_170.mjs',[]),('history-170','test_history_170.mjs',[]),('live-record-170','test_live_record_170.mjs',[]),('scene-180','test_scene_180.mjs',[]),('web-installer','web-installer.mjs',[])]:
  run(name,[node,ROOT/'tests'/test,*extra])
 host=ROOT/'source/editions/groovebox/build/host/zombie-groovebox_host'
@@ -38,8 +38,8 @@ if args.fuzz:
  asan=OUT/'zombie-groovebox_asan';shutil.copy2(host,asan)
  run('fuzz-panel-midi-editor',py+['tests/fuzz_panel.py',asan,'--runs',args.fuzz,'--steps',400,'--out',OUT/'fuzz'])
  subprocess.run(py+['source/build-groovebox-180.py','--host-only'],cwd=ROOT,capture_output=True)
-report=dict(version='0.18.0',hardware_verified=False,scope='C panel, display, audio and platform doubles; simulated NOR and MIDI',checks=results)
-for key,p in [('emulator','emulator/app.wasm'),('firmware','source/output/editions-0.18.0/zombie-groovebox-0.18.0.fwsc')]:
+report=dict(version='0.18.1',hardware_verified=False,scope='C panel, display, audio and platform doubles; simulated NOR and MIDI',checks=results)
+for key,p in [('emulator','emulator/app.wasm'),('firmware','source/output/editions-0.18.1/zombie-groovebox-0.18.1.fwsc')]:
  f=ROOT/p
  if f.exists():report[key+'_sha256']=hashlib.sha256(f.read_bytes()).hexdigest()
 (ROOT/'emulator/audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

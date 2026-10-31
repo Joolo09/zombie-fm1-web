@@ -490,12 +490,30 @@
         "ru": "32 новых пресета ZMB (слоты 97–128). Зомби на экране качает головой в такт, ноты разлетаются искрами, при включении он вылезает из земли. Ночная заставка через минуту без касаний (отключается в Настройках). Звук, проекты и управление 0.17 не изменились. Физический FM-1 не проверялся.",
         "en": "32 new ZMB presets (slots 97-128). The on-screen zombie headbangs to the beat, notes fly off as sparks, it climbs out of the ground at power-on. Night screensaver after a minute untouched (switch off in Settings). Sound, projects and controls of 0.17 unchanged. Physical FM-1 unverified."
       },
-      "channel": "beta",
+      "channel": "archive",
       "bytes": 610100,
       "sha256": "63e25de236eb6c822dab2061dee7e79e1c9f27d4aaa492dcdf47d1c7e1f20eb7",
       "file": "downloads/zombie-groovebox-0.18.0.fwsc",
       "editor": "webapp/groovebox-180/",
       "source": "downloads/groovebox-source-0.18.0.zip"
+    },
+    {
+      "product": "FM-1_63001801",
+      "version": "0.18.1",
+      "label": {
+        "ru": "Groovebox 0.18.1 beta · 4 заставки, «О системе», исправлена заставка",
+        "en": "Groovebox 0.18.1 beta · 4 screensavers, About screen, screensaver fix"
+      },
+      "notes": {
+        "ru": "Исправлено: заставка не появлялась на FM-1 (дребезг ручки сбрасывал таймер). Четыре заставки: ночь, синтвейв, матрица, лого; на заставке держи HOME, чтобы сменить. HOME дважды: живой экран «О системе» (нагрузка, время работы, MIDI, ядро 2, когда будет заставка). Всё из 0.18.0: банк ZMB, живой экран. Физический FM-1 не проверялся.",
+        "en": "Fixed: the screensaver never came up on FM-1 (a resting knob tick reset the timer). Four screensavers: night, synthwave, matrix, bounce; hold HOME on one to switch. HOME twice: a live About screen (load, uptime, MIDI, core 2, when the screensaver comes). Everything from 0.18.0: ZMB bank, living screen. Physical FM-1 unverified."
+      },
+      "channel": "beta",
+      "bytes": 610100,
+      "sha256": "d07a0f77dba2306152185d36ce6897df7df270c29f38d367ed5a2471fe4f1dcf",
+      "file": "downloads/zombie-groovebox-0.18.1.fwsc",
+      "editor": "webapp/groovebox-180/",
+      "source": "downloads/groovebox-source-0.18.1.zip"
     }
   ]
 }

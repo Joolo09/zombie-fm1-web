@@ -77,7 +77,7 @@ static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;
   if(id==Z_SAMPLE){static const char *const name[]={"MC ZOMBIE","MC HURT","MC DEATH","MC CREEPER","MC BOOM","MC XP","USR1","USR2","USR3","USR4","ZC KICK","ZC SNARE","ZC HAT","ZC CLAP"};return name[value];}
  }else switch(id){
   case U_CLKOUT:return clock_out_on()?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
-  case U_SAVER:return saver_on()?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
+  case U_SAVER:return !saver_on()?word("ВЫКЛ","OFF"):z_song.language?ui_saver_en[saver_style()]:ui_saver_ru[saver_style()];
   case U_SCALE:{static const char *const ru[Z_SCALES]={"ВЫКЛ","МАЖОР","МИНОР","ДОРИЙСКИЙ","ФРИГИЙСКИЙ","МИКСОЛИДИЙ","ПЕНТА МАЖ","ПЕНТА МИН","БЛЮЗ","ГАРМ.МИНОР"},*const en[Z_SCALES]={"OFF","MAJOR","MINOR","DORIAN","PHRYGIAN","MIXOLYDIAN","PENT MAJ","PENT MIN","BLUES","HARM MINOR"};return z_song.language?en[scale_index()]:ru[scale_index()];}
   case U_ROOT:{static const char *const n[12]={"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};return n[scale_root()];}
   case U_COUNTIN:{uint32_t b=rec_countin_bars();return b==0?word("ВЫКЛ","OFF"):b==1?word("1 ТАКТ","1 BAR"):word("2 ТАКТА","2 BARS");}
@@ -137,7 +137,7 @@ static void knob(uint32_t id,int delta){if(id==U_NOTE)roll_note_slot=0;else if(i
  switch(id){
   case U_COUNTIN:system_set(8,clamp((int)rec_countin_bars()+delta,0,2));break;
   case U_CLKOUT:system_set(12,delta>0);break;
-  case U_SAVER:system_set(13,delta>0);break;
+  case U_SAVER:{int v=clamp((saver_on()?(int)saver_style()+1:0)+(delta>0?1:-1),0,4);system_set(13,v>0);if(v)system_set(14,(uint32_t)v-1);break;}
   case U_EU_HITS:eu_hits=(uint8_t)clamp((int)eu_hits+delta,0,(int)seq_steps());break;
   case U_EU_ROT:eu_rot=(uint8_t)clamp((int)eu_rot+delta,0,(int)seq_steps()-1);break;
   case U_SCALE:system_set(10,clamp((int)scale_index()+delta,0,Z_SCALES-1));break;
@@ -353,7 +353,8 @@ static void draw_layer(void){uint32_t j;char buf[24];if(!Z_SAMPLER_EDITION&&acti
 #include "daw_panel.c"
 #include "sampler_panel.inc"
 static void draw_ui(void){ui_prepare();
- if(ui_saver_active()){ui_draw_saver();return;}
+ if(ui_saver_active()){ui_about=0;ui_draw_saver();return;}
+ if(ui_about){ui_draw_about();return;}
  if(active_layer>=0)draw_layer();
  else if(z_sys.midi_mode==2&&z_song.section!=Z_GLO)draw_daw();
  else if(sampler_open())draw_sampler();
@@ -392,6 +393,7 @@ static void select_tempo(int d){
  redraw_at=0;
 }
 static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),lights=0;int d;if(daw_seen&&now-daw_seen>=3500)daw_playing=daw_recording=0;touch_poll();keys=touch_keys();
+ if(ui_saver_home(buttons,held_buttons,now))buttons&=~(1u<<B_HOME);   /* HOME on a screensaver: tap wakes, hold picks the next */
  for(k=0;k<NB;k++)if((buttons>>k&1)&&!(held_buttons>>k&1)){
   uint32_t section;button_since[k]=now;button_used[k]=0;pulse_until[k]=now+180;
   if(layer_locked&&k!=B_HOME&&k!=B_OCTDN&&k!=B_OCTUP&&(active_layer<0||k!=(uint32_t)(active_layer==Z_SECTIONS?B_REC:section_button[active_layer])))layer_close();
@@ -413,7 +415,7 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
  /* A held section is a momentary control layer. Key combinations can enter it immediately. */
  if(active_layer<0){uint32_t section;for(section=0;section<Z_SECTIONS;section++){uint32_t b=section==Z_SECTIONS?B_REC:section_button[section];if((buttons>>b&1)&&!button_used[b]&&((now-button_since[b]>=SECTION_HOLD_MS)||(keys&~panel_keys_before))){if(!Z_SAMPLER_EDITION&&section==Z_EDIT&&z_song.section==Z_SEQ){button_used[B_EDIT]=1;roll_edit=1;}else layer_open(section);break;}}}
  if(active_layer>=0){uint32_t b=active_layer==Z_SECTIONS?B_REC:section_button[active_layer];if(!layer_locked&&!(buttons>>b&1))layer_close();}
- for(k=0;k<Z_SECTIONS;k++){uint32_t b=section_button[k];if(!(buttons>>b&1)&&(held_buttons>>b&1)&&!button_used[b]&&now-button_since[b]<SECTION_HOLD_MS){if(k==Z_EDIT&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){roll_delete();}else if(k==Z_HOME){panel_setting(1,Z_HOME);panel_setting(2,0);}else if(z_song.section==k)panel_setting(2,(z_song.subpage+1)%page_count[k]);else panel_setting(1,k);redraw_at=0;}}
+ for(k=0;k<Z_SECTIONS;k++){uint32_t b=section_button[k];if(!(buttons>>b&1)&&(held_buttons>>b&1)&&!button_used[b]&&now-button_since[b]<SECTION_HOLD_MS){if(k==Z_EDIT&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){roll_delete();}else if(k==Z_HOME){panel_setting(1,Z_HOME);panel_setting(2,0);ui_home_tap(now);}else if(z_song.section==k)panel_setting(2,(z_song.subpage+1)%page_count[k]);else panel_setting(1,k);redraw_at=0;}}
 
  if(!(buttons>>B_EDIT&1))roll_edit=0;
  t=z_song.selected;uint32_t drum_keys_done=0;
@@ -440,11 +442,11 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
   if(!(keys&bit)&&(panel_keys_before&bit)&&key_action[k]>=3){if(active_layer>=0&&key_layer[k]==active_layer)layer_action(key_action[k]-3,0,now);key_action[k]=0;}
   if(!(keys&bit)&&(panel_keys_before&bit)&&key_action[k]==1){if(held_local[k])z_key(held_tracks[k],held_notes[k],0,0);if(held_raw[k])raw_note(held_channels[k],held_notes[k],0,0);key_action[k]=0;}
  }
- if(keys!=panel_keys_before||buttons!=held_buttons)ui_input();
- d=plat_enc(EN_ALGO);if(d)ui_input();if(d)panel_setting(7,(z_song.selected+6+d%6)%6);t=z_song.selected;
- d=plat_enc(EN_SELECT);if(d)ui_input();if(d)select_tempo(d);
- d=plat_enc(EN_PRESET);if(d)ui_input();if(d&&active_layer>=0){uint32_t count=active_layer==Z_EDIT?3:active_layer==Z_SEQ?4:page_count[active_layer<Z_SECTIONS?active_layer:0];layer_page=(uint8_t)(layer_page+count+d%(int)count)%count;}else if(d&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){panel_setting(3,(z_song.step_bank+4+d%4)%4);}else if(d&&sampler_open()){sampler_page=(sampler_page+3+d%3)%3;}else if(d&&z_sys.midi_mode==2){daw_touch_at=now;daw_values[t][5]=(uint8_t)clamp((int)daw_values[t][5]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,10,daw_values[t][5]);}else if(d)knob(U_PRESET,d);
- for(k=0;k<4;k++){d=plat_enc(EN_K1+k);if(d)ui_knob_touch(k);
+ if(keys!=panel_keys_before)ui_input_from(1);if(buttons!=held_buttons)ui_input_from(2);
+ d=plat_enc(EN_ALGO);if(d)ui_enc(EN_ALGO,d);if(d)panel_setting(7,(z_song.selected+6+d%6)%6);t=z_song.selected;
+ d=plat_enc(EN_SELECT);if(d)ui_enc(EN_SELECT,d);if(d)select_tempo(d);
+ d=plat_enc(EN_PRESET);if(d)ui_enc(EN_PRESET,d);if(d&&active_layer>=0){uint32_t count=active_layer==Z_EDIT?3:active_layer==Z_SEQ?4:page_count[active_layer<Z_SECTIONS?active_layer:0];layer_page=(uint8_t)(layer_page+count+d%(int)count)%count;}else if(d&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){panel_setting(3,(z_song.step_bank+4+d%4)%4);}else if(d&&sampler_open()){sampler_page=(sampler_page+3+d%3)%3;}else if(d&&z_sys.midi_mode==2){daw_touch_at=now;daw_values[t][5]=(uint8_t)clamp((int)daw_values[t][5]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,10,daw_values[t][5]);}else if(d)knob(U_PRESET,d);
+ for(k=0;k<4;k++){d=plat_enc(EN_K1+k);if(d)ui_knob_touch(k,d);
   /* a held step: K2 chance, K3 velocity, K4 roll of that step, on every SEQ page; the hit stays when let go */
   /* a held melodic step: K1 note, K2 velocity, K3 length, K4 gate of that step; one undo step for the whole hold */
   if(d&&grid_hold.key>=0&&!grid_hold.drum&&!z_drum_track(t)&&z_sys.midi_mode!=2){uint32_t at=grid_hold.at;z_step *s=&z_song.track[t].steps[at];z_step n=*s;int dur=z_song.duration[t][at];

@@ -58,6 +58,9 @@ static uint32_t rec_click_on(void){return !(z_sys.padding[0]&4u);}
 static uint32_t clock_out_on(void){return (z_sys.padding[0]&8u)!=0;}
 /* bit 4: the screensaver off (0, the default, is on) */
 static uint32_t saver_on(void){return !(z_sys.padding[0]&16u);}
+/* bits 5-6: which screensaver (0 night, 1 synthwave, 2 matrix, 3 bounce) */
+static uint32_t saver_style(void){return (z_sys.padding[0]>>5)&3u;}
+static const char *const ui_saver_ru[4]={"НОЧЬ","СИНТВЕЙВ","МАТРИЦА","ЛОГО"},*const ui_saver_en[4]={"NIGHT","SYNTHWAVE","MATRIX","BOUNCE"};
 /* padding[1]: low nibble the scale lock (0 off, 1 major ... 9 harmonic minor), high nibble its root (0 = C ... 11 = B). */
 #define Z_SCALES 10
 static const uint16_t scale_mask[Z_SCALES]={0xFFF,0xAB5,0x5AD,0x6AD,0x5AB,0x6B5,0x295,0x4A9,0x4E9,0x9AD};
@@ -75,12 +78,13 @@ static void system_init(void){
  if((n==108||n==sizeof saved)&&system_valid(&saved))z_sys=saved;
  z_sys.midi_mode=0; /* Always boot as a local synth, including upgrades with saved DAW settings. */
  z_sys.dual=0; /* Experimental hardware mode always requires an explicit session opt-in. */
- z_sys.padding[0]&=31u;z_rec_click(rec_click_on());if((z_sys.padding[1]&15u)>=Z_SCALES||(z_sys.padding[1]>>4)>=12)z_sys.padding[1]=0;
+ z_sys.padding[0]&=127u;z_rec_click(rec_click_on());if((z_sys.padding[1]&15u)>=Z_SCALES||(z_sys.padding[1]>>4)>=12)z_sys.padding[1]=0;
 }
 static int system_save(void){z_system_settings saved=z_sys;saved.dual=0;int rc=plat_store_save(OBJ_SYSTEM,&saved,sizeof saved);if(!rc)system_dirty=0;return rc;}
 static int system_set(uint32_t id,uint32_t value){
- static const uint8_t maximum[]={1,127,1,2,2,2,2,1,2,1,9,11,1,1};uint8_t *p;
- if(id>=14||value>maximum[id])return 0;
+ static const uint8_t maximum[]={1,127,1,2,2,2,2,1,2,1,9,11,1,1,3};uint8_t *p;
+ if(id>=15||value>maximum[id])return 0;
+ if(id==14){uint8_t before=z_sys.padding[0];z_sys.padding[0]=(uint8_t)((before&~0x60u)|(value<<5));if(before!=z_sys.padding[0])system_dirty=1;return 1;}
  if(id==13){uint8_t before=z_sys.padding[0];z_sys.padding[0]=(uint8_t)(value?before&~16u:before|16u);if(before!=z_sys.padding[0])system_dirty=1;return 1;}
  if(id==12){uint8_t before=z_sys.padding[0];z_sys.padding[0]=(uint8_t)(value?before|8u:before&~8u);if(before!=z_sys.padding[0])system_dirty=1;return 1;}
  if(id>=10){uint8_t before=z_sys.padding[1];z_sys.padding[1]=(uint8_t)(id==10?(before&0xf0)|value:(before&15)|(value<<4));if(before!=z_sys.padding[1])system_dirty=1;return 1;}
