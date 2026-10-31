@@ -23,7 +23,10 @@ def presets(kind="groovebox"):
     rows=re.findall(r'\{"(\w+)",(-?\d+),(-?\d+),(-?\d+)\}',(ED/'shared/dsp.c').read_text())
     bank=json.loads((ED/'presets.json').read_text(encoding='utf-8'))
     assert len(rows)==27 and len(bank)==64
-    if kind=='groovebox':bank+=json.loads((ED/'idm-presets.json').read_text(encoding='utf-8'))
+    if kind=='groovebox':
+        bank+=json.loads((ED/'idm-presets.json').read_text(encoding='utf-8'))
+        if (ED/'zombie-presets.json').exists():bank+=json.loads((ED/'zombie-presets.json').read_text(encoding='utf-8'))
+    assert len(bank)<=128
     keys=[r[0] for r in rows];values=[]
     for name,changes in bank:
         assert len(name)<24

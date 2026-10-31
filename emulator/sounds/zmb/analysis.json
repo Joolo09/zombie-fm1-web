@@ -1,0 +1,294 @@
+{
+  "version": "0.18.0",
+  "engine_sha256": "0c4db178547cca5100ca9a83c1c5ebae7b7a376db1e75460a70cce894ca7deb8",
+  "presets": [
+    {
+      "slot": 97,
+      "name": "ZMB 808 Grave",
+      "category": "BASS / 808",
+      "peak": 0.1913,
+      "rms_db": -27.86,
+      "file": "zmb-808-grave.wav",
+      "hash": "8bc5ef8a0cb4f47c48607812f029a9b2d543fa71aac6d338060de8490ec60ca7"
+    },
+    {
+      "slot": 98,
+      "name": "ZMB Grave Wobble",
+      "category": "BASS / 808",
+      "peak": 0.2205,
+      "rms_db": -25.17,
+      "file": "zmb-grave-wobble.wav",
+      "hash": "00454a5ccfbfbe9069fea026cad4986a38126554b3d6907aa224780983a8aa91"
+    },
+    {
+      "slot": 99,
+      "name": "ZMB Rotten Reese",
+      "category": "BASS / 808",
+      "peak": 0.275,
+      "rms_db": -24.02,
+      "file": "zmb-rotten-reese.wav",
+      "hash": "70d2287a4d3f9a6624b28f32f137d9b902997a58a692f95055c7730c5399bf7f"
+    },
+    {
+      "slot": 100,
+      "name": "ZMB Acid Crawl",
+      "category": "BASS / 808",
+      "peak": 0.1656,
+      "rms_db": -30.38,
+      "file": "zmb-acid-crawl.wav",
+      "hash": "158d24708437303fc088e55edcfbe48bbfefa8cad4e14547fe2a81efc6144fed"
+    },
+    {
+      "slot": 101,
+      "name": "ZMB Sub Hunger",
+      "category": "BASS / 808",
+      "peak": 0.1751,
+      "rms_db": -24.48,
+      "file": "zmb-sub-hunger.wav",
+      "hash": "9bf6cde7c910fce387aecf45b1402f8fd4f042374a06a19dd91df52dab0b673f"
+    },
+    {
+      "slot": 102,
+      "name": "ZMB FM Growl",
+      "category": "BASS / 808",
+      "peak": 0.2089,
+      "rms_db": -22.67,
+      "file": "zmb-fm-growl.wav",
+      "hash": "ebc4fa8a97e84027a3d61a40ebe45813be44d496eaeed57bf57f5b9d204ef0d3"
+    },
+    {
+      "slot": 103,
+      "name": "ZMB Phase Pump",
+      "category": "BASS / 808",
+      "peak": 0.1837,
+      "rms_db": -28.9,
+      "file": "zmb-phase-pump.wav",
+      "hash": "64115ed66a4f34379b538a0f29a526dcd45b1595aa15bfcb21caa47af382ab0a"
+    },
+    {
+      "slot": 104,
+      "name": "ZMB Tomb Pluck Bass",
+      "category": "BASS / 808",
+      "peak": 0.1752,
+      "rms_db": -32.31,
+      "file": "zmb-tomb-pluck-bass.wav",
+      "hash": "4c4f579750f06c984c36d84b6701d6b1ec8605bdf1313784acba8a07dd30f892"
+    },
+    {
+      "slot": 105,
+      "name": "ZMB Supersaw Moon",
+      "category": "LEADS",
+      "peak": 0.1485,
+      "rms_db": -29.43,
+      "file": "zmb-supersaw-moon.wav",
+      "hash": "afa1d26111ba15b926051d48508bb9ceea838a344c9d9e62585a45e97d6037e5"
+    },
+    {
+      "slot": 106,
+      "name": "ZMB Synthwave Lead",
+      "category": "LEADS",
+      "peak": 0.1214,
+      "rms_db": -30,
+      "file": "zmb-synthwave-lead.wav",
+      "hash": "a6edfd4fd96af0a503231aba1da710b27d4c7bf70b7cc1bf0ca22f1951c52274"
+    },
+    {
+      "slot": 107,
+      "name": "ZMB Chip Ghoul",
+      "category": "LEADS",
+      "peak": 0.1399,
+      "rms_db": -24.2,
+      "file": "zmb-chip-ghoul.wav",
+      "hash": "cc629fde2f2cf0b4506db147458d318a834ec930a29cc4464d054f695b22c69e"
+    },
+    {
+      "slot": 108,
+      "name": "ZMB Screamer",
+      "category": "LEADS",
+      "peak": 0.2561,
+      "rms_db": -21.04,
+      "file": "zmb-screamer.wav",
+      "hash": "0bfa5823970095a9a3a99d37ee4fa9367fe658d43d7050ae59a7037e0f72234c"
+    },
+    {
+      "slot": 109,
+      "name": "ZMB Hoover Horde",
+      "category": "LEADS",
+      "peak": 0.1958,
+      "rms_db": -24.16,
+      "file": "zmb-hoover-horde.wav",
+      "hash": "ad71b2ff5389df9af5242110818a4e6490318df0a5f849df0be0b1db6c026981"
+    },
+    {
+      "slot": 110,
+      "name": "ZMB Laser Bite",
+      "category": "LEADS",
+      "peak": 0.1947,
+      "rms_db": -33.19,
+      "file": "zmb-laser-bite.wav",
+      "hash": "56d367c69507d0e1d0290304833b6a0e2ed957852d9087133a2f8ae51852b840"
+    },
+    {
+      "slot": 111,
+      "name": "ZMB Neon Brain",
+      "category": "LEADS",
+      "peak": 0.1201,
+      "rms_db": -30.2,
+      "file": "zmb-neon-brain.wav",
+      "hash": "b0d929bc36d2135d805a0a87e7d560411d271804c319166faab04ef92b65b6bc"
+    },
+    {
+      "slot": 112,
+      "name": "ZMB Moon Whistle",
+      "category": "LEADS",
+      "peak": 0.1475,
+      "rms_db": -27.61,
+      "file": "zmb-moon-whistle.wav",
+      "hash": "0f7ead67a6d2148efd9c65ffdf0ee5455a18580ee63d924ca48f3bf28a5cebc8"
+    },
+    {
+      "slot": 113,
+      "name": "ZMB Lo-Fi Keys",
+      "category": "KEYS / PLUCKS",
+      "peak": 0.2111,
+      "rms_db": -25.75,
+      "file": "zmb-lo-fi-keys.wav",
+      "hash": "cda1a6449e2841827e7ba8f83c777651effc732426b715659330f11a53036b19"
+    },
+    {
+      "slot": 114,
+      "name": "ZMB Crypt Bells",
+      "category": "KEYS / PLUCKS",
+      "peak": 0.2753,
+      "rms_db": -24.73,
+      "file": "zmb-crypt-bells.wav",
+      "hash": "9ac4f1696d06bc4a92e52975ea78d02d3da2fc5f1cd7f022ced27c1808db1e75"
+    },
+    {
+      "slot": 115,
+      "name": "ZMB Tomb Marimba",
+      "category": "KEYS / PLUCKS",
+      "peak": 0.0976,
+      "rms_db": -33.71,
+      "file": "zmb-tomb-marimba.wav",
+      "hash": "2a7e3e908f9eacd9831a6e30ca153e3d99b198e136b6831f5bacecb72c0f845a"
+    },
+    {
+      "slot": 116,
+      "name": "ZMB Rave Stab",
+      "category": "KEYS / PLUCKS",
+      "peak": 0.1397,
+      "rms_db": -30.91,
+      "file": "zmb-rave-stab.wav",
+      "hash": "c1744467a5229cec53a5417a1de89613b3b1d9f2a550b2f36d42e1101d454f9e"
+    },
+    {
+      "slot": 117,
+      "name": "ZMB Pluck Rain",
+      "category": "KEYS / PLUCKS",
+      "peak": 0.1148,
+      "rms_db": -32.4,
+      "file": "zmb-pluck-rain.wav",
+      "hash": "87f3979fb815091c5601de37a46bbcf1ae6e4b3b27838c0e153c44e07321dbf2"
+    },
+    {
+      "slot": 118,
+      "name": "ZMB Dusty Rhodes",
+      "category": "KEYS / PLUCKS",
+      "peak": 0.2346,
+      "rms_db": -24.36,
+      "file": "zmb-dusty-rhodes.wav",
+      "hash": "66e7adedf50b8d66635bfa4f4b49f86efc4063a92727fb8aa842030da41a43ca"
+    },
+    {
+      "slot": 119,
+      "name": "ZMB Glass Coffin",
+      "category": "KEYS / PLUCKS",
+      "peak": 0.1762,
+      "rms_db": -27.44,
+      "file": "zmb-glass-coffin.wav",
+      "hash": "daf78ea817efde940f9c772124c8badca2d558487caaead09d07f1e697597ba4"
+    },
+    {
+      "slot": 120,
+      "name": "ZMB House Organ",
+      "category": "KEYS / PLUCKS",
+      "peak": 0.1634,
+      "rms_db": -25.53,
+      "file": "zmb-house-organ.wav",
+      "hash": "ba3cf36bbdba08b15123f0abc122b5a863b29914c14a2fa7c9bbcfd60b3bfe96"
+    },
+    {
+      "slot": 121,
+      "name": "ZMB Graveyard Fog",
+      "category": "HORROR / ATMOSPHERE",
+      "peak": 0.1394,
+      "rms_db": -33.48,
+      "file": "zmb-graveyard-fog.wav",
+      "hash": "7d2b55f8b32c3b5230e6957eacd6f27dfa136037a47186d4adc7181b201482ce"
+    },
+    {
+      "slot": 122,
+      "name": "ZMB Haunted Choir",
+      "category": "HORROR / ATMOSPHERE",
+      "peak": 0.2051,
+      "rms_db": -24.12,
+      "file": "zmb-haunted-choir.wav",
+      "hash": "2815024917d043a50e291d7a50cc061572e6da628cde657a1baa9b62a2efd76c"
+    },
+    {
+      "slot": 123,
+      "name": "ZMB Dead Radio",
+      "category": "HORROR / ATMOSPHERE",
+      "peak": 0.2274,
+      "rms_db": -27.18,
+      "file": "zmb-dead-radio.wav",
+      "hash": "462ed23a81a1b5b692d9d0cb8dbb32f5981a8470ba0b749438fc3a01c2482090"
+    },
+    {
+      "slot": 124,
+      "name": "ZMB Siren Moan",
+      "category": "HORROR / ATMOSPHERE",
+      "peak": 0.0818,
+      "rms_db": -31.68,
+      "file": "zmb-siren-moan.wav",
+      "hash": "f021162c1c12b2a0646378191359892a89dfc7dba89b7e87f5f55e437401052c"
+    },
+    {
+      "slot": 125,
+      "name": "ZMB Brain Drill",
+      "category": "HORROR / ATMOSPHERE",
+      "peak": 0.3902,
+      "rms_db": -18.51,
+      "file": "zmb-brain-drill.wav",
+      "hash": "72d48110876c18702b14099a85f0c1038973a737e6c0ea3e3a09893af8005454"
+    },
+    {
+      "slot": 126,
+      "name": "ZMB Coffin Knock",
+      "category": "HORROR / ATMOSPHERE",
+      "peak": 0.1564,
+      "rms_db": -42.55,
+      "file": "zmb-coffin-knock.wav",
+      "hash": "56a319a4048703e014d182ed8b7ed0daba9f9668a78208b23de4a0a0b2604792"
+    },
+    {
+      "slot": 127,
+      "name": "ZMB Ghost Swell",
+      "category": "HORROR / ATMOSPHERE",
+      "peak": 0.0913,
+      "rms_db": -31.63,
+      "file": "zmb-ghost-swell.wav",
+      "hash": "10f474ffbd39df5e73255b0a18cc98ebffb3419d99c2dfb11884be4a87f13907"
+    },
+    {
+      "slot": 128,
+      "name": "ZMB Undead Riser",
+      "category": "HORROR / ATMOSPHERE",
+      "peak": 0.1331,
+      "rms_db": -31.69,
+      "file": "zmb-undead-riser.wav",
+      "hash": "13796c596d7cc1f0140f0b9d14458566f21bc0a9e3af014075283d4231e7fd8a"
+    }
+  ]
+}

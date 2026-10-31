@@ -1,0 +1,24 @@
+/* SPDX-License-Identifier: MIT — 0.18.0: the ZMB bank (slots 97-128) rendered by the shipped C engine, with a listening page. */
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+const mod=new WebAssembly.Module(readFileSync('webapp/groovebox-180/zombie-core.wasm'));
+const bank=JSON.parse(readFileSync('source/editions/zombie-presets.json'));
+const fresh=()=>{const w=new WebAssembly.Instance(mod,{}).exports;w.z_init();return w;};
+const render=(w,frames)=>{const a=new Float32Array(frames*2);for(let at=0;at<frames;at+=256){const n=Math.min(256,frames-at);w.z_render(w.z_buffer(),n);a.set(new Float32Array(w.memory.buffer,w.z_buffer(),n*2),at*2);}return a;};
+function wav(path,a){const b=Buffer.alloc(44+a.length*2);b.write('RIFF');b.writeUInt32LE(b.length-8,4);b.write('WAVEfmt ',8);b.writeUInt32LE(16,16);b.writeUInt16LE(1,20);b.writeUInt16LE(2,22);b.writeUInt32LE(44100,24);b.writeUInt32LE(176400,28);b.writeUInt16LE(4,32);b.writeUInt16LE(16,34);b.write('data',36);b.writeUInt32LE(a.length*2,40);a.forEach((x,i)=>b.writeInt16LE(Math.round(Math.max(-1,Math.min(1,x*2.2))*32767),44+i*2));writeFileSync(path,b);}
+const dir='emulator/sounds/zmb';mkdirSync(dir,{recursive:true});
+const cats=['BASS / 808','LEADS','KEYS / PLUCKS','HORROR / ATMOSPHERE'],report=[];
+/* a short phrase per category, so each sound is heard in use */
+const phrase=[[36,0,.3],[36,.375,.12],[43,.5,.3],[39,.875,.3]],lead=[[60,0,.35],[63,.4,.35],[67,.8,.6]],keys=[[60,0,.2],[64,.25,.2],[67,.5,.2],[72,.75,.5]],pad=[[48,0,2.2],[55,0,2.2]];
+for(let i=0;i<32;i++){const w=fresh(),id=96+i;w.z_preset(0,id);w.z_set(0,15,90);const notes=[phrase,lead,keys,pad][i>>3],total=44100*(i>=24?3.5:2.2),out=new Float32Array(total*2);let at=0;
+ const ev=[];for(const [n,t,d] of notes){ev.push([Math.round(t*44100),n,1],[Math.round((t+d)*44100),n,0]);}ev.sort((a,b)=>a[0]-b[0]);
+ for(const [t,n,on] of ev){if(t>at){out.set(render(w,t-at),at*2);at=t;}w.z_key(0,n,on?100:0,on);}out.set(render(w,total-at),at*2);
+ let e=0,pk=0;for(const x of out){assert(Number.isFinite(x));e+=x*x;pk=Math.max(pk,Math.abs(x));}const rms=Math.sqrt(e/out.length);assert(rms>.002,'inaudible '+bank[i][0]);assert(pk<.95,'too hot '+bank[i][0]);
+ const slug=bank[i][0].toLowerCase().replaceAll(' ','-');wav(dir+'/'+slug+'.wav',out);
+ report.push({slot:id+1,name:bank[i][0],category:cats[i>>3],peak:+pk.toFixed(4),rms_db:+(20*Math.log10(rms)).toFixed(2),file:slug+'.wav',hash:createHash('sha256').update(new Uint8Array(out.buffer)).digest('hex')});}
+assert.equal(new Set(report.map(r=>r.hash)).size,32,'presets must render distinct audio');
+writeFileSync(dir+'/analysis.json',JSON.stringify({version:'0.18.0',engine_sha256:createHash('sha256').update(readFileSync('webapp/groovebox-180/zombie-core.wasm')).digest('hex'),presets:report},null,2)+'\n');
+const groups=cats.map(c=>`<h2>${c}</h2><section>`+report.filter(r=>r.category===c).map(r=>`<article><small>${r.slot}</small><h3>${r.name.slice(4)}</h3><audio controls preload="none" src="${r.file}"></audio></article>`).join('')+'</section>').join('');
+writeFileSync(dir+'/index.html',`<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Zombie ZMB · 32 пресета</title><style>:root{color-scheme:dark}body{margin:30px auto;max-width:1100px;padding:0 20px;background:radial-gradient(900px 500px at 85% -10%,#2a3550 0,transparent 60%),#0b1110;color:#e2edcf;font:16px system-ui}a{color:#b8df78}h1{font:800 46px ui-monospace,monospace;margin:.2em 0;letter-spacing:-.02em}h2{font:700 12px ui-monospace,monospace;letter-spacing:.16em;color:#b8df78;margin:34px 0 12px}section{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}article{background:#141f19;border:1px solid #2a3d2f;border-radius:12px;padding:14px;transition:transform .2s,border-color .2s}article:hover{transform:translateY(-3px);border-color:#b8df78}small{font:12px ui-monospace,monospace;color:#8fa58c}h3{margin:4px 0 10px;font-size:18px}audio{width:100%}img{image-rendering:pixelated;border-radius:10px;border:1px solid #2a3d2f;float:right;margin-left:20px}@media(max-width:600px){img{float:none;display:block;margin:0 0 16px}}</style><a href="../../../">← Zombie FM-1</a> · <a href="../">IDM-банк</a><img src="../../../previews/fm1-night-018.webp" width="160" height="160" alt=""><h1>ZMB · 32 звука</h1><p>Новый банк прошивки 0.18, слоты 97–128 (крути PRESET дальше IDM). Отрендерен тем же C-движком, что играет в FM-1: каждая запись — короткая фраза на этом пресете, без обработки.</p>${groups}<p><small>Отчёт: <a href="analysis.json">analysis.json</a>. Лицензия MIT.</small></p></html>`);
+console.log('PASS 32 ZMB patches rendered: audible, finite, under 0.95 peak, distinct');

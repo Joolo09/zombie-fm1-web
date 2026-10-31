@@ -65,7 +65,7 @@
         "ru": "Лад и тоника: клавиши попадают в тональность, ноты лада подсвечены. Зажми шаг мелодии и крути K1–K4. SEQ-инструменты: Эвклид, бит, половина, COOK. MIDI clock наружу (выкл по умолчанию). Отмена на 8 шагов. Физический FM-1 не проверен.",
         "en": "Scale and root: keys snap to the key and its notes glow. Hold a melodic step and turn K1-K4. SEQ tools: Euclid, beat, half, COOK. MIDI clock out (off by default). Eight undo steps. Physical FM-1 unverified."
       },
-      "channel": "beta",
+      "channel": "archive",
       "bytes": 610100,
       "sha256": "c2b0c3e72643f1b7a5c3962d8f20ecf7260f5fc50ec4cc1b4b3803c548ca7418",
       "file": "downloads/zombie-groovebox-0.17.0.fwsc",
@@ -478,6 +478,24 @@
       "editor": "webapp/groovebox-136/",
       "source": "downloads/groovebox-source-0.13.6.zip",
       "channel": "archive"
+    },
+    {
+      "product": "FM-1_63001800",
+      "version": "0.18.0",
+      "label": {
+        "ru": "Groovebox 0.18.0 beta · живой экран, ночная заставка, банк ZMB",
+        "en": "Groovebox 0.18.0 beta · living screen, night screensaver, ZMB bank"
+      },
+      "notes": {
+        "ru": "32 новых пресета ZMB (слоты 97–128). Зомби на экране качает головой в такт, ноты разлетаются искрами, при включении он вылезает из земли. Ночная заставка через минуту без касаний (отключается в Настройках). Звук, проекты и управление 0.17 не изменились. Физический FM-1 не проверялся.",
+        "en": "32 new ZMB presets (slots 97-128). The on-screen zombie headbangs to the beat, notes fly off as sparks, it climbs out of the ground at power-on. Night screensaver after a minute untouched (switch off in Settings). Sound, projects and controls of 0.17 unchanged. Physical FM-1 unverified."
+      },
+      "channel": "beta",
+      "bytes": 610100,
+      "sha256": "63e25de236eb6c822dab2061dee7e79e1c9f27d4aaa492dcdf47d1c7e1f20eb7",
+      "file": "downloads/zombie-groovebox-0.18.0.fwsc",
+      "editor": "webapp/groovebox-180/",
+      "source": "downloads/groovebox-source-0.18.0.zip"
     }
   ]
 }

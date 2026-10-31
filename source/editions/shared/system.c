@@ -56,6 +56,8 @@ static int system_valid(const z_system_settings *s){uint32_t i;
 static uint32_t rec_countin_bars(void){uint32_t c=z_sys.padding[0]&3u;return c==0?1:c==1?0:2;}
 static uint32_t rec_click_on(void){return !(z_sys.padding[0]&4u);}
 static uint32_t clock_out_on(void){return (z_sys.padding[0]&8u)!=0;}
+/* bit 4: the screensaver off (0, the default, is on) */
+static uint32_t saver_on(void){return !(z_sys.padding[0]&16u);}
 /* padding[1]: low nibble the scale lock (0 off, 1 major ... 9 harmonic minor), high nibble its root (0 = C ... 11 = B). */
 #define Z_SCALES 10
 static const uint16_t scale_mask[Z_SCALES]={0xFFF,0xAB5,0x5AD,0x6AD,0x5AB,0x6B5,0x295,0x4A9,0x4E9,0x9AD};
@@ -73,12 +75,13 @@ static void system_init(void){
  if((n==108||n==sizeof saved)&&system_valid(&saved))z_sys=saved;
  z_sys.midi_mode=0; /* Always boot as a local synth, including upgrades with saved DAW settings. */
  z_sys.dual=0; /* Experimental hardware mode always requires an explicit session opt-in. */
- z_sys.padding[0]&=15u;z_rec_click(rec_click_on());if((z_sys.padding[1]&15u)>=Z_SCALES||(z_sys.padding[1]>>4)>=12)z_sys.padding[1]=0;
+ z_sys.padding[0]&=31u;z_rec_click(rec_click_on());if((z_sys.padding[1]&15u)>=Z_SCALES||(z_sys.padding[1]>>4)>=12)z_sys.padding[1]=0;
 }
 static int system_save(void){z_system_settings saved=z_sys;saved.dual=0;int rc=plat_store_save(OBJ_SYSTEM,&saved,sizeof saved);if(!rc)system_dirty=0;return rc;}
 static int system_set(uint32_t id,uint32_t value){
- static const uint8_t maximum[]={1,127,1,2,2,2,2,1,2,1,9,11,1};uint8_t *p;
- if(id>=13||value>maximum[id])return 0;
+ static const uint8_t maximum[]={1,127,1,2,2,2,2,1,2,1,9,11,1,1};uint8_t *p;
+ if(id>=14||value>maximum[id])return 0;
+ if(id==13){uint8_t before=z_sys.padding[0];z_sys.padding[0]=(uint8_t)(value?before&~16u:before|16u);if(before!=z_sys.padding[0])system_dirty=1;return 1;}
  if(id==12){uint8_t before=z_sys.padding[0];z_sys.padding[0]=(uint8_t)(value?before|8u:before&~8u);if(before!=z_sys.padding[0])system_dirty=1;return 1;}
  if(id>=10){uint8_t before=z_sys.padding[1];z_sys.padding[1]=(uint8_t)(id==10?(before&0xf0)|value:(before&15)|(value<<4));if(before!=z_sys.padding[1])system_dirty=1;return 1;}
  if(id>=8){uint8_t before=z_sys.padding[0];if(id==8)z_sys.padding[0]=(uint8_t)((z_sys.padding[0]&~3u)|(value==1?0u:value==0?1u:2u));else{z_sys.padding[0]=(uint8_t)(value?z_sys.padding[0]&~4u:z_sys.padding[0]|4u);z_rec_click(value);}if(before!=z_sys.padding[0])system_dirty=1;return 1;}p=id<6?&z_sys.dual+id:id==6?&z_sys.midi_mode:&z_sys.transport;

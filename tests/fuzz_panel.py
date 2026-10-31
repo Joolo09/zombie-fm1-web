@@ -47,7 +47,7 @@ def project(r):
         for i in range(64): p[o:o + 4] = bytes([r.randrange(128), r.choice([0, 0, r.randrange(128)]), r.randrange(128), r.randint(1, 127)]); o += 4
     p[o] = (r.randint(-3, 3)) & 255; o += 1
     sec = r.randrange(9); p[o] = sec; p[o + 1] = r.randrange(6 if sec == 6 else 4); cur = r.randrange(64); p[o + 2] = r.randrange(4); o += 3
-    for t in range(6): p[o + t] = r.randrange(5); p[o + 6 + t] = r.randrange(4); p[o + 12 + t] = r.randint(1, 3); p[o + 18 + t] = r.randrange(2); p[o + 24 + t] = r.choice([255, r.randrange(96)])
+    for t in range(6): p[o + t] = r.randrange(5); p[o + 6 + t] = r.randrange(4); p[o + 12 + t] = r.randint(1, 3); p[o + 18 + t] = r.randrange(2); p[o + 24 + t] = r.choice([255, r.randrange(128)])
     o += 30; p[o] = 0; p[o + 1] = cur; o += 2
     for i in range(6 * 64 * 3): p[o + i] = r.choice([0, 0, 0, r.randint(1, 128)])
     o += 6 * 64 * 3

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Zombie Groovebox для M-VAVE FM-1: установка прошивки из браузера по USB, эмулятор и редактор звука.">
 <title>Zombie FM-1 · Установка</title>
-<link rel="stylesheet" href="site.css?v=151">
+<link rel="stylesheet" href="site.css?v=180">
 </head>
 <body>
 <header class="top"><div class="wrap">
@@ -13,7 +13,7 @@
  <nav class="links" aria-label="Разделы">
   <a href="#install" data-t="navInstall">Установка</a>
   <a href="emulator/" data-t="navEmulator">Эмулятор</a>
-  <a id="editor-link" href="webapp/groovebox-170/" data-t="navEditor">Редактор</a>
+  <a id="editor-link" href="webapp/groovebox-180/" data-t="navEditor">Редактор</a>
   <a href="#new" data-t="navNew">Что нового</a>
   <a href="#help" data-t="navHelp">Помощь</a>
  </nav>
@@ -26,10 +26,10 @@
  <section>
   <p class="eyebrow">M-VAVE FM-1 · USB MIDI</p>
   <h1 data-t="headline">Прошивка FM-1 прямо из браузера</h1>
-  <p class="lead" data-t="lead">Шесть дорожек, 96 пресетов, драм-машина, пианоролл. Установка займёт около минуты. Нужны кабель USB и Chrome или Edge.</p>
+  <p class="lead" data-t="lead">Шесть дорожек, 128 пресетов, драм-машина, пианоролл. Установка займёт около минуты. Нужны кабель USB и Chrome или Edge.</p>
   <div class="cta"><a class="btn primary" href="#install" data-t="ctaInstall">Установить →</a><a class="btn" href="emulator/" data-t="ctaTry">Попробовать в эмуляторе</a></div>
-  <ul class="facts"><li>6 TRACKS</li><li>96 PRESETS</li><li>16 DRUMS</li><li>64 STEPS</li><li>RU / EN</li></ul>
-  <div class="screen"><img src="emulator/home.png" width="240" height="240" alt="Экран Zombie Groovebox"><p class="muted small" data-t="screenNote">Экран снят в эмуляторе, который работает на том же C-коде, что и прошивка.</p></div>
+  <ul class="facts"><li>6 TRACKS</li><li>128 PRESETS</li><li>16 DRUMS</li><li>64 STEPS</li><li>RU / EN</li></ul>
+  <figure class="showcase"><div class="dev a"><span class="tag">PLAY</span><img src="previews/fm1-home-018.webp" width="240" height="240" alt="Экран Zombie Groovebox: зомби качает головой в такт"></div><div class="dev b"><span class="tag">NIGHT</span><img src="previews/fm1-night-018.webp" width="240" height="240" alt="Ночная заставка Zombie Groovebox" loading="lazy"></div><figcaption class="muted small" data-t="screenNote">Настоящие кадры прошивки 0.18: сняты в симуляторе, который работает на том же C-коде.</figcaption></figure>
  </section>
 
  <section id="install" class="card installer" aria-labelledby="install-title">
@@ -72,17 +72,17 @@
 <section class="block" id="new">
  <div class="grid2">
   <div>
-   <p class="eyebrow">0.17.0 beta</p>
-   <h2 data-t="newTitle">Что нового в 0.17: лад, правка шагов, инструменты</h2>
+   <p class="eyebrow">0.18.0 beta</p>
+   <h2 data-t="newTitle">Что нового в 0.18: живой экран и 32 новых звука</h2>
    <ul class="changes" id="changes">
-    <li data-t="c1">Лад и тоника (Настройки): клавиши попадают в тональность, ноты лада подсвечены. Работает для записи и арпеджиатора.</li>
-    <li data-t="c2">Зажми шаг мелодии и крути K1–K4: нота, сила, длина, гейт. Драмка: K2–K4 шанс, сила, дробь.</li>
-    <li data-t="c3">SEQ-инструменты (держи SEQ, PRESET): Эвклид, бит, половина, COOK. Новые идеи одним нажатием.</li>
-    <li data-t="c4">MIDI clock наружу по USB (выключен по умолчанию): 24 импульса на четверть, Start и Stop.</li>
-    <li data-t="c5">Отмена и повтор на 8 шагов вместо 4.</li>
-    <li data-t="c6">Всё новое можно задать из веб-редактора. Попробуйте в эмуляторе до установки.</li>
+    <li data-t="c1">Банк ZMB: 32 новых пресета (слоты 97–128): 808, вобл-басы, ривз, суперсо, синтвейв, хоррор-атмосферы.</li>
+    <li data-t="c2">Зомби на главной качает головой в такт, открывает рот под звук, машет руками; ноты разлетаются цветными искрами.</li>
+    <li data-t="c3">Ночная заставка: через минуту без касаний — луна, летучие мыши, кладбище; во время игры — темп и шесть «свечей» дорожек.</li>
+    <li data-t="c4">При включении зомби вылезает из земли. Карточки ручек вспыхивают при повороте, за курсором шагов бежит след.</li>
+    <li data-t="c5">Заставку можно выключить: Настройки (GLO), страница 5, или в веб-редакторе. Любое касание будит экран и работает как обычно.</li>
+    <li data-t="c6">Звук, проекты и управление 0.17 не изменились. Попробуйте в эмуляторе до установки.</li>
    </ul>
-   <p class="small"><a href="source/GROOVEBOX-170-RU.md" data-t="notesLink">Подробно: что изменено и как проверено</a> · <a href="emulator/audit.json" data-t="auditLink">Отчёт тестов</a></p>
+   <p class="small"><a href="source/GROOVEBOX-180-RU.md" data-t="notesLink">Подробно: что изменено и как проверено</a> · <a href="emulator/audit.json" data-t="auditLink">Отчёт тестов</a></p>
   </div>
   <div>
    <h2 data-t="ctrlTitle">Главное управление</h2>
@@ -105,21 +105,23 @@
  <details><summary data-t="q1">FM-1 не находится</summary><ol><li data-t="q1a">Нужен кабель с передачей данных: зарядный кабель не подойдёт.</li><li data-t="q1b">Закройте DAW и все вкладки редактора или эмулятора, подключённые к FM-1.</li><li data-t="q1c">Нажмите на значок замка в адресной строке, разрешите MIDI-устройства и обновите страницу.</li><li data-t="q1d">Оставьте подключённым только один FM-1.</li></ol></details>
  <details><summary data-t="q2">USB отключился во время записи</summary><p data-t="q2a">Не паникуйте: загрузчик FM-1 остаётся рабочим. Подключите кабель снова, выберите ту же версию, нажмите «Найти FM-1», затем «Установить». Запись начнётся заново, и результат проверится после перезапуска.</p></details>
  <details><summary data-t="q3">Установщик пишет «Open-прошивка»</summary><p data-t="q3a">На FM-1 стоит официальная Open-прошивка M-VAVE, и она принимает только штатную FM-1 V15. Сначала верните её официальным установщиком M-VAVE, затем установите Zombie.</p></details>
- <details><summary data-t="q4">Звук трещит или новая версия не нравится</summary><p data-t="q4a">Откройте «Другие версии» и установите 0.16.0 или стабильную 0.8.3. Перед откатом на 0.13.5 и старше экспортируйте проект в JSON в редакторе. 0.17.0 проверена в эмуляторе и тестах.</p></details>
+ <details><summary data-t="q4">Звук трещит или новая версия не нравится</summary><p data-t="q4a">Откройте «Другие версии» и установите 0.17.0 или стабильную 0.8.3. Перед откатом на 0.13.5 и старше экспортируйте проект в JSON в редакторе. 0.18.0 проверена в эмуляторе и тестах.</p></details>
  <details><summary data-t="q5">Как вернуть заводскую прошивку M-VAVE</summary><p data-t="q5a">Воспользуйтесь официальным установщиком M-VAVE для FM-1 (V15). Сохранённые в Zombie проекты при этом не переносятся.</p></details>
 </section>
 
 <section class="block">
  <h2 data-t="moreTitle">Ещё</h2>
  <div class="grid3">
-  <a class="card tile" href="emulator/"><img src="emulator/home.png" alt="" width="240" height="240"><h3 data-t="t1">Эмулятор FM-1</h3><p class="small muted" data-t="t1a">Экран, кнопки и звук на коде прошивки 0.17.0. Можно поиграть с клавиатуры ПК.</p></a>
-  <a class="card tile" href="emulator/sounds/"><img src="previews/groovebox-piano.png" alt="" width="240" height="240"><h3 data-t="t2">IDM-банк</h3><p class="small muted" data-t="t2a">Послушайте 32 пресета до установки.</p></a>
+  <a class="card tile" href="emulator/"><img src="previews/fm1-home-018.webp" loading="lazy" alt="" width="240" height="240"><h3 data-t="t1">Эмулятор FM-1</h3><p class="small muted" data-t="t1a">Экран, кнопки и звук на коде прошивки 0.18.0. Можно поиграть с клавиатуры ПК.</p></a>
+  <a class="card tile" href="emulator/sounds/zmb/"><img src="previews/fm1-night-018.webp" loading="lazy" alt="" width="240" height="240"><h3 data-t="t2">Банки IDM и ZMB</h3><p class="small muted" data-t="t2a">Послушайте 64 пресета до установки: IDM и новый банк ZMB 0.18.</p></a>
   <a class="card tile" href="downloads/Zombie-FM1-DAW-Profiles-0.8.2.zip" download><img src="previews/groovebox-lock.png" alt="" width="240" height="240"><h3 data-t="t3">Профили FL Studio и Ableton</h3><p class="small muted" data-t="t3a">Скрипты для режима DAW Controller, инструкции RU/EN.</p></a>
  </div>
 </section>
 </main>
 
 <footer class="bottom"><div class="wrap"><span>ZOMBIE FM-1 · WEB 2.0 · <span id="footer-version">GROOVEBOX 0.15.1</span></span><span><a href="licenses/THIRD-PARTY.txt" data-t="licenses">Лицензии</a> · <a href="lab/">Lab</a> · <a href="https://github.com/Joolo09/zombie-fm1-web" rel="noopener">GitHub</a></span></div></footer>
-<script type="module" src="installer.js?v=170"></script>
+<script type="module" src="installer.js?v=180"></script>
+<script>/* blocks fade in as they scroll into view; without this script they are simply shown */
+(()=>{if(!("IntersectionObserver" in window)||matchMedia("(prefers-reduced-motion: reduce)").matches)return;const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");o.unobserve(e.target);}}),{threshold:.12});document.querySelectorAll("main .block").forEach(b=>{b.classList.add("reveal");o.observe(b);});})();</script>
 </body>
 </html>
