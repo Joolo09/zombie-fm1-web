@@ -49,22 +49,6 @@
         "ru": "Диагностика USB-MIDI, CRC известных секторов flash и собственного RAM-буфера. USB-host и накопители не реализованы. На физическом FM-1 разработчиком не проверена.",
         "en": "USB-MIDI diagnostics, known flash-sector CRCs and owned RAM buffer test. No USB host or drive support. Not verified on physical FM-1 by the developer."
       }
-    },
-    {
-      "product": "FM-1_63000802",
-      "version": "0.8.2",
-      "label": {
-        "ru": "Вернуть Groovebox 0.8.2",
-        "en": "Restore Groovebox 0.8.2"
-      },
-      "notes": {
-        "ru": "Возврат к музыкальной прошивке. После установки открывай основной редактор.",
-        "en": "Return to the music firmware. Use the main editor after installation."
-      },
-      "bytes": 610100,
-      "sha256": "9547dd8a94b6a2bd797cd8d908b5ea6fc77a89c29d1fa67ce3a822e355da5909",
-      "file": "../downloads/zombie-groovebox-0.8.2.fwsc",
-      "editor": "../webapp/groovebox/"
     }
   ]
 }
