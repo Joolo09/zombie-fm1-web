@@ -26,8 +26,12 @@ static uint8_t ui_vu[6];
 static int ui_zhead,ui_zmouth,ui_zwalk,ui_zplay;
 typedef struct{uint32_t born;int16_t x;uint8_t color,kind;}ui_spark_t;
 static ui_spark_t ui_sparks[12];static uint32_t ui_spark_next;
-static void ui_input(void){ui_input_at=plat_ms();}
-static void ui_knob_touch(uint32_t k){ui_input_at=plat_ms();if(k<4)ui_knob_at[k]=ui_input_at|1;}
+static uint8_t ui_about,ui_wake_src;static uint32_t ui_about_at,ui_home_tap_at,ui_enc_at[7];static int8_t ui_enc_dir[7];
+/* what counts as a touch: src 1 a key, 2 a button, 3.. an encoder (EN_* + 3) */
+static void ui_input_from(uint32_t src){uint32_t now=plat_ms();ui_input_at=now;ui_wake_src=(uint8_t)src;if(ui_about&&now-ui_about_at>300)ui_about=0;}
+/* one lone detent is not a touch (a resting encoder can tick by itself on the device); two, or a second the same way soon after, are */
+static void ui_enc(uint32_t role,int d){uint32_t now=plat_ms();int s=d>0?1:-1;if(role<7){if(d>=2||d<=-2||(ui_enc_dir[role]==s&&now-ui_enc_at[role]<700))ui_input_from(3+role);ui_enc_dir[role]=(int8_t)s;ui_enc_at[role]=now;}}
+static void ui_knob_touch(uint32_t k,int d){ui_enc(EN_K1+k,d);if(k<4)ui_knob_at[k]=plat_ms()|1;}
 static uint32_t ui_knob_glow(uint32_t k){uint32_t age=plat_ms()-ui_knob_at[k&3];return ui_knob_at[k&3]&&age<500?(500-age)*100/500:0;}
 /* new voices (a key, a step, MIDI) light their track's meter and send a note flying */
 static void ui_scene_tick(uint32_t now){uint32_t t;
@@ -116,8 +120,9 @@ static void ui_zombie(uint32_t now){
 }
 /* idle for a minute (no key, button or knob), outside a layer and not recording: the night scene, until any touch */
 #define UI_SAVER_MS 60000u
-static uint32_t ui_saver_active(void){uint32_t now=plat_ms();
- return saver_on()&&ui_input_at&&now-ui_input_at>UI_SAVER_MS&&active_layer<0&&!z_song.recording&&!z_countin_state()&&grid_hold.key<0&&z_sys.midi_mode!=2&&(int32_t)(message_until-now)<=0;}
+/* 0: nothing holds it back; else why not (shown on the About screen) */
+static uint32_t ui_saver_block(void){uint32_t now=plat_ms();if(!saver_on())return 1;if(active_layer>=0)return 2;if(z_song.recording||z_countin_state())return 3;if(grid_hold.key>=0)return 4;if(z_sys.midi_mode==2)return 5;if((int32_t)(message_until-now)>0)return 6;return 0;}
+static uint32_t ui_saver_active(void){return ui_input_at&&plat_ms()-ui_input_at>UI_SAVER_MS&&!ui_saver_block();}
 /* the keys while it sleeps: a slow wave across the white keys (glow on, stopped) */
 static uint32_t ui_saver_keys(uint32_t now){static const uint8_t white[16]=PLAT_WHITE_KEYS;uint32_t m=0,p=(now/140)%30,j;
  for(j=0;j<16;j++){int d=(int)j-(int)(p<16?p:30-p);if(d>=-1&&d<=1)m|=1u<<white[j];}return m;}
@@ -139,9 +144,73 @@ static void ui_saver_band(int yoff,uint32_t now){uint32_t i,t;int play=ui_zplay;
  if(yoff==0){cv_text(10,8,&FONT_XS,"ZOMBIE FM-1",RGB(150,190,120));
   if(play){number(z_song.bpm,b);cv_text(10,22,&FONT_M,b,RGB(226,239,206));cv_text(12+text_w(&FONT_M,b),36,&FONT_XS,"BPM",RGB(145,168,124));
    for(i=0;i<16;i++)cv_rect(10+(int)i*5,50,4,4,i==z_position()%16?RGB(255,255,235):i%4?RGB(40,60,50):RGB(80,110,80));}
-  else z_text(10,22,&FONT_XS,word("ЛЮБАЯ КНОПКА: ПРОСНУТЬСЯ","ANY KEY: WAKE UP"),RGB(110,130,100));}
+  else z_text(10,22,&FONT_XS,(now/4000)&1?word("ДЕРЖИ HOME: ДРУГАЯ ЗАСТАВКА","HOLD HOME: NEXT SAVER"):word("ЛЮБАЯ КНОПКА: ПРОСНУТЬСЯ","ANY KEY: WAKE UP"),RGB(110,130,100));}
 }
-static void ui_draw_saver(void){uint32_t now=plat_ms();cv_begin(240,120,RGB(6,9,20));ui_saver_band(0,now);cv_blit(0,0);cv_begin(240,120,RGB(6,9,20));ui_saver_band(120,now);cv_blit(0,120);}
+/* 0.18.1: four screensavers (hold HOME on one for the next), and the About screen (HOME twice). */
+static uint32_t ui_saver_label_at;
+static void ui_saver_next(void){system_set(14,(saver_style()+1)%4);ui_saver_label_at=plat_ms()|1;}
+/* HOME on a screensaver belongs to it: a tap wakes, a hold turns to the next one (again every 0.6 s); 1 = HOME is taken */
+static uint8_t ui_saver_hold;static uint32_t ui_saver_hold_at;
+static int ui_saver_home(uint32_t buttons,uint32_t held,uint32_t now){int down=(int)(buttons>>B_HOME&1);
+ if(ui_saver_hold){if(!down){if(ui_saver_hold==1)ui_input_from(2);ui_saver_hold=0;return 1;}if(now-ui_saver_hold_at>=600){ui_saver_next();ui_saver_hold_at=now;ui_saver_hold=2;}return 1;}
+ if(down&&!(held>>B_HOME&1)&&ui_saver_active()){ui_saver_hold=1;ui_saver_hold_at=now;return 1;}
+ return 0;}
+static void ui_home_tap(uint32_t now){if(ui_home_tap_at&&now-ui_home_tap_at<450){ui_about=1;ui_about_at=now|1;ui_home_tap_at=0;}else ui_home_tap_at=now|1;}
+static void ui_saver_top(uint32_t now,const char *title){char b[12];cv_text(10,8,&FONT_XS,title,RGB(150,190,120));
+ if(z_playing()){uint32_t i;number(z_song.bpm,b);cv_text(10,22,&FONT_M,b,RGB(236,242,220));cv_text(12+text_w(&FONT_M,b),36,&FONT_XS,"BPM",RGB(160,170,150));for(i=0;i<16;i++)cv_rect(10+(int)i*5,50,4,4,i==z_position()%16?RGB(255,255,235):i%4?RGB(50,60,60):RGB(110,120,110));}(void)now;}
+static void ui_saver_label(uint32_t now,int yoff){uint32_t age=now-ui_saver_label_at;char t[48];uint32_t k=0;const char *p;
+ if(!ui_saver_label_at||age>1600)return;p=word("ЗАСТАВКА: ","SCREENSAVER: ");while(*p)t[k++]=*p++;p=z_song.language?ui_saver_en[saver_style()]:ui_saver_ru[saver_style()];while(*p&&k<40)t[k++]=*p++;t[k]=0;
+ ui_round(30,92-yoff,180,42,RGB(20,26,24),RGB(0,0,0));cv_rect(30,92-yoff,180,2,ui_colors[saver_style()]);z_text(40,98-yoff,&FONT_XS,t,RGB(236,242,220));z_text(40,115-yoff,&FONT_XS,word("SAVE: ЗАПОМНИТЬ","SAVE: KEEP IT"),RGB(140,150,140));}
+static void ui_synth_band(int yoff,uint32_t now){int i,dy,r=44,play=ui_zplay;
+ static const uint16_t sky[10]={RGB(16,6,38),RGB(26,8,52),RGB(40,10,66),RGB(58,12,80),RGB(80,16,90),RGB(108,20,98),RGB(138,28,98),RGB(166,40,92),RGB(194,58,84),RGB(220,80,74)};
+ for(i=0;i<10;i++)cv_rect(0,i*13-yoff,240,13,sky[i]);ui_stars(0,2,240,64,22,now,yoff);
+ for(dy=-r;dy<=r;dy++){int w=0,y=96+dy;while((w+1)*(w+1)+dy*dy<=r*r)w++;if(dy>4&&((dy+(int)(now/70))%9)<1+dy/12)continue;cv_rect(120-w,y-yoff,2*w+1,1,ui_blend(RGB(255,224,96),RGB(255,64,150),(uint32_t)(dy+r)*127/(2*r)));}
+ for(i=0;i<240;i+=3){int h=(int)(16+ui_sin(i/110.0f)*9+ui_sin(i/41.0f+0.3f)*5);cv_rect(i,130-h-yoff,3,h,RGB(34,8,58));cv_rect(i,130-h-yoff,3,1,RGB(255,92,210));}
+ if(play)for(i=0;i<6;i++){int h=ui_vu[i]*34/127;cv_rect(84+i*12,129-h-yoff,8,h,ui_colors[i]);}
+ cv_rect(0,130-yoff,240,110,RGB(12,3,26));cv_rect(0,130-yoff,240,1,RGB(255,140,230));
+ {float ph=play?(float)(z_position()%4)/4.0f:(float)(now%1600)/1600.0f;for(i=0;i<12;i++){float z=(float)i+1.0f-ph;if(z<0.35f)continue;int y=130+(int)(100.0f/z);if(y>239)continue;cv_rect(0,y-yoff,240,1,ui_blend(RGB(60,10,80),RGB(255,70,200),(uint32_t)(127-(int)(z*10>127?127:z*10))));}}
+ for(i=-9;i<=9;i++)cv_line(120+i*4,130-yoff,120+i*44,239-yoff,RGB(200,50,180));
+ ui_zscale=1;ui_zox=88;ui_zoy=152-yoff;ui_zombie(now);if(play)ui_draw_sparks(136,150-yoff,70,now,RGB(12,3,26));
+ if(!yoff)ui_saver_top(now,"ZOMBIE FM-1");}
+static void ui_matrix_band(int yoff,uint32_t now){static const char set[]="ZOMBIE0123456789#$%&*+=<>FM";int c,i;char ch[2]={0,0};
+ for(c=0;c<20;c++){uint32_t h=(uint32_t)c*2654435761u,speed=36+(h>>8)%64;if(ui_zplay)speed=speed*3/2;int head=(int)((now*speed/1000+(h>>16))%380)-60;uint16_t lead=ui_zplay&&ui_vu[c%6]>60?ui_colors[c%6]:RGB(214,255,214);
+  for(i=0;i<14;i++){int y=head-i*12;if(y-yoff<-12||y-yoff>=120)continue;ch[0]=set[((h>>4)+(uint32_t)i*7+now/(140+(uint32_t)(c%5)*50))%(sizeof set-1)];cv_text(c*12+2,y-yoff,&FONT_XS,ch,i==0?lead:ui_blend(RGB(60,230,90),RGB(0,0,0),(uint32_t)i*9));}}
+ if(yoff<150&&yoff+120>90){static const char *const msg[2]={"WAKE UP, ZOMBIE...","FOLLOW THE BEAT"};const char *m=msg[(now/9000)&1];uint32_t n=(now%9000)/110,len=0;char t[24];while(m[len])len++;if(n>len)n=len;for(i=0;i<(int)n;i++)t[i]=m[i];t[n]=0;
+  ui_round(30,94-yoff,180,48,RGB(0,0,0),RGB(0,0,0));cv_rect(30,94-yoff,180,1,RGB(60,230,90));cv_rect(30,141-yoff,180,1,RGB(60,230,90));cv_text(42,104-yoff,&FONT_XS,t,RGB(120,255,140));if((now/400)&1)cv_rect(42+text_w(&FONT_XS,t)+1,104-yoff,6,10,RGB(120,255,140));
+  if(ui_zplay){char b[8];number(z_song.bpm,b);cv_text(42,122-yoff,&FONT_XS,b,RGB(60,230,90));cv_text(42+text_w(&FONT_XS,b)+4,122-yoff,&FONT_XS,"BPM",RGB(40,150,60));}}}
+static void ui_bounce_band(int yoff,uint32_t now){const int w=112,h=50;uint32_t tx=now*46/1000,ty=now*33/1000,rx=240-w,ry=240-h,bx=tx%(2*rx),by=ty%(2*ry);int x=(int)(bx<rx?bx:2*rx-bx),y=(int)(by<ry?by:2*ry-by);uint32_t hits=tx/rx+ty/ry;uint16_t c=ui_colors[hits%6];
+ ui_stars(0,0,240,240,26,now,yoff);
+ if((x<4||x>(int)rx-4)&&(y<4||y>(int)ry-4)&&!yoff)z_text(80,112,&FONT_S,word("УГОЛ!","CORNER!"),RGB(255,255,200));
+ if(ui_zplay&&z_position()%4==0)ui_round(x-3,y-3-yoff,w+6,h+6,ui_blend(c,RGB(0,0,0),70),RGB(4,4,10));
+ ui_round(x,y-yoff,w,h,c,RGB(4,4,10));cv_text(x+10,y+6-yoff,&FONT_S,"ZOMBIE",RGB(8,10,14));cv_text(x+10,y+30-yoff,&FONT_XS,"FM-1  GROOVEBOX",ui_blend(c,RGB(0,0,0),80));
+ if(!yoff&&ui_zplay)ui_saver_top(now,"");}
+static void ui_draw_saver(void){uint32_t now=plat_ms(),s=saver_style();int b;static const uint16_t bg[4]={RGB(6,9,20),RGB(16,6,38),RGB(0,0,0),RGB(4,4,10)};
+ for(b=0;b<2;b++){cv_begin(240,120,bg[s]);if(s==1)ui_synth_band(b*120,now);else if(s==2)ui_matrix_band(b*120,now);else if(s==3)ui_bounce_band(b*120,now);else ui_saver_band(b*120,now);ui_saver_label(now,b*120);cv_blit(0,(uint32_t)b*120);}}
+/* About: a live picture of the device instead of a page of text */
+static void ui_card(int x,int y,int w,int h,const char *title,uint16_t c){ui_round(x,y,w,h,UI_CARD,UI_BG);cv_rect(x+2,y,w-4,2,c);z_text_clip(x+6,y+4,&FONT_XS,title,UI_MUTED,(uint32_t)w-10);}
+static void ui_big(int x,int y,const char *v,uint16_t c){cv_text(x,y,&FONT_S,v,c);}
+static void ui_draw_about(void){uint32_t now=plat_ms(),t,notes=0,up=now/1000,cpu=plat_cpu_pct(),idle=(now-ui_input_at)/1000,why=ui_saver_block();char b[40],v[24];int i;
+ for(t=0;t<6;t++)notes+=z_track_hits(t);
+ /* top: a wave of letters, the version, the owner, the zombie */
+ cv_begin(240,120,UI_BG);{static const char title[]="ZOMBIE FM-1";int x=10;for(i=0;title[i];i++){char ch[2]={title[i],0};int dy=(int)(ui_sin(now/900.0f+i*0.09f)*3);cv_text(x,8+dy,&FONT_S,ch,title[i]==' '?UI_BG:ui_colors[(i+now/400)%6]);x+=text_w(&FONT_S,ch);}}
+ cv_text(10,30,&FONT_XS,"GROOVEBOX " Z_EDITION_VERSION,UI_MUTED);z_text_clip(10,44,&FONT_XS,z_sys.name,UI_TEXT,150);
+ ui_zscale=1;ui_zox=178;ui_zoy=0;ui_zplay=z_playing();ui_zombie(now);
+ ui_card(4,62,74,56,word("ЗВУК","AUDIO"),ui_colors[0]);number((int)cpu,v);{uint32_t k=0;while(v[k])k++;v[k++]='%';v[k]=0;}ui_big(10,76,v,cpu>85?RGB(255,111,145):UI_TEXT);cv_rect(10,100,62,4,UI_GRID);cv_rect(10,100,(int)(cpu>100?100:cpu)*62/100,4,cpu>85?RGB(255,111,145):ui_colors[0]);
+  cv_rect(10,108,(int)(ui_meter>100?100:ui_meter)*62/100,3,ui_colors[3]);
+ ui_card(83,62,74,56,word("РАБОТАЕТ","UPTIME"),ui_colors[1]);{uint32_t k=0;number((int)(up/3600),b);while(b[k])k++;b[k++]=':';b[k++]=(char)('0'+up/60%60/10);b[k++]=(char)('0'+up/60%10);b[k++]=':';b[k++]=(char)('0'+up%60/10);b[k++]=(char)('0'+up%10);b[k]=0;}ui_big(89,76,b,UI_TEXT);
+ ui_card(162,62,74,56,word("ПРОЕКТ","PROJECT"),ui_colors[2]);number((int)notes,v);ui_big(168,76,v,UI_TEXT);z_text(168,100,&FONT_XS,saved_revision!=z_revision()?word("НЕ СОХР.","UNSAVED"):word("СОХРАНЕН","SAVED"),saved_revision!=z_revision()?RGB(255,180,90):UI_MUTED);
+ cv_blit(0,0);
+ cv_begin(240,120,UI_BG);
+ ui_card(4,2,74,56,"MIDI USB",ui_colors[3]);{uint32_t in=plat_midi_count(PORT_USB,0),out=plat_midi_count(PORT_USB,1);int ai=plat_midi_ago(PORT_USB,0)<250,ao=plat_midi_ago(PORT_USB,1)<250;
+  cv_rect(10,20,6,6,ai?ui_colors[3]:UI_GRID);number((int)in,v);cv_text(20,18,&FONT_XS,v,UI_TEXT);cv_rect(10,36,6,6,ao?ui_colors[4]:UI_GRID);number((int)out,v);cv_text(20,34,&FONT_XS,v,UI_TEXT);z_text(10,46,&FONT_XS,word("ВХОД/ВЫХОД","IN / OUT"),UI_MUTED);}
+ ui_card(83,2,74,56,word("ПРЕСЕТЫ","PRESETS"),ui_colors[4]);ui_big(89,16,"128",UI_TEXT);cv_rect(89,40,32,5,ui_colors[0]);cv_rect(121,40,16,5,ui_colors[4]);cv_rect(137,40,16,5,ui_colors[5]);cv_text(89,47,&FONT_XS,"F  IDM ZMB",UI_MUTED);
+ ui_card(162,2,74,56,word("ЯДРО 2","CORE 2"),ui_colors[5]);z_text(168,18,&FONT_XS,core_status==Z_CORE_RUNNING||core_status==Z_CORE_SIMULATED?word("РАБОТАЕТ","RUNNING"):core_status==Z_CORE_OFF?word("ВЫКЛ","OFF"):word("СБОЙ","FAULT"),core_status==Z_CORE_RUNNING||core_status==Z_CORE_SIMULATED?RGB(126,224,140):UI_MUTED);number((int)plat_xruns(),v);z_text(168,34,&FONT_XS,word("СРЫВЫ:","XRUNS:"),UI_MUTED);cv_text(212,34,&FONT_XS,v,UI_TEXT);
+ /* the screensaver: which, when, or what holds it back (and what last counted as a touch) */
+ ui_round(4,62,232,38,UI_CARD,UI_BG);{uint32_t k=0;const char *p=word("ЗАСТАВКА ","SAVER ");while(*p)b[k++]=*p++;p=!saver_on()?word("ВЫКЛ","OFF"):z_song.language?ui_saver_en[saver_style()]:ui_saver_ru[saver_style()];while(*p&&k<38)b[k++]=*p++;b[k]=0;z_text(10,66,&FONT_XS,b,UI_TEXT);
+  static const char *const wr[8]={"","ВЫКЛ В НАСТРОЙКАХ","ОТКРЫТ СЛОЙ","ИДЕТ ЗАПИСЬ","ЗАЖАТ ШАГ","РЕЖИМ DAW","СООБЩЕНИЕ",""},*const we[8]={"","OFF IN SETTINGS","A LAYER IS OPEN","RECORDING","A STEP IS HELD","DAW MODE","A MESSAGE",""};
+  if(why&&why<7)z_text(10,82,&FONT_XS,z_song.language?we[why]:wr[why],RGB(255,180,90));else{uint32_t left=idle>=60?0:60-idle;k=0;p=word("ЧЕРЕЗ ","IN ");while(*p)v[k++]=*p++;number((int)left,v+k);while(v[k])k++;v[k++]=' ';p=word("С","S");while(*p)v[k++]=*p++;v[k]=0;z_text(10,82,&FONT_XS,v,ui_colors[3]);cv_rect(120,86,110,3,UI_GRID);cv_rect(120,86,(int)(idle>60?60:idle)*110/60,3,ui_colors[3]);}}
+ {static const char *const src[]={"-","KEY","BTN","SELECT","ALGO","PRESET","K1","K2","K3","K4"};uint32_t k=0;const char *p=word("ПОСЛЕДНЕЕ КАСАНИЕ: ","LAST TOUCH: ");while(*p)b[k++]=*p++;p=src[ui_wake_src<10?ui_wake_src:0];while(*p)b[k++]=*p++;b[k]=0;z_text(8,104,&FONT_XS,b,UI_MUTED);}
+ cv_blit(0,120);}
 static uint32_t ui_hit_at(uint32_t t,uint32_t at){if(!z_drum_track(t))return z_song.track[t].steps[at].velocity!=0;for(uint32_t d=0;d<16;d++)if(at<z_dm.sound[d].length&&z_dm.step[d][at].velocity)return 1;return 0;}
 static void ui_zombie_home(void){uint32_t t=z_song.selected,pg=z_song.subpage%2,now=plat_ms(),hits=z_track_hits(t);char b[32];
  ui_header("ZOMBIE FM-1",z_song.recording?(z_playing()?"REC LIVE / 1:16":"REC STEP / NEXT ON RELEASE"):z_playing()?word("ИГРАЕТ / PLAY","PLAYING"):word("ГОТОВ / STOP","READY / STOP"));ui_tracks();
