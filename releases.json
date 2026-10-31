@@ -1,24 +1,24 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63001802",
+  "current": "FM-1_63001803",
   "releases": [
     {
-      "product": "FM-1_63001802",
-      "version": "0.18.2",
+      "product": "FM-1_63001803",
+      "version": "0.18.3",
       "label": {
-        "ru": "Groovebox 0.18.2 · 128 пресетов, живой экран, 4 заставки",
-        "en": "Groovebox 0.18.2 · 128 presets, living screen, 4 screensavers"
+        "ru": "Groovebox 0.18.3 · 128 пресетов, живой экран, 4 заставки",
+        "en": "Groovebox 0.18.3 · 128 presets, living screen, 4 screensavers"
       },
       "notes": {
-        "ru": "Английский язык по умолчанию для новых проектов (переключить: HOME + GLO). Названия параметров на английском написаны полностью. Банк ZMB, живой экран, 4 заставки (на заставке держи HOME), HOME дважды: «О системе». Проверена в эмуляторе и автотестах, на FM-1 пока нет.",
-        "en": "English by default for new projects (switch: HOME + GLO). Full English parameter names. ZMB bank, living screen, 4 screensavers (hold HOME on one), HOME twice: About. Tested in the emulator and test suite, not yet on a physical FM-1."
+        "ru": "Английский язык по умолчанию для новых проектов (переключить: HOME + GLO). Названия параметров на английском написаны полностью, подписи драм-сетки переведены на русский. Банк ZMB, живой экран, 4 заставки (на заставке держи HOME), HOME дважды: «О системе». Проверена в эмуляторе и автотестах, на FM-1 пока нет.",
+        "en": "English by default for new projects (switch: HOME + GLO). Full English parameter names; drum-grid labels in Russian too. ZMB bank, living screen, 4 screensavers (hold HOME on one), HOME twice: About. Tested in the emulator and test suite, not yet on a physical FM-1."
       },
       "channel": "recommended",
       "bytes": 610100,
-      "sha256": "24093bde5311ed71d26d8a133cb07f9889ac9953cb1aa7efca263f1b7ebcce95",
-      "file": "downloads/zombie-groovebox-0.18.2.fwsc",
+      "sha256": "0a767d345d72ba0a4613b02133d9a84fbce48aa507ccbcc99874d8deddae79db",
+      "file": "downloads/zombie-groovebox-0.18.3.fwsc",
       "editor": "webapp/groovebox-180/",
-      "source": "downloads/groovebox-source-0.18.2.zip"
+      "source": "downloads/groovebox-source-0.18.3.zip"
     },
     {
       "product": "FM-1_64000800",

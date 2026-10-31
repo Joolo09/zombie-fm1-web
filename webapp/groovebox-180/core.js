@@ -54,7 +54,7 @@ export class Link {
  async connect(input,output){if(this.input||this.output)this.close();const generation=this.generation,current=()=>generation===this.generation&&this.input===input&&this.output===output,check=()=>{if(!current())throw Error("MIDI connection cancelled");};this.input=input;this.output=output;try{
   await input.open();check();await output.open();check();input.onmidimessage=e=>{if(current())this.receive(e.data);};
   const version=new TextDecoder().decode(await this.command(1));check();this.version=version;
-  if(this.version!=='ZCORE/1/0.18.2/groovebox')throw Error('Открой редактор своей версии прошивки или установи 0.18.2');
+  if(this.version!=='ZCORE/1/0.18.3/groovebox')throw Error('Открой редактор своей версии прошивки или установи 0.18.3');
   this.edition=EDITION;this.sampler=false;this.daw=this.system=this.polish=this.live=this.modern=this.connected=true;this.lastRevision=-1;
   const state=await this.readState();check();return state;
  }catch(e){if(current())this.close();else{if(input!==this.input)Promise.resolve(input.close()).catch(()=>{});if(output!==this.output)Promise.resolve(output.close()).catch(()=>{});}throw e;}}
