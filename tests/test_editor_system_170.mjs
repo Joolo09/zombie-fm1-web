@@ -10,7 +10,7 @@ check('every setting written with command 29 reads back through decodeSystem',()
  for(const [id,k] of SYSTEM_KEYS.entries()){if(id===0||id===6||id===7||id===1)continue;for(const v of [SYSTEM_MAX[id],0,Math.min(1,SYSTEM_MAX[id])]){p(29,[id,v]);assert.equal(decodeSystem(p(28))[k],v,k+'='+v);}}});
 
 check('out-of-range values are refused by the firmware (status 1), not stored',()=>{const e=create(),p=protocol(e);
- p(29,[10,10],1);p(29,[11,12],1);p(29,[8,3],1);p(29,[12,2],1);p(29,[15,0],1);const s=decodeSystem(p(28));assert.deepEqual([s.scale,s.root,s.countin,s.clockOut],[0,0,1,0]);});
+ p(29,[10,10],1);p(29,[11,12],1);p(29,[8,3],1);p(29,[12,2],1);p(29,[20,0],1);const s=decodeSystem(p(28));assert.deepEqual([s.scale,s.root,s.countin,s.clockOut],[0,0,1,0]);});
 
 check('scale and root are independent nibbles',()=>{const e=create(),p=protocol(e);p(29,[10,7]);p(29,[11,9]);let s=decodeSystem(p(28));assert.deepEqual([s.scale,s.root],[7,9]);p(29,[10,2]);s=decodeSystem(p(28));assert.deepEqual([s.scale,s.root],[2,9]);});
 

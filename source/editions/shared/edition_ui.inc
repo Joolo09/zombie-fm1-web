@@ -186,6 +186,31 @@ static void ui_bounce_band(int yoff,uint32_t now){const int w=112,h=50;uint32_t 
  if(!yoff&&ui_zplay)ui_saver_top(now,"");}
 static void ui_draw_saver(void){uint32_t now=plat_ms(),s=saver_style();int b;static const uint16_t bg[4]={RGB(6,9,20),RGB(16,6,38),RGB(0,0,0),RGB(4,4,10)};
  for(b=0;b<2;b++){cv_begin(240,120,bg[s]);if(s==1)ui_synth_band(b*120,now);else if(s==2)ui_matrix_band(b*120,now);else if(s==3)ui_bounce_band(b*120,now);else ui_saver_band(b*120,now);ui_saver_label(now,b*120);cv_blit(0,(uint32_t)b*120);}}
+/* 0.19: SYSTEM, its own tab (GLO three times): MIDI, sync, core and output, panel. GLO turns its pages, any other section button leaves. */
+static const uint32_t sys_knobs[4][4]={{U_MIDI_OMNI,U_MIDI_THRU,U_PC_IN,U_CC_IN},{U_CLOCK,U_CLKOUT,U_MIDI_MODE,U_DAW_TRANSPORT},{U_CORE,U_CORE_BOOT,U_TRIM,U_LIMITER},{U_GLOW,U_CURVE,U_START,U_SAVER}};
+static uint32_t sys_knob(uint32_t k){return sys_knobs[sys_page%4][k&3];}
+static void ui_port(int x,const char *name,uint32_t count,int active,uint16_t c){char b[12];ui_round(x,14,70,46,UI_CARD,UI_BG);cv_rect(x+2,14,66,2,c);z_text_clip(x+6,19,&FONT_XS,name,UI_MUTED,60);
+ cv_rect(x+6,38,7,7,active?c:UI_GRID);if(active){cv_rect(x+5,37,9,9,ui_blend(UI_CARD,c,50));cv_rect(x+6,38,7,7,c);}number((int)count,b);cv_text(x+18,35,&FONT_XS,b,UI_TEXT);}
+static void ui_draw_system(void){uint32_t now=plat_ms(),pg=sys_page%4,i,j;char b[32],sub[48];static const char *const pr[4]={"MIDI","СИНХРО","ЯДРА","ПАНЕЛЬ"},*const pe[4]={"MIDI","SYNC","CORES","PANEL"};
+ {uint32_t k=0;const char *q=word("СТР. ","PAGE ");while(*q)sub[k++]=*q++;number((int)pg+1,sub+k);while(sub[k])k++;q=word(" ИЗ 4: "," OF 4: ");while(*q)sub[k++]=*q++;q=z_song.language?pe[pg]:pr[pg];while(*q&&k<46)sub[k++]=*q++;sub[k]=0;}
+ ui_header(word("СИСТЕМА","SYSTEM"),sub);ui_tracks();
+ cv_begin(240,78,UI_BG);
+ if(pg==0){ui_port(6,"USB IN",plat_midi_count(PORT_USB,0),plat_midi_ago(PORT_USB,0)<250,ui_colors[3]);ui_port(85,"USB OUT",plat_midi_count(PORT_USB,1),plat_midi_ago(PORT_USB,1)<250,ui_colors[4]);ui_port(164,"TRS IN",plat_midi_count(PORT_TRS,0),plat_midi_ago(PORT_TRS,0)<250,ui_colors[0]);
+  if(z_ext.thru){int x=(int)((now/40)%70);for(i=0;i<3;i++){int px=164-(x+(int)i*24)%79;cv_rect(px,64,6,2,ui_colors[0]);}cv_rect(85,66,149,1,ui_blend(UI_BG,ui_colors[0],60));}
+  z_text_clip(6,0,&FONT_XS,z_ext.omni?word("ВСЕ КАНАЛЫ ИГРАЮТ ВЫБРАННЫЙ ТРЕК","EVERY CHANNEL PLAYS THE SELECTED TRACK"):word("КАЖДЫЙ ТРЕК СЛУШАЕТ СВОЙ КАНАЛ","EACH TRACK LISTENS ON ITS CHANNEL"),UI_MUTED,228);}
+ else if(pg==1){int beat=z_playing()?(int)(z_position()/4%4):-1;z_text_clip(6,0,&FONT_XS,z_song.reserved?word("ТАКТ ОТ USB / TRS","CLOCK FROM USB / TRS"):word("СВОЙ ТАКТ","OWN CLOCK"),UI_MUTED,228);
+  for(i=0;i<4;i++){uint16_t c=(int)i==beat?ui_accent():UI_CARD;ui_round(10+(int)i*30,24,24,24,c,UI_BG);}number(z_sys.midi_mode==2?daw_bpm:z_song.bpm,b);cv_text(140,20,&FONT_M,b,UI_TEXT);cv_text(140,46,&FONT_XS,"BPM",UI_MUTED);
+  if(clock_out_on()){cv_text(190,24,&FONT_XS,"CLK",ui_colors[3]);if(beat>=0&&(now/80)&1)cv_rect(190,40,30,3,ui_colors[3]);}}
+ else if(pg==2){uint32_t cpu=plat_cpu_pct();int on=core_status==Z_CORE_RUNNING||core_status==Z_CORE_SIMULATED;
+  ui_round(10,8,96,50,UI_CARD,UI_BG);cv_rect(12,8,92,2,ui_colors[0]);cv_text(18,14,&FONT_XS,"CPU0",UI_TEXT);z_text(18,30,&FONT_XS,word("ЗВУК, ЭКРАН","SOUND, SCREEN"),UI_MUTED);cv_rect(18,46,80,4,UI_GRID);cv_rect(18,46,(int)(cpu>100?100:cpu)*80/100,4,cpu>85?RGB(255,111,145):ui_colors[0]);
+  ui_round(124,8,106,50,UI_CARD,UI_BG);cv_rect(126,8,102,2,on?ui_colors[5]:UI_GRID);cv_text(132,14,&FONT_XS,"CPU1",on?UI_TEXT:UI_MUTED);z_text(132,30,&FONT_XS,on?word("ВЫХОД, ЛИМИТЕР","OUTPUT, LIMITER"):word("СПИТ","ASLEEP"),UI_MUTED);if(on&&(now/300)&1)cv_rect(214,14,8,8,ui_colors[5]);
+  for(i=0;i<5;i++)cv_rect(106,18+(int)i*8,18,2,on?ui_blend(UI_BG,ui_colors[5],(uint32_t)((now/60+i*3)%8)*16):UI_GRID);
+  if(z_ext.core_boot)z_text(10,64,&FONT_XS,word("CPU1 ВКЛЮЧИТСЯ ПРИ ЗАПУСКЕ","CPU1 STARTS AT BOOT"),ui_colors[5]);}
+ else {uint8_t ys[96];for(i=0;i<96;i++){uint32_t v=i*127/95,o=z_sys.velocity==1?127-(127-v)*(127-v)/127:z_sys.velocity==2?100:v;ys[i]=(uint8_t)(o*50/127);}ui_round(8,4,104,62,UI_CARD,UI_BG);for(i=1;i<96;i++)cv_line(11+(int)i-1,60-ys[i-1],11+(int)i,60-ys[i],ui_accent());z_text(14,6,&FONT_XS,word("СИЛА","VELOCITY"),UI_MUTED);
+  for(j=0;j<16;j++){int lit=z_sys.glow==2||(z_sys.glow==1&&((j+now/200)%16)<3);cv_rect(124+(int)(j%8)*13,14+(int)(j/8)*24,10,18,lit?ui_blend(UI_CARD,ui_accent(),z_sys.glow==2?120:60):UI_CARD);}z_text(124,62,&FONT_XS,word("ПОДСВЕТКА","KEY LIGHTS"),UI_MUTED);}
+ cv_blit(0,58);
+ for(i=0;i<2;i++){cv_begin(240,42,UI_BG);for(j=0;j<2;j++){uint32_t id=sys_knob(i*2+j);ui_cell(6+(int)j*118,(int)(i*2+j),label(id),value_text(id,b),id==U_TRIM?z_sys.trim:0);}cv_blit(0,136+i*42);}
+ cv_begin(240,2,UI_BG);cv_blit(0,220);ui_footer(word("GLO: СТРАНИЦА / ДРУГОЙ РАЗДЕЛ: ВЫЙТИ","GLO: PAGE / OTHER SECTION: LEAVE"));}
 /* About: a live picture of the device instead of a page of text */
 static void ui_card(int x,int y,int w,int h,const char *title,uint16_t c){ui_round(x,y,w,h,UI_CARD,UI_BG);cv_rect(x+2,y,w-4,2,c);z_text_clip(x+6,y+4,&FONT_XS,title,UI_MUTED,(uint32_t)w-10);}
 static void ui_big(int x,int y,const char *v,uint16_t c){cv_text(x,y,&FONT_S,v,c);}

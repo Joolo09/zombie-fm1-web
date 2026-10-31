@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: MIT — 0.18.3 night screensaver, the live scene and the ZMB preset bank. */
+/* SPDX-License-Identifier: MIT — 0.19.0 night screensaver, the live scene and the ZMB preset bank. */
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {create,WHITE} from './native_emulator_harness.mjs';import {protocol} from './native_protocol_harness.mjs';
 let failed=0;const check=(name,fn)=>{try{fn();console.log('PASS '+name);}catch(e){failed++;console.error('FAIL '+name+': '+e.message);}};
 /* the saver's moon: its face colour, in either byte order, inside the box around (186, 52) */
@@ -23,7 +23,7 @@ check('the ZMB bank fills slots 97-128: every patch audible, finite, unclipped a
   const rms=Math.sqrt(e/n);assert(rms>0.004,names[i][0]+' rms '+rms);assert(pk<0.9,names[i][0]+' peak '+pk);sums.add(sum.toFixed(4));}
  assert.equal(sums.size,32);});
 
-/* 0.18.3 */
+/* 0.19.0 */
 const about=e=>{const fb=new Uint16Array(e.memory.buffer,e.w.web_fb(),240*240);let n=0;for(let x=6;x<76;x++){const v=fb[62*240+x];if(v===0xFCCB||v===0xCBFC)n++;}return n>50;};
 const style=e=>protocol(e)(28)[110]>>5&3;
 check('a lone encoder tick (a resting knob on the device) does not keep the screensaver away',()=>{const e=create();idle(e,30000);e.turn(3,1);idle(e,1500);e.turn(3,-1);idle(e,31000);assert(moon(e)>300,'saver despite two lone ticks');});
