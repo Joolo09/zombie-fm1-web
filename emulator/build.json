@@ -1,6 +1,6 @@
 {
   "version": "0.20.1",
   "product": "FM-1_63002001",
-  "wasm_sha256": "f26b90bd7e5407cd9c93c6418845744b4cd03ed8b45ef802f50635018c421aaa",
-  "source_sha256": "5e22d9510f5e5d5f2c512968caeb35d9b040597558afebf357561a5079251993"
+  "wasm_sha256": "bd63c76b5a7ab6f663b03e3d07b4c53e6cf1291185807ef1cf8ffd20e72b2e37",
+  "source_sha256": "7b0dbe41dedf2ad4b11afaef9362fa1664bb2973e1abd7defaaadd98ad4cbf7c"
 }
