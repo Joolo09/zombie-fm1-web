@@ -7,4 +7,5 @@ check('drums: the same gesture sets the kit length',()=>{const e=create();e.run(
 check('the turn uses the button: letting SEQ go does not also open the SEQ page',()=>{const e=create();e.run(300);const sec=e.root()[1873];e.hold('SEQ');e.turn(3,1);e.up('SEQ');e.run(60);assert.equal(e.root()[1873],sec);});
 check('a plain SEQ tap still opens the piano roll',()=>{const e=create();e.run(300);e.tap("SEQ");e.run(60);assert.equal(e.root()[1873],8);});
 check('PRESET while SEQ is held pages the SEQ layer, not the preset',()=>{const e=create();e.run(300);const preset=e.root()[1900];e.hold('SEQ');e.turn(2,1);e.up('SEQ');e.run(60);assert.equal(e.root()[1900],preset);});
+check('roll: EDIT held and a knob turned straight away is the edit mode, and letting EDIT go deletes nothing',()=>{const e=create();e.run(300);e.tap('SEQ');e.run(100);const before=[...e.root()].slice(66,70);e.hold('EDIT');e.turn(5,2);e.up('EDIT');e.run(100);const slow=create();slow.run(300);slow.tap('SEQ');slow.run(100);slow.hold('EDIT');slow.run(500);slow.turn(5,2);slow.up('EDIT');slow.run(100);assert.deepEqual([...e.root()].slice(66,70),[...slow.root()].slice(66,70));});
 if(failed)process.exit(1);

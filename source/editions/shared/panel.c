@@ -65,6 +65,8 @@ static uint32_t page_knob(uint32_t section,uint32_t pg,uint32_t k){
   static const uint8_t sel[2][4]={{U_TRACK,U_DRUM_SOUND,Z_MUTE,Z_PAN},{Z_CHANNEL,U_DRUM_TUNE,Z_PROBABILITY,Z_LEVEL}};
   if(section==Z_HOME&&pg==0)return sound[k];if(section==Z_ENV)return env[pg%2][k];if(section==Z_EDIT)return edit[pg%3][k];if(section==Z_LFO)return lfo[pg%2][k];if(section==Z_SEL)return sel[pg%2][k];if(section==Z_GLO&&pg==2&&k==3)return U_STEPS;
  }
+ /* a SAMPLE track: EDIT page 2 picks the WAV slot and its root note */
+ if(!Z_SAMPLER_EDITION&&section==Z_EDIT&&pg%page_count[section]==1&&k<2&&z_get(z_song.selected,Z_MODEL)==8)return k?Z_ROOT:Z_SAMPLE;
  return pages[section][pg%page_count[section]][k];
 }
 /* the selected track's loop length in steps (on the drum track: the selected sound's) */
@@ -77,6 +79,7 @@ static const char *value_text(uint32_t id,char *str){uint32_t t=z_song.selected;
   if(id==Z_MODEL)return z_drum_track(t)?"DRUM KIT":z_models[value];
   if(id==Z_WAVE){static const char *const ru[]={"СИНУС","ПИЛА","ИМПУЛЬС","ТРЕУГОЛЬНИК"},*const en[]={"SINE","SAW","PULSE","TRIANGLE"};return z_song.language?en[value]:ru[value];}
   if(id==Z_MUTE)return value?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
+  if(id==Z_SAMPLE&&!Z_SAMPLER_EDITION&&!z_sample_frames((uint32_t)value)&&value>=6&&value<=9){const char *n=word(" ПУСТО"," EMPTY");uint32_t k=4;str[0]='U';str[1]='S';str[2]='R';str[3]=(char)('1'+value-6);while(*n)str[k++]=*n++;str[k]=0;return str;}
   if(id==Z_SAMPLE){static const char *const name[]={"MC ZOMBIE","MC HURT","MC DEATH","MC CREEPER","MC BOOM","MC XP","USR1","USR2","USR3","USR4","ZC KICK","ZC SNARE","ZC HAT","ZC CLAP"};return name[value];}
  }else switch(id){
   case U_CLKOUT:return clock_out_on()?word("ВКЛ","ON"):word("ВЫКЛ","OFF");
@@ -408,7 +411,7 @@ static void select_tempo(int d){
 }
 /* A knob turned while a section button is held opens that button's layer at once, as a key press does: holding SEQ
  * and turning K1 straight away sets the step count instead of changing the page underneath (0.19.1). */
-static void layer_on_turn(uint32_t buttons){uint32_t s;if(active_layer>=0)return;for(s=0;s<Z_SECTIONS;s++){uint32_t b=section_button[s];if((buttons>>b&1)&&!button_used[b]){if(!Z_SAMPLER_EDITION&&s==Z_EDIT&&z_song.section==Z_SEQ)return;layer_open(s);return;}}}
+static void layer_on_turn(uint32_t buttons){uint32_t s;if(active_layer>=0)return;for(s=0;s<Z_SECTIONS;s++){uint32_t b=section_button[s];if((buttons>>b&1)&&!button_used[b]){if(!Z_SAMPLER_EDITION&&s==Z_EDIT&&z_song.section==Z_SEQ){button_used[B_EDIT]=1;roll_edit=1;return;} /* as the hold does: EDIT on the roll is the edit mode, and its release is no delete */layer_open(s);return;}}}
 /* GLO three times opens SYSTEM; there GLO turns its pages, and another section button leaves it (and does its usual job) */
 static int sys_tap(uint32_t k,uint32_t now){
  if(sys_open){if(k==Z_GLO){sys_page=(uint8_t)((sys_page+1)%4);redraw_at=0;return 1;}sys_open=0;redraw_at=0;return 0;}

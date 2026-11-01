@@ -133,7 +133,7 @@ uint32_t z_live_state(void){return live_requested;}
 void z_clear_track(uint32_t t){(void)z_erase(t,0,2);}
 /* Reconcile control changes without copying transient key/transport state. */
 void z_apply_state(void){uint32_t t,n;
- for(t=0;t<6;t++){if(Z_SAMPLER_EDITION&&z_song.track[t].p[Z_MODEL]!=8){z_song.track[t].p[Z_MODEL]=8;z_song.track[t].p[Z_ATTACK]=0;z_song.track[t].p[Z_SUSTAIN]=127;z_song.track[t].p[Z_RELEASE]=8;z_song.preset[t]=255;}else if(!Z_SAMPLER_EDITION&&z_song.track[t].p[Z_MODEL]>7){z_song.track[t].p[Z_MODEL]=0;z_song.preset[t]=255;}}
+ for(t=0;t<6;t++){if(Z_SAMPLER_EDITION&&z_song.track[t].p[Z_MODEL]!=8){z_song.track[t].p[Z_MODEL]=8;z_song.track[t].p[Z_ATTACK]=0;z_song.track[t].p[Z_SUSTAIN]=127;z_song.track[t].p[Z_RELEASE]=8;z_song.preset[t]=255;}else if(!Z_SAMPLER_EDITION&&z_song.track[t].p[Z_MODEL]>7&&(t==5||z_song.track[t].p[Z_SAMPLE]<6||z_song.track[t].p[Z_SAMPLE]>9)){z_song.track[t].p[Z_MODEL]=0;z_song.preset[t]=255;}} /* a Groovebox SAMPLE track keeps its USR slot */
  z_sampler.tracks=Z_SAMPLER_EDITION?63:0;
  if(!Z_SAMPLER_EDITION){z_song.track[5].p[Z_MODEL]=7;z_song.preset[5]=255;z_song.arp_mode[5]=z_song.arp_hold[5]=0;}
  for(t=0;t<6;t++){if(applied_mode[t]!=z_song.arp_mode[t]){z_alloff(t);applied_mode[t]=z_song.arp_mode[t];}arp_count[t]=0;for(n=0;n<128;n++){
@@ -171,7 +171,10 @@ uint32_t z_state_size(void) { return sizeof z_song; }
 const char *z_preset_name(uint32_t p) { return p<Z_PRESETS?Z_PRESET_NAMES[p]:"EDITED"; }
 int z_set(uint32_t t,uint32_t p,int v) {
  if(t>=Z_TRACKS||p>=Z_PARAMS)return -9999;
- if(p==Z_MODEL)v=Z_SAMPLER_EDITION?8:z_drum_track(t)?7:(v>7?7:v);
+ /* 0.20: Groovebox tracks 1-5 may play the player's own WAVs (SAMPLE, USR1-USR4); the drum track stays the kit */
+ if(p==Z_MODEL)v=Z_SAMPLER_EDITION?8:z_drum_track(t)?7:(v>8?8:v);
+ if(!Z_SAMPLER_EDITION&&p==Z_SAMPLE)v=v<6?6:v>9?9:v;
+ if(!Z_SAMPLER_EDITION&&p==Z_MODEL&&v==8){int16_t *s=&z_song.track[t].p[Z_SAMPLE];if(*s<6||*s>9)*s=6;}
  if(v<z_desc[p].min)v=z_desc[p].min;if(v>z_desc[p].max)v=z_desc[p].max;
  if(z_song.track[t].p[p]!=v){if(p==Z_CHANNEL)z_alloff(t);z_song.track[t].p[p]=(int16_t)v;
   if(p==Z_MUTE&&v&&midi_out)midi_out(t,128,0,0);
