@@ -1,24 +1,24 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63002000",
+  "current": "FM-1_63002001",
   "releases": [
     {
-      "product": "FM-1_63002000",
-      "version": "0.20.0",
+      "product": "FM-1_63002001",
+      "version": "0.20.1",
       "label": {
-        "ru": "Groovebox 0.20.0 · свои сэмплы, вкладка «Система», 128 пресетов",
-        "en": "Groovebox 0.20.0 · your own samples, SYSTEM tab, 128 presets"
+        "ru": "Groovebox 0.20.1 · свои сэмплы, вкладка «Система», 128 пресетов",
+        "en": "Groovebox 0.20.1 · your own samples, SYSTEM tab, 128 presets"
       },
       "notes": {
-        "ru": "Свои сэмплы (USR1–USR4) на дорожках 1–5, вкладка «Система», исправлены жесты SEQ + K1 и EDIT + ручка.",
-        "en": "Your own samples (USR1–USR4) on tracks 1–5, the SYSTEM tab, SEQ + K1 and EDIT + knob gesture fixes."
+        "ru": "Отмена правки зажатого шага — одним действием. Свои сэмплы (USR1–USR4), вкладка «Система», 128 пресетов.",
+        "en": "Undoing a held-step edit is one step. Your own samples (USR1–USR4), SYSTEM tab, 128 presets."
       },
       "channel": "recommended",
       "bytes": 610100,
-      "sha256": "9600d2399f87506930e0bd70784e50810d5170289ffa9555492646378399d894",
-      "file": "downloads/zombie-groovebox-0.20.0.fwsc",
+      "sha256": "588651b9d7892f538e2af28fbae837c4bf8301ace670296ef3e7947d723009a8",
+      "file": "downloads/zombie-groovebox-0.20.1.fwsc",
       "editor": "webapp/groovebox-180/",
-      "source": "downloads/groovebox-source-0.20.0.zip"
+      "source": "downloads/groovebox-source-0.20.1.zip"
     }
   ]
 }

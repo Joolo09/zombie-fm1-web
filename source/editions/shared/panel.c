@@ -484,9 +484,9 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
    else if(k==1)n.velocity=(uint8_t)clamp((int)n.velocity+d,1,127);else if(k==2)dur=clamp(dur+d,0,63);else n.gate=(uint8_t)clamp((int)n.gate+d,1,127);
    if(n.note!=s->note||n.velocity!=s->velocity||n.gate!=s->gate||dur!=z_song.duration[t][at]){edit_stop();if(!grid_hold.edited){z_checkpoint();grid_hold.edited=1;}*s=n;z_song.duration[t][at]=(uint8_t)dur;z_touch();if(k==0&&!z_playing())z_audition_step(t,at);redraw_at=0;}
    continue;}
-  if(d&&k&&grid_hold.key>=0&&z_drum_track(t)&&z_sys.midi_mode!=2){z_dm_step_t v=z_dm.step[grid_hold.sound][grid_hold.at];grid_hold.edited=1;if(!v.velocity)v.velocity=100;
+  if(d&&k&&grid_hold.key>=0&&z_drum_track(t)&&z_sys.midi_mode!=2){z_dm_step_t v=z_dm.step[grid_hold.sound][grid_hold.at];if(!grid_hold.edited)z_dm_checkpoint();grid_hold.edited=1;if(!v.velocity)v.velocity=100; /* one undo point for the whole hold */
    if(k==1)v.chance=(uint8_t)clamp((int)v.chance+d,0,127);else if(k==2)v.velocity=(uint8_t)clamp((int)v.velocity+d,1,127);else v.ratchet=(uint8_t)clamp((int)v.ratchet+d,1,4);
-   z_dm_step(grid_hold.sound,grid_hold.at,v.velocity,v.chance,v.ratchet);redraw_at=0;continue;}
+   z_dm_step_quiet(grid_hold.sound,grid_hold.at,v.velocity,v.chance,v.ratchet);redraw_at=0;continue;}
   if(d&&k==0&&active_layer==Z_SEQ&&!tools_page()&&z_sys.midi_mode!=2)knob(U_STEPS,d);else if(d&&z_drum_track(t)&&z_sys.midi_mode!=2&&!tools_page()&&(active_layer==Z_SEQ||(active_layer<0&&z_song.section==Z_SEQ)))dm_knob(k,d);else if(d&&active_layer<0&&sampler_open()&&z_sys.midi_mode!=2)sampler_knob(k,d);else if(d&&active_layer<0&&z_sys.midi_mode==2&&z_song.section!=Z_GLO){daw_values[t][k]=(uint8_t)clamp((int)daw_values[t][k]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,daw_cc[k],daw_values[t][k]);}else if(d)knob(active_layer>=0?layer_knob(k):page_knob(z_song.section,z_song.subpage,k),d);}
  for(t=0;t<6;t++)for(k=0;k<128;k++)if(off_deadline[t][k]&&(int32_t)(now-off_deadline[t][k])>=0){note_packet(t,k,0,0);off_deadline[t][k]=0;}
  if(now-editor_seen>3500&&editor_effect){editor_effect=0;z_live(0);}

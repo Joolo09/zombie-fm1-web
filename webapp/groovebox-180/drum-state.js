@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-import {DRUMS} from './drums.js';
+import {DRUMS} from './drums.js?v=201';
 export const DRUM_BYTES=3208;
 const fields=['level','decay','tune','pan','mute','length'];
 export function migrateDrums(state){const sounds=DRUMS.map(()=>({level:100,decay:64,tune:0,pan:0,mute:0,length:state.tracks[5].p[23],steps:Array.from({length:64},()=>({velocity:0,chance:127,ratchet:1}))}));state.tracks[5].steps.forEach((s,at)=>{if(s.velocity)for(const n of [s.note,...s.chord.filter(Boolean).map(n=>n-1)]){const i=DRUMS.findIndex(d=>d[0]===n);sounds[i<0?n%16:i].steps[at]={velocity:s.velocity,chance:s.chance,ratchet:1};}});return {format:'zombie-drums/1',selected:0,sounds};}
