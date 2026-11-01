@@ -8,7 +8,7 @@ shutil.copy2(root/'source/output/editions-0.20.0'/fw.name,fw)
 shutil.copy2(root/'source/output/editions-0.20.0/groovebox.wasm',root/'webapp/groovebox-180/zombie-core.wasm')
 p=root/'releases.json';s=json.loads(p.read_text(encoding='utf-8'))
 r=dict(product='FM-1_63002000',version='0.20.0',label=dict(ru='Groovebox 0.20.0 · свои сэмплы, вкладка «Система», 128 пресетов',en='Groovebox 0.20.0 · your own samples, SYSTEM tab, 128 presets'),notes=dict(ru='Свои сэмплы: дорожки 1–5 играют WAV из слотов USR1–USR4 (движок SAMPLE); загрузка во вкладке «Сэмплы» веб-редактора. Исправлены жесты: EDIT + ручка на пианоролле больше не удаляет ноту, SEQ + K1 сразу меняет шаги. Вкладка «Система», банк ZMB, 4 заставки. Проверена в эмуляторе и автотестах, на FM-1 пока нет.',en='Your own samples: tracks 1–5 play WAVs from slots USR1–USR4 (SAMPLE engine); upload on the web editor Samples tab. Gesture fixes: EDIT + a knob on the roll no longer deletes the note, SEQ + K1 sets steps at once. SYSTEM tab, ZMB bank, 4 screensavers. Tested in the emulator and test suite, not yet on a physical FM-1.'),channel='recommended',bytes=fw.stat().st_size,sha256=hashlib.sha256(fw.read_bytes()).hexdigest(),file='downloads/'+fw.name,editor='webapp/groovebox-180/',source='downloads/groovebox-source-0.20.0.zip')
-s['releases']=[r]+[v for v in s['releases'] if v['product']=='FM-1_64000800']
+s['releases']=[r]
 s['current']=r['product']
 for v in s['releases']:
  if v['product'] in('FM-1_63001700','FM-1_63001800'):v['channel']='archive'

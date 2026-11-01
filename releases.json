@@ -19,23 +19,6 @@
       "file": "downloads/zombie-groovebox-0.19.1.fwsc",
       "editor": "webapp/groovebox-180/",
       "source": "downloads/groovebox-source-0.19.1.zip"
-    },
-    {
-      "product": "FM-1_64000800",
-      "version": "0.8.0",
-      "label": {
-        "ru": "Sampler 0.8.0 · отдельная прошивка",
-        "en": "Sampler 0.8.0 · dedicated firmware"
-      },
-      "notes": {
-        "ru": "32 пэда, свои WAV, CHOP, reverse, GATE / LOOP. Standalone при запуске. Новая сборка: проверена в симуляторе, на железе пока нет.",
-        "en": "32 pads, user WAVs, CHOP, reverse, GATE / LOOP. Standalone at startup. New build: simulator-tested, not hardware-verified."
-      },
-      "bytes": 610108,
-      "sha256": "d1f15450be7de13dd449be1d8c43e811ad33b2fbb7c0070aab9fe379c2603248",
-      "file": "downloads/zombie-sampler-0.8.0.fwsc",
-      "editor": "webapp/sampler/",
-      "channel": "stable"
     }
   ]
 }
