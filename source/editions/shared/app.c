@@ -63,6 +63,7 @@ static void midi_mode_changed(uint32_t mode){app_panic();midi_local=mode==0;daw_
 /* External MIDI Note On is an attack, including repeated percussion hits without Note Off.
  * Keep physical/editor key deduplication in z_key unchanged. */
 static void midi_key(uint32_t t,uint32_t n,uint32_t v,uint32_t on){if(on&&v)z_key(t,n,0,0);z_key(t,n,v,on);}
+static uint8_t pc_bank[6];
 static void midi_receive(void){uint32_t pkt;int port;while(plat_midi_in(&pkt,&port)){
  uint32_t status=(pkt>>8)&255,n=(pkt>>16)&127,v=(pkt>>24)&127,t;
  if(z_ext.thru&&port==PORT_TRS)plat_midi_out(pkt); /* SYSTEM > TRS THRU: a DIN keyboard on the jack reaches the computer */
@@ -72,9 +73,9 @@ static void midi_receive(void){uint32_t pkt;int port;while(plat_midi_in(&pkt,&po
   if(z_sys.midi_mode==2){if((status&0xf0)==0xb0){uint32_t k;for(k=0;k<4;k++)if(n==daw_cc[k])daw_values[t][k]=v;if(n==7)daw_values[t][4]=v;else if(n==10)daw_values[t][5]=v;else if(n==120||n==123)z_alloff(t);}continue;}
   if((status&0xf0)==0x90){edition_note(t,n,v,v!=0);midi_key(t,n,v,v!=0);}
   else if((status&0xf0)==0x80)z_key(t,n,0,0);
-  else if((status&0xf0)==0xb0){if(n==123||n==120)z_alloff(t);else if(z_ext.no_cc){}else if(n==121){z_bend(t,8192);z_sustain(t,0);}else if(n==122&&z_sys.midi_mode==0)midi_local=v>=64;else if(n==73)z_set(t,Z_ATTACK,v);else if(n==72)z_set(t,Z_RELEASE,v);else if(n==64)z_sustain(t,v>=64);else if(n==74)z_set(t,Z_CUTOFF,v);else if(n==71)z_set(t,Z_RESONANCE,v);else if(n==1)z_set(t,Z_FM,v);else if(n==7)z_set(t,Z_LEVEL,v);else if(n==10)z_set(t,Z_PAN,(int)v-64);}
+  else if((status&0xf0)==0xb0){if(n==123||n==120)z_alloff(t);else if(n==0||n==32)pc_bank[t]=(uint8_t)(v&1);else if(z_ext.no_cc){}else if(n==5)z_x_set(t,Z_X_GLIDE,v);else if(n==76)z_x_set(t,Z_X_VIB_RATE,v);else if(n==77)z_x_set(t,Z_X_VIB,v);else if(n==121){z_bend(t,8192);z_sustain(t,0);}else if(n==122&&z_sys.midi_mode==0)midi_local=v>=64;else if(n==73)z_set(t,Z_ATTACK,v);else if(n==72)z_set(t,Z_RELEASE,v);else if(n==64)z_sustain(t,v>=64);else if(n==74)z_set(t,Z_CUTOFF,v);else if(n==71)z_set(t,Z_RESONANCE,v);else if(n==1)z_set(t,Z_FM,v);else if(n==7)z_set(t,Z_LEVEL,v);else if(n==10)z_set(t,Z_PAN,(int)v-64);}
   else if((status&0xf0)==0xe0)z_bend(t,n|(v<<7));
-  else if((status&0xf0)==0xc0){if(!z_ext.no_pc)z_preset(t,n%Z_PRESETS);}
+  else if((status&0xf0)==0xc0){if(!z_ext.no_pc)z_preset(t,pc_bank[t]*128u+n<Z_PRESETS?pc_bank[t]*128u+n:n%Z_PRESETS);}   /* bank select (CC0 or CC32 = 1) reaches presets 129..249 */
  }
 }}
 void app_render(int32_t *lr,uint32_t n,uint32_t master){uint32_t i;float *buf=z_buffer();if(flash_busy){for(i=0;i<n*2;i++)lr[i]=0;return;}midi_receive();z_render(buf,n);if(z_sys.midi_mode==2)for(i=0;i<n*2;i++)buf[i]=0;

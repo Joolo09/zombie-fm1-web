@@ -93,3 +93,12 @@ body.studio #tracks button strong{white-space:nowrap;overflow:hidden;text-overfl
 body.studio #tracks button{grid-template-columns:minmax(0,1fr)}
 /* settings: the old FL Studio and HOLD notes are covered by the profiles and the README */
 body.studio h3:has(+ [data-i=flHelp]),body.studio [data-i=flHelp],body.studio h3:has(+ [data-i=holdHelp]),body.studio [data-i=holdHelp]{display:none}
+/* 0.21: generator and motion */
+body.studio .x-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px 16px;margin-top:10px}
+body.studio .x-control{display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;font-size:13px}
+body.studio .x-control span{grid-column:1/-1;color:var(--s-muted);font:600 11px/1.2 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase}
+body.studio .x-control output{font:700 12px ui-monospace,monospace;color:var(--s-accent);min-width:28px;text-align:right}
+body.studio .x-control select{grid-column:1/-1}
+body.studio .gen-card{border-color:color-mix(in srgb,var(--s-accent) 40%,var(--s-line));background:radial-gradient(500px 160px at 90% 0,#b5e86b14,transparent),linear-gradient(180deg,var(--s-card2),var(--s-card))}
+body.studio .gen-actions{margin-top:12px;gap:8px;flex-wrap:wrap}
+body.studio .x-card .small{font-size:12px;margin:4px 0 0}

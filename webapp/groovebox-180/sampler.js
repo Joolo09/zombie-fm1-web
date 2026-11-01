@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT — original pad editor and independent config codec. */
-import {SAMPLES,u16,u32,crc32} from './core.js?v=202';
+import {SAMPLES,u16,u32,crc32} from './core.js?v=210';
 export const SAMPLER_BYTES=396;
 export const PAD_FIELDS=['start','end','source','tune','gain','pan','mode','reverse','choke','quality'];
 export function decodeSampler(bytes){

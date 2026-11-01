@@ -30,7 +30,7 @@ static const char *const special_ru[]={"ДОРОЖКА","ПРЕСЕТ","ОКТА
  "АЛГОРИТМ","СТИЛЬ","ПЛОТНОСТЬ","СЛОЖНОСТЬ","МУТАЦИЯ","ОКТАВЫ","РАЗВИТИЕ","SEED"};
 static const char *const special_en[]={"TRACK","PRESET","OCTAVE","BPM","SWING","CLOCK","LANGUAGE","STEP PAGE","MODE","RATE","OCTAVES","HOLD","STEP","NOTE","VELOCITY","GATE","CHANCE","RECORD MODE","QUANTIZE","METRONOME","FX AMOUNT","FX RATE","CPU1 / EXP.","OUTPUT %","LIMITER","KEY GLOW","VELOCITY","START PAGE","MIDI MODE","DAW TRANSPORT","LENGTH","CHORD 1","CHORD 2","CHORD 3","SOURCE","PAD TUNE","PAD GAIN","PAD MODE","SOUND","LEVEL","DECAY","TUNE","SOUND LENGTH","PART MUTE","PART PAN","STEPS","COUNT-IN","REC CLICK","SCALE","ROOT","CLOCK OUT","EUCLID HITS","ROTATE","SCREENSAVER","MIDI IN","TRS THRU USB","PROGRAM IN","CC IN","CPU1 AT BOOT",
  "GLIDE","VIBRATO","VIBRATO RATE","LFO SHAPE","LFO TARGET","FM ENVELOPE","DRIFT","CRUSH","HUMANIZE","ROLL","TREMOLO","RANDOM",
- "ALGORITHM","STYLE","DENSITY","COMPLEXITY","MUTATION","OCTAVES","EVOLVE","SEED"};
+ "ALGO","STYLE","DENSITY","COMPLEX","MUTATION","OCTAVES","EVOLVE","SEED"};
 static void number(int n,char *s){char tmp[12];int i=0;if(n<0){*s++='-';n=-n;}do{tmp[i++]=(char)('0'+n%10);n/=10;}while(n);while(i)*s++=tmp[--i];*s=0;}
 /* Platform text is byte-oriented. Decode UTF-8 here and add the Cyrillic glyphs,
  * without changing the shared driver or replacing it with question marks. */

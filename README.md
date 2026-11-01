@@ -4,7 +4,7 @@
 
 # 🧟 Zombie Groovebox for the M-VAVE FM-1
 
-**An alternative firmware: six tracks, 128 presets, a drum machine, your own samples and a screen that moves with the music.**
+**An alternative firmware: six tracks, 249 presets, a melody and rhythm generator, a drum machine, your own samples and a screen that moves with the music.**
 
 <img src="previews/readme-hero-en.webp" width="480" alt="Home screen: the zombie headbangs to the beat">
 
@@ -22,7 +22,9 @@
 | | |
 |---|---|
 | 🎛 **Sound** | 5 synth tracks + a drum kit. 8 engines: analog, FM, phase, wavetable, noise, percussion and **SAMPLE** (your WAVs). Filter, envelope, LFO, drive, delay, reverb, arpeggiator. |
-| 🎹 **128 presets** | Factory, **IDM** and **ZMB** banks: 808s, wobble basses, supersaws, synthwave, horror atmospheres. |
+| 🎹 **249 presets** | 14 banks: factory, **IDM**, **ZMB** and 11 new ones — chiptune, glitch, ambient, breakcore, acid, FM bells, industrial, sci-fi, generative, lo-fi, basses and leads. |
+| 🌀 **Motion** | Glide, vibrato, 6 LFO shapes onto filter / pitch / FM / amp / pan, FM envelope, drift, crush, humanize, roll, tremolo, random. |
+| 🎲 **Generator** | 8 algorithms (motif, Markov, Euclid, random walk, probability, arpeggio, Turing machine, chaos) in 7 styles, in key; mutate, evolve over loops, jam the whole project. |
 | 🎼 **Sequencer** | Up to 64 steps per track, chords, scale and root, edit a held step with the knobs, Euclid and beat generator, 8-step undo. |
 | 🥁 **Drum machine** | 16 sounds; chance, velocity and roll on every step; its own loop length for every sound. |
 | ⏺ **Recording** | Count-in and a live overdub loop, step entry. |
@@ -34,6 +36,21 @@
 <img src="previews/readme-screens-en.webp" width="100%" alt="Home, piano roll and drum grid">
 
 Home, piano roll and drum grid. These are real firmware frames, captured in the simulator that runs the same C code.
+
+## Generator
+
+<img src="previews/readme-gen-en.png" width="100%" alt="The generator page and the LFO motion page">
+
+**Hold SEQ and turn PRESET to page 5–6.** Knobs: algorithm, style, density, complexity / mutation, octaves, seed, evolve. Black keys:
+
+1. **Gen** — a new part for the selected track, in key (scale and root from GLO page 2; with the scale off, the style's own);
+2. **Mutate** — changes a few steps, keeps the shape;
+3. **Seed** — a new seed and a new part at once;
+4. **Jam** — the whole project in the style: tempo, sounds from the style's bank, lead, bass, pad, arpeggio, texture and drums.
+
+**EDIT + OCT−** undoes any of them. Evolve mutates the part a little every 1–8 loops while the song plays. On the drum track it writes a beat in the style (breakcore: an Amen-style break).
+
+**Motion:** LFO pages 3–4 and ENV page 3. MIDI: CC5 glide, CC76/77 vibrato, CC0 = 1 before a Program Change reaches presets 129–249.
 
 ## Screensavers
 

@@ -124,4 +124,9 @@ check('render cost: all five synth tracks with every motion on stay within 1.6x 
   const t0=process.hrtime.bigint();render(w,1500);return Number(process.hrtime.bigint()-t0);};
  run(0);run(1);const off=Math.min(run(0),run(0)),on=Math.min(run(1),run(1));assert(on<off*1.6,'on '+on+' off '+off);console.log('  cost ratio '+(on/off).toFixed(2));});
 
+check('MIDI: bank select (CC0 = 1) then Program Change reaches presets 129-249; CC5 glide, CC76/77 vibrato',()=>{
+ const e=create(),cc=(n,v)=>{e.w.web_midi_in(0,11|(0xB0<<8)|(n<<16)|(v<<24));e.run(20);},pc=n=>{e.w.web_midi_in(0,12|(0xC0<<8)|(n<<16));e.run(20);};
+ pc(5);assert.equal(e.root()[1900],5);cc(0,1);pc(5);assert.equal(e.root()[1900],133);pc(127);assert.equal(e.root()[1900],127,'past the last preset: the program number alone');
+ cc(0,0);pc(7);assert.equal(e.root()[1900],7);cc(5,90);cc(77,40);cc(76,99);assert.deepEqual([X.GLIDE,X.VIB,X.VIB_RATE].map(i=>e.w.z_x_get(0,i)),[90,40,99]);});
+
 if(failed){console.error(failed+' failed');process.exit(1);}

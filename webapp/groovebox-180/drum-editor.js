@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT — original Zombie drum controls. */
-import {DRUMS} from './drums.js?v=202';
+import {DRUMS} from './drums.js?v=210';
 export function renderDrums({root,state,bank,language,step,param,select,hit,release}){
  const dm=state.drums,d=dm.selected,p=dm.sounds[d],ru=language==='ru';root.replaceChildren();
  const title=document.createElement('h3');title.textContent=ru?'Дорожка 6 · Ударные':'Track 6 · Drums';const help=document.createElement('p');help.className='muted';help.textContent=ru?'Выбери звук. Клик по клетке включает удар. Каждая партия имеет свою длину. Общие PLAY, REC, BPM и эффекты — сверху.':'Select a sound. Click a cell to toggle a hit. Each part has its own length. PLAY, REC, BPM and effects are shared.';root.append(title,help);

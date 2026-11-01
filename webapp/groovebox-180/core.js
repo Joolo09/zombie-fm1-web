@@ -1,9 +1,9 @@
-import {decodeDrums,validateDrums} from './drum-state.js?v=202';
+import {decodeDrums,validateDrums} from './drum-state.js?v=210';
 export const EDITION="groovebox";
 /* SPDX-License-Identifier: MIT - original editor state, wire protocol and audio adapter. */
 export const MODELS=['ANALOG','FM-2','PHASE','WAVETABLE','NOISE','KICK','SNARE','HAT','SAMPLE'];
-import {PRESETS as PRESET_NAMES} from './presets.js?v=202';
-export {PRESETS} from './presets.js?v=202';
+import {PRESETS as PRESET_NAMES} from './presets.js?v=210';
+export {PRESETS} from './presets.js?v=210';
 export const SAMPLES=['MC Zombie','MC Hurt','MC Death','MC Creeper','MC Boom','MC XP','USR1','USR2','USR3','USR4','ZC Kick','ZC Snare','ZC Hat','ZC Clap'];
 export const STATE_BYTES=3452;
 export const LEGACY_STATE_BYTES=1872;
@@ -55,7 +55,7 @@ export class Link {
  async connect(input,output){if(this.input||this.output)this.close();const generation=this.generation,current=()=>generation===this.generation&&this.input===input&&this.output===output,check=()=>{if(!current())throw Error("MIDI connection cancelled");};this.input=input;this.output=output;try{
   await input.open();check();await output.open();check();input.onmidimessage=e=>{if(current())this.receive(e.data);};
   const version=new TextDecoder().decode(await this.command(1));check();this.version=version;
-  if(this.version!=='ZCORE/1/0.20.2/groovebox')throw Error('Открой редактор своей версии прошивки или установи 0.20.2');
+  if(this.version!=='ZCORE/1/0.21.0/groovebox')throw Error('Открой редактор своей версии прошивки или установи 0.21.0');
   this.edition=EDITION;this.sampler=false;this.daw=this.system=this.polish=this.live=this.modern=this.connected=true;this.lastRevision=-1;
   const state=await this.readState();check();return state;
  }catch(e){if(current())this.close();else{if(input!==this.input)Promise.resolve(input.close()).catch(()=>{});if(output!==this.output)Promise.resolve(output.close()).catch(()=>{});}throw e;}}
@@ -107,7 +107,7 @@ export class AudioEngine {
   this.starting=(async()=>{try{
    if(!this.context){this.context=new AudioContext({sampleRate:44100,latencyHint:'interactive'});
     if(this.context.sampleRate!==44100)throw Error('44.1 kHz audio required');
-    await this.context.audioWorklet.addModule(new URL('./worklet.js?v=202',import.meta.url));
+    await this.context.audioWorklet.addModule(new URL('./worklet.js?v=210',import.meta.url));
     this.node=new AudioWorkletNode(this.context,'zombie-core',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module}});
     this.node.port.onmessage=e=>{const reply=e.data;if(reply.requestId){const r=this.requests.get(reply.requestId);if(r){clearTimeout(r.timer);this.requests.delete(reply.requestId);if(reply.error)r.reject(Error(reply.error));else r.resolve(reply);}return;}this.onMessage(reply);};
     this.gain=this.context.createGain();this.gain.gain.value=.7;this.node.connect(this.gain).connect(this.context.destination);
