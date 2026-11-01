@@ -1,24 +1,24 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63001900",
+  "current": "FM-1_63001901",
   "releases": [
     {
-      "product": "FM-1_63001900",
-      "version": "0.19.0",
+      "product": "FM-1_63001901",
+      "version": "0.19.1",
       "label": {
-        "ru": "Groovebox 0.19.0 · вкладка «Система», 128 пресетов, 4 заставки",
-        "en": "Groovebox 0.19.0 · SYSTEM tab, 128 presets, 4 screensavers"
+        "ru": "Groovebox 0.19.1 · вкладка «Система», 128 пресетов, 4 заставки",
+        "en": "Groovebox 0.19.1 · SYSTEM tab, 128 presets, 4 screensavers"
       },
       "notes": {
-        "ru": "Вкладка «Система» (GLO три раза быстро): MIDI-вход по каналам или омни, TRS-вход → USB, приём Program Change и CC, CPU1 при запуске, синхронизация, панель. Английский по умолчанию, банк ZMB, живой экран, 4 заставки. Проверена в эмуляторе и автотестах, на FM-1 пока нет.",
-        "en": "SYSTEM tab (GLO three times quickly): MIDI in by channel or omni, TRS in to USB, program change and CC in, CPU1 at boot, sync, panel. English by default, ZMB bank, living screen, 4 screensavers. Tested in the emulator and test suite, not yet on a physical FM-1."
+        "ru": "Исправлено: «держи SEQ и крути K1» сразу меняет число шагов (раньше быстрый поворот менял пресет). Вкладка «Система» (GLO три раза быстро): MIDI-вход по каналам или омни, TRS-вход → USB, приём Program Change и CC, CPU1 при запуске, синхронизация, панель. Английский по умолчанию, банк ZMB, живой экран, 4 заставки. Проверена в эмуляторе и автотестах, на FM-1 пока нет.",
+        "en": "Fixed: hold SEQ and turn K1 straight away sets the step count (a quick turn used to change the preset). SYSTEM tab (GLO three times quickly): MIDI in by channel or omni, TRS in to USB, program change and CC in, CPU1 at boot, sync, panel. English by default, ZMB bank, living screen, 4 screensavers. Tested in the emulator and test suite, not yet on a physical FM-1."
       },
       "channel": "recommended",
       "bytes": 610100,
-      "sha256": "62d1bc5d64737116a5d938123395b77e1ba00c97fcc3fc2acc71dce34eba114a",
-      "file": "downloads/zombie-groovebox-0.19.0.fwsc",
+      "sha256": "bc26bdc6609f3cf9b7d1b3ca2d0f8bcf8a932a928d7462642beccd4cba45b2b6",
+      "file": "downloads/zombie-groovebox-0.19.1.fwsc",
       "editor": "webapp/groovebox-180/",
-      "source": "downloads/groovebox-source-0.19.0.zip"
+      "source": "downloads/groovebox-source-0.19.1.zip"
     },
     {
       "product": "FM-1_64000800",
