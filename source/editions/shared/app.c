@@ -48,7 +48,7 @@ static int project_save_all(void){
 #if Z_SAMPLER_EDITION
  rc=plat_store_save(OBJ_SETTINGS,&z_song,sizeof z_song);if(!rc)rc=system_save();if(!rc)rc=plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler);
 #else
- rc=system_save();if(!rc)rc=plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler);if(!rc)rc=project_pair_save(&z_song,&z_dm);
+ rc=system_save();if(!rc)rc=plat_store_save(OBJ_SAMPLER,&z_sampler,sizeof z_sampler);if(!rc)rc=project_pair_save(&z_song,&z_dm);if(!rc)rc=plat_store_save(OBJ_EXT,z_x_data(),z_x_size());
 #endif
  return rc;
 }
@@ -63,6 +63,7 @@ static void midi_mode_changed(uint32_t mode){app_panic();midi_local=mode==0;daw_
 /* External MIDI Note On is an attack, including repeated percussion hits without Note Off.
  * Keep physical/editor key deduplication in z_key unchanged. */
 static void midi_key(uint32_t t,uint32_t n,uint32_t v,uint32_t on){if(on&&v)z_key(t,n,0,0);z_key(t,n,v,on);}
+static uint8_t pc_bank[6];
 static void midi_receive(void){uint32_t pkt;int port;while(plat_midi_in(&pkt,&port)){
  uint32_t status=(pkt>>8)&255,n=(pkt>>16)&127,v=(pkt>>24)&127,t;
  if(z_ext.thru&&port==PORT_TRS)plat_midi_out(pkt); /* SYSTEM > TRS THRU: a DIN keyboard on the jack reaches the computer */
@@ -72,9 +73,9 @@ static void midi_receive(void){uint32_t pkt;int port;while(plat_midi_in(&pkt,&po
   if(z_sys.midi_mode==2){if((status&0xf0)==0xb0){uint32_t k;for(k=0;k<4;k++)if(n==daw_cc[k])daw_values[t][k]=v;if(n==7)daw_values[t][4]=v;else if(n==10)daw_values[t][5]=v;else if(n==120||n==123)z_alloff(t);}continue;}
   if((status&0xf0)==0x90){edition_note(t,n,v,v!=0);midi_key(t,n,v,v!=0);}
   else if((status&0xf0)==0x80)z_key(t,n,0,0);
-  else if((status&0xf0)==0xb0){if(n==123||n==120)z_alloff(t);else if(z_ext.no_cc){}else if(n==121){z_bend(t,8192);z_sustain(t,0);}else if(n==122&&z_sys.midi_mode==0)midi_local=v>=64;else if(n==73)z_set(t,Z_ATTACK,v);else if(n==72)z_set(t,Z_RELEASE,v);else if(n==64)z_sustain(t,v>=64);else if(n==74)z_set(t,Z_CUTOFF,v);else if(n==71)z_set(t,Z_RESONANCE,v);else if(n==1)z_set(t,Z_FM,v);else if(n==7)z_set(t,Z_LEVEL,v);else if(n==10)z_set(t,Z_PAN,(int)v-64);}
+  else if((status&0xf0)==0xb0){if(n==123||n==120)z_alloff(t);else if(n==0||n==32)pc_bank[t]=(uint8_t)(v&1);else if(z_ext.no_cc){}else if(n==5)z_x_set(t,Z_X_GLIDE,v);else if(n==76)z_x_set(t,Z_X_VIB_RATE,v);else if(n==77)z_x_set(t,Z_X_VIB,v);else if(n==121){z_bend(t,8192);z_sustain(t,0);}else if(n==122&&z_sys.midi_mode==0)midi_local=v>=64;else if(n==73)z_set(t,Z_ATTACK,v);else if(n==72)z_set(t,Z_RELEASE,v);else if(n==64)z_sustain(t,v>=64);else if(n==74)z_set(t,Z_CUTOFF,v);else if(n==71)z_set(t,Z_RESONANCE,v);else if(n==1)z_set(t,Z_FM,v);else if(n==7)z_set(t,Z_LEVEL,v);else if(n==10)z_set(t,Z_PAN,(int)v-64);}
   else if((status&0xf0)==0xe0)z_bend(t,n|(v<<7));
-  else if((status&0xf0)==0xc0){if(!z_ext.no_pc)z_preset(t,n%Z_PRESETS);}
+  else if((status&0xf0)==0xc0){if(!z_ext.no_pc)z_preset(t,pc_bank[t]*128u+n<Z_PRESETS?pc_bank[t]*128u+n:n%Z_PRESETS);}   /* bank select (CC0 or CC32 = 1) reaches presets 129..249 */
  }
 }}
 void app_render(int32_t *lr,uint32_t n,uint32_t master){uint32_t i;float *buf=z_buffer();if(flash_busy){for(i=0;i<n*2;i++)lr[i]=0;return;}midi_receive();z_render(buf,n);if(z_sys.midi_mode==2)for(i=0;i<n*2;i++)buf[i]=0;
@@ -103,6 +104,9 @@ void app_init(void){project_pair_boot();z_project saved;audio_test_left=0;audio_
  z_song.padding[0]=Z_SAMPLER_EDITION?2:1;
  {z_sampler_state kit;int bytes=plat_store_load(OBJ_SAMPLER,&kit,sizeof kit);if(bytes==sizeof kit&&z_sampler_valid(&kit))z_sampler=kit;}
  if(!Z_SAMPLER_EDITION){z_dm_state kit;int bytes=project_store_load(OBJ_DRUM,&kit,sizeof kit);if(project_loaded&&drum_root_matches&&bytes==sizeof kit&&z_dm_valid(&kit))z_dm=kit;else if(project_loaded&&drum_root_matches&&z_song.padding[1]!=0xD1)z_dm_migrate();else z_dm_init();z_dm_authoritative();}
+#if !Z_SAMPLER_EDITION
+ {static uint8_t ext[256];int bytes=plat_store_load(OBJ_EXT,ext,sizeof ext);if(!project_loaded||bytes<=0||z_x_apply(ext,(uint32_t)bytes))z_x_from_presets();}
+#endif
  z_apply_state();z_song.recording=0;for(t=0;t<6;t++)z_song.arp_hold[t]=0;z_external(z_song.reserved);load_samples();z_set_midi_out(seq_out);z_set_clock_out(clock_out_cb);
  panel_keys_before=held_buttons=0;editor_effect=0;message[0]=0;message_until=0;redraw_at=0;save_requested=save_after_stop=0;upload_slot=255;
  for(i=0;i<27;i++)key_action[i]=0;for(i=0;i<NB;i++)pulse_until[i]=0;
@@ -167,7 +171,7 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
  else if(cmd==15&&n==0){for(k=0;k<4;k++){const uint8_t *p=plat_data(0xA0000u+k*0xC000u);wr32(out+8*k,p&&rd32(p)==0x3150435au?rd32(p+4):0);wr32(out+8*k+4,p?rd32(p+8):0);}count=32;}
  else if(cmd==16&&n==4){app_panic();upload_slot=254;upload_size=sizeof z_song;upload_at=0;upload_crc=rd32(a);}
  else if(cmd==17&&n>=3&&(upload_slot==254||upload_slot==253||upload_slot==252)){uint32_t at=a[0]|a[1]<<8;if(at!=upload_at||at+n-2>upload_size)status=2;else for(j=2;j<n;j++)z_transfer()[upload_at++]=a[j];}
- else if(cmd==18&&n==0&&upload_slot==254){if(upload_at!=sizeof z_song||crc32(z_transfer(),upload_at)!=upload_crc||!valid_project((const z_project *)z_transfer()))status=3;else {app_panic();z_song=*(const z_project *)z_transfer();z_song.recording=0;if(!Z_SAMPLER_EDITION){if(z_song.padding[1]==0xD1)z_dm_init();else z_dm_migrate();z_dm_authoritative();}z_history_reset();panel_reset();z_apply_state();z_external(z_song.reserved);z_touch();}upload_slot=255;}
+ else if(cmd==18&&n==0&&upload_slot==254){if(upload_at!=sizeof z_song||crc32(z_transfer(),upload_at)!=upload_crc||!valid_project((const z_project *)z_transfer()))status=3;else {app_panic();z_song=*(const z_project *)z_transfer();z_song.recording=0;if(!Z_SAMPLER_EDITION){if(z_song.padding[1]==0xD1)z_dm_init();else z_dm_migrate();z_dm_authoritative();}z_history_reset();panel_reset();z_x_from_presets();z_apply_state();z_external(z_song.reserved);z_touch();}upload_slot=255;}
  else if(cmd==19&&n==7){
   uint32_t at=a[0]|a[1]<<8,amount=a[2],token=rd32(a+3);
   if(!amount||amount>192||at+amount>sizeof z_song)status=1;
@@ -209,6 +213,11 @@ int app_sysex(const uint8_t *wire,uint32_t len){uint8_t a[240],out[220],status=0
   uint32_t t=a[0],at=a[1],changed=z_song.duration[t][at]!=a[2];z_step *s=&z_song.track[t].steps[at];if(s->note!=a[6]||s->velocity!=a[7]||s->chance!=a[8]||s->gate!=a[9])changed=1;for(j=0;j<3;j++)if(z_song.chord[t][at][j]!=a[3+j])changed=1;if(changed){if(z_song.recording){z_record(0);z_alloff(t);}z_checkpoint();*s=(z_step){a[6],a[7],a[8],a[9]};z_song.duration[t][at]=a[2];for(j=0;j<3;j++)z_song.chord[t][at][j]=a[3+j];z_touch();}
  }
  else if(cmd==49&&n==3){if(z_erase(a[0],a[1],a[2]))status=1;}
+ /* 0.21: motion and generator (z_ext_state): 50 read the block, 51 set track/id/value, 52 generate (0) or mutate (1) a track, 53 jam style/seed */
+ else if(!Z_SAMPLER_EDITION&&cmd==50&&n==0){plat_unlock(f);reply(seq,cmd,0,z_x_data(),z_x_size());return 1;}
+ else if(!Z_SAMPLER_EDITION&&cmd==51&&n==3){if(z_x_set(a[0],a[1],a[2])<0)status=1;}
+ else if(!Z_SAMPLER_EDITION&&cmd==52&&n==2&&a[0]<6&&a[1]<=1){if(a[1]){if(z_drum_track(a[0]))z_dm_checkpoint();else z_checkpoint();z_gen_mutate(a[0]);}else z_gen(a[0],scale_mask[scale_index()],scale_root());}
+ else if(!Z_SAMPLER_EDITION&&cmd==53&&n==2&&a[0]<7){z_gen_all(a[0],a[1],scale_mask[scale_index()],scale_root());z_apply_state();}
  else if(cmd==22&&n==3){if(z_arp_set(a[0],a[1],a[2]))status=1;}
  else status=1;
  plat_unlock(f);reply(seq,cmd,status,out,count);return 1;

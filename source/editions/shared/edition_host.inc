@@ -33,6 +33,7 @@ static void inv(int ok,const char *what,int a,int b){if(!ok){fprintf(stderr,"INV
 static void ed_invariants(void){uint32_t t,i,j;inv_fail=0;
  inv(z_song.selected<6,"selected track",z_song.selected,0);inv(z_song.section<Z_SECTIONS,"section",z_song.section,0);
  inv(z_song.subpage<page_count[z_song.section<Z_SECTIONS?z_song.section:0],"subpage",z_song.section,z_song.subpage);
+ {const z_ext_state saved=z_xs;inv(z_x_apply(&saved,sizeof saved)==0,"motion and generator block in range",0,0);for(t=0;t<6;t++)inv(z_xs.root[t]<12,"generator root",t,z_xs.root[t]);}
  inv(z_song.step_edit<64,"step cursor",z_song.step_edit,0);inv(z_song.step_bank<4,"step bank",z_song.step_bank,0);inv(z_song.step_bank==z_song.step_edit/16,"bank follows cursor",z_song.step_bank,z_song.step_edit);
  inv(z_song.octave>=-3&&z_song.octave<=3,"octave",z_song.octave,0);inv(z_song.bpm>=30&&z_song.bpm<=300,"bpm",z_song.bpm,0);inv(z_song.swing<=60,"swing",z_song.swing,0);
  inv(z_song.language<=1&&z_song.rec_mode<=1&&z_song.rec_quant<=1&&z_song.metronome<=1&&z_song.recording<=1,"flags",z_song.language,z_song.recording);

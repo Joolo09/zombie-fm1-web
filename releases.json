@@ -1,24 +1,24 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63002002",
+  "current": "FM-1_63002100",
   "releases": [
     {
-      "product": "FM-1_63002002",
-      "version": "0.20.2",
+      "product": "FM-1_63002100",
+      "version": "0.21.0",
       "label": {
-        "ru": "Groovebox 0.20.2 · свои сэмплы, вкладка «Система», 128 пресетов",
-        "en": "Groovebox 0.20.2 · your own samples, SYSTEM tab, 128 presets"
+        "ru": "Groovebox 0.21.0 · генератор, движение звука, 249 пресетов",
+        "en": "Groovebox 0.21.0 · generator, motion, 249 presets"
       },
       "notes": {
-        "ru": "Новый вид редактора с зомби, банк ZMB в редакторе, экраны слоёв в общем стиле. Свои сэмплы, вкладка «Система», 128 пресетов.",
-        "en": "A new editor look with the zombie, the ZMB bank in the editor, layer screens in the common style. Your own samples, SYSTEM tab, 128 presets."
+        "ru": "Генератор мелодий и ритмов (8 алгоритмов, 7 стилей, мутация, развитие, джем), глайд, вибрато, формы и цели LFO, FM-огибающая, дрейф, биткраш, дробь. 11 новых банков: 249 пресетов.",
+        "en": "A melody and rhythm generator (8 algorithms, 7 styles, mutate, evolve, jam), glide, vibrato, LFO shapes and targets, FM envelope, drift, crush, roll. 11 new banks: 249 presets."
       },
       "channel": "recommended",
       "bytes": 610100,
-      "sha256": "390900854de784b0fc6ec61ac0378a8c720beb47a582057fc9ec5d9b1c7e3f20",
-      "file": "downloads/zombie-groovebox-0.20.2.fwsc",
+      "sha256": "f368656376488c782b202ad074dbe126a4406b138caeb52610a09bea1993b8b8",
+      "file": "downloads/zombie-groovebox-0.21.0.fwsc",
       "editor": "webapp/groovebox-180/",
-      "source": "downloads/groovebox-source-0.20.2.zip"
+      "source": "downloads/groovebox-source-0.21.0.zip"
     }
   ]
 }

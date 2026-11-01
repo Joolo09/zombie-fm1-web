@@ -63,3 +63,20 @@ void z_new_project(void);
 
 uint32_t z_note_lights(uint32_t track,int32_t base);
 void z_audition_step(uint32_t track,uint32_t step);
+
+/* 0.21 motion and generator (gen.inc). Per track: twelve sound values (presets carry them) and eight for the
+ * generator. Saved as one block apart from the project (OBJ_EXT); the editor reads and sets it by id. */
+enum {Z_X_GLIDE,Z_X_VIB,Z_X_VIB_RATE,Z_X_SHAPE,Z_X_TARGET,Z_X_FM_ENV,Z_X_DRIFT,Z_X_CRUSH,Z_X_HUMAN,Z_X_ROLL,Z_X_TREM,Z_X_RANDOM,
+      Z_X_SOUND,Z_G_ALGO=Z_X_SOUND,Z_G_STYLE,Z_G_DENSITY,Z_G_COMPLEX,Z_G_MUTATE,Z_G_OCTAVES,Z_G_EVOLVE,Z_G_SEED,Z_X_COUNT};
+#define Z_EXT_MAGIC 0x3158545Au
+typedef struct {uint32_t magic;uint16_t version,size;uint8_t v[6][Z_X_COUNT];uint16_t scale[6],turing[6];uint8_t root[6],reserved[6];} z_ext_state;
+extern z_ext_state z_xs;
+void z_x_reset(void); void z_x_from_presets(void);
+int z_x_get(uint32_t track,uint32_t id);
+int z_x_set(uint32_t track,uint32_t id,int value);
+uint32_t z_x_size(void);
+uint8_t *z_x_data(void);
+int z_x_apply(const void *src,uint32_t n);
+uint32_t z_gen(uint32_t track,uint32_t scale_mask,uint32_t root);
+uint32_t z_gen_mutate(uint32_t track);
+void z_gen_all(uint32_t style,uint32_t seed,uint32_t scale_mask,uint32_t root);

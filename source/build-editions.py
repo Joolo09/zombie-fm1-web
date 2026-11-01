@@ -19,6 +19,10 @@ def run(args,log):
         raise SystemExit(result.returncode)
     print(log+': PASS',flush=True)
 
+# 0.21 motion values a preset may set (dsp.h Z_X_GLIDE..Z_X_RANDOM): key, min, max, default
+XPARAMS=[('glide',0,127,0),('vib',0,127,0),('vibRate',0,127,40),('lfoShape',0,5,0),('lfoTarget',0,4,0),('fmEnv',0,127,0),('drift',0,127,0),('crush',0,127,0),('humanize',0,127,0),('roll',0,127,0),('tremolo',0,127,0),('random',0,127,0)]
+XKEYS=[m[0] for m in XPARAMS]
+PRESET_MOTION=[]
 def presets(kind="groovebox"):
     rows=re.findall(r'\{"(\w+)",(-?\d+),(-?\d+),(-?\d+)\}',(ED/'shared/dsp.c').read_text())
     bank=json.loads((ED/'presets.json').read_text(encoding='utf-8'))
@@ -26,14 +30,19 @@ def presets(kind="groovebox"):
     if kind=='groovebox':
         bank+=json.loads((ED/'idm-presets.json').read_text(encoding='utf-8'))
         if (ED/'zombie-presets.json').exists():bank+=json.loads((ED/'zombie-presets.json').read_text(encoding='utf-8'))
-    assert len(bank)<=128
-    keys=[r[0] for r in rows];values=[]
+        for extra in ['bank-210.json']:
+            if (ED/extra).exists():bank+=json.loads((ED/extra).read_text(encoding='utf-8'))
+    assert len(bank)<=255   # a preset number is a byte; 255 means an edited sound
+    keys=[r[0] for r in rows];values=[];motion=[]
     for name,changes in bank:
-        assert len(name)<24
-        p=[int(r[3]) for r in rows]
+        assert len(name)<24,name
+        p=[int(r[3]) for r in rows];x=[m[3] for m in XPARAMS]
         for key,value in changes.items():
+            if key in XKEYS:
+                i=XKEYS.index(key);assert XPARAMS[i][1]<=value<=XPARAMS[i][2],(name,key,value);x[i]=value;continue
             i=keys.index(key);assert int(rows[i][1])<=value<=int(rows[i][2]),(name,key,value);p[i]=value
-        assert p[0]<8;values.append(p)
+        assert p[0]<8;values.append(p);motion.append(x)
+    PRESET_MOTION.clear();PRESET_MOTION.extend(motion)
     return bank,values
 
 def prepare(kind):
@@ -62,7 +71,7 @@ licence = "MIT / MPL-2.0 platform"
     if sample:
         names=['Pad Tone %02d'%(i+1) for i in range(64)]
         for p in values:p[0]=8;p[6]=0;p[8]=127;p[9]=8
-    (gen/'z_presets.h').write_text(f'/* Original MIT factory bank. */\nstatic const char *const Z_PRESET_NAMES[{len(bank)}]='+json.dumps(names).replace('[','{').replace(']','}')+f';\nstatic const int16_t Z_PRESET_VALUES[{len(bank)}][27]='+json.dumps(values).replace('[','{').replace(']','}')+';\n',encoding='utf-8')
+    (gen/'z_presets.h').write_text(f'/* Original MIT factory bank. */\nstatic const char *const Z_PRESET_NAMES[{len(bank)}]='+json.dumps(names).replace('[','{').replace(']','}')+f';\nstatic const int16_t Z_PRESET_VALUES[{len(bank)}][27]='+json.dumps(values).replace('[','{').replace(']','}')+';\n'+f'static const uint8_t Z_PRESET_X[{len(bank)}][12]='+json.dumps(PRESET_MOTION if not sample else [[m[3] for m in XPARAMS]]*len(bank)).replace('[','{').replace(']','}')+';\n',encoding='utf-8')
     return app,names
 
 def script(kind):
