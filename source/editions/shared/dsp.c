@@ -229,11 +229,15 @@ void z_note(uint32_t t,uint32_t note,uint32_t vel,uint32_t on) {
  uint32_t i,best=0,oldest=0xffffffffu;voice *v;
  if(t>=Z_TRACKS||note>127)return;if(z_drum_track(t)){z_dm_key(note,vel,on);return;}
  if(!on||!vel){for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&voices[i].note==note){voices[i].released=1;if(!sustain[t]&&(voices[i].pad==255||voices[i].settings.mode))voices[i].stage=3;}return;}
- /* Free voice, else the same synth note (retrigger), else the quietest released voice, else the oldest. */
+ /* Free voice, else the same synth note (retrigger), else the quietest released voice, else the oldest note that ends
+  * on its own (sequencer gate or arpeggio), else the oldest of this track, else the oldest. 0.21.1: a held chord is always
+  * the oldest, so plain oldest-first cut the player's chord whenever the sequence needed a voice. */
  {float quiet=2;uint32_t found=Z_VOICES;
   if(z_song.track[t].p[Z_MODEL]!=8)for(i=0;i<Z_VOICES;i++)if(voices[i].active&&voices[i].track==t&&voices[i].note==note&&voices[i].pad==255&&!voices[i].arp){found=i;break;}
   if(found==Z_VOICES)for(i=0;i<Z_VOICES;i++)if(!voices[i].active){found=i;break;}
   if(found==Z_VOICES)for(i=0;i<Z_VOICES;i++)if(voices[i].stage>=3&&voices[i].env<quiet){quiet=voices[i].env;found=i;}
+  if(found==Z_VOICES)for(i=0;i<Z_VOICES;i++)if((voices[i].gate||voices[i].arp)&&voices[i].stamp<oldest){oldest=voices[i].stamp;found=i;}
+  if(found==Z_VOICES)for(i=0;i<Z_VOICES;i++)if(voices[i].track==t&&voices[i].stamp<oldest){oldest=voices[i].stamp;found=i;}
   if(found==Z_VOICES)for(i=0;i<Z_VOICES;i++)if(voices[i].stamp<oldest){oldest=voices[i].stamp;found=i;}
   best=found;}
  v=&voices[best];

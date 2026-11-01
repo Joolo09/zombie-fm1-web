@@ -1,24 +1,24 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63002100",
+  "current": "FM-1_63002101",
   "releases": [
     {
-      "product": "FM-1_63002100",
-      "version": "0.21.0",
+      "product": "FM-1_63002101",
+      "version": "0.21.1",
       "label": {
-        "ru": "Groovebox 0.21.0 · генератор, движение звука, 249 пресетов",
-        "en": "Groovebox 0.21.0 · generator, motion, 249 presets"
+        "ru": "Groovebox 0.21.1 · аккорды не пропадают, REC очищает паттерн, генератор, 249 пресетов",
+        "en": "Groovebox 0.21.1 · chords keep sounding, hold REC to clear, generator, 249 presets"
       },
       "notes": {
-        "ru": "Генератор мелодий и ритмов (8 алгоритмов, 7 стилей, мутация, развитие, джем), глайд, вибрато, формы и цели LFO, FM-огибающая, дрейф, биткраш, дробь. 11 новых банков: 249 пресетов.",
-        "en": "A melody and rhythm generator (8 algorithms, 7 styles, mutate, evolve, jam), glide, vibrato, LFO shapes and targets, FM envelope, drift, crush, roll. 11 new banks: 249 presets."
+        "ru": "Исправлено: зажатый аккорд глох, когда играл секвенсор. Долгий REC на странице SEQ очищает паттерн дорожки. Генератор мелодий и ритмов (8 алгоритмов, 7 стилей, мутация, развитие, джем), глайд, вибрато, формы и цели LFO, FM-огибающая, дрейф, биткраш, дробь. 11 новых банков: 249 пресетов.",
+        "en": "Fixed: a held chord went silent while the sequence played. Hold REC on the SEQ page to clear the track pattern. A melody and rhythm generator (8 algorithms, 7 styles, mutate, evolve, jam), glide, vibrato, LFO shapes and targets, FM envelope, drift, crush, roll. 11 new banks: 249 presets."
       },
       "channel": "recommended",
       "bytes": 610100,
-      "sha256": "f368656376488c782b202ad074dbe126a4406b138caeb52610a09bea1993b8b8",
-      "file": "downloads/zombie-groovebox-0.21.0.fwsc",
+      "sha256": "89bde89379392d21cb23f700c31832f61bc99cf84ca3510604bb69565b509194",
+      "file": "downloads/zombie-groovebox-0.21.1.fwsc",
       "editor": "webapp/groovebox-180/",
-      "source": "downloads/groovebox-source-0.21.0.zip"
+      "source": "downloads/groovebox-source-0.21.1.zip"
     }
   ]
 }
