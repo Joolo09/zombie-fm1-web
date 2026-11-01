@@ -1,106 +1,126 @@
 <div align="center">
 
-# 🧟 Zombie Groovebox для M-VAVE FM-1
+**English** · [Русский](README.ru.md)
 
-**Альтернативная прошивка: шесть дорожек, 128 пресетов, драм-машина, свои сэмплы и экран, который живёт вместе с музыкой.**
+# 🧟 Zombie Groovebox for the M-VAVE FM-1
 
-<img src="previews/readme-hero.webp" width="480" alt="Главный экран: зомби качает головой в такт">
+**An alternative firmware: six tracks, 128 presets, a drum machine, your own samples and a screen that moves with the music.**
 
-[**Установить из браузера**](https://joolo09.github.io/zombie-fm1-web/) ·
-[Эмулятор](https://joolo09.github.io/zombie-fm1-web/emulator/) ·
-[Веб-редактор](https://joolo09.github.io/zombie-fm1-web/webapp/groovebox-180/) ·
-[Звуки ZMB](https://joolo09.github.io/zombie-fm1-web/emulator/sounds/zmb/)
+<img src="previews/readme-hero-en.webp" width="480" alt="Home screen: the zombie headbangs to the beat">
+
+[**Install from the browser**](https://joolo09.github.io/zombie-fm1-web/) ·
+[Emulator](https://joolo09.github.io/zombie-fm1-web/emulator/) ·
+[Web editor](https://joolo09.github.io/zombie-fm1-web/webapp/groovebox-180/) ·
+[ZMB sounds](https://joolo09.github.io/zombie-fm1-web/emulator/sounds/zmb/)
 
 </div>
 
 ---
 
-## Возможности
+## Features
 
 | | |
 |---|---|
-| 🎛 **Звук** | 5 синтезаторных дорожек + драм-кит. 8 движков: аналог, FM, фазовый, wavetable, шум, ударные и **SAMPLE** (твои WAV). Фильтр, огибающая, LFO, drive, delay, reverb, арпеджиатор. |
-| 🎹 **128 пресетов** | Заводской банк, **IDM** и **ZMB**: 808, вобл-басы, суперсо, синтвейв, хоррор-атмосферы. |
-| 🎼 **Секвенсор** | До 64 шагов на дорожку, аккорды, лад и тоника, правка зажатого шага ручками, Эвклид и генератор ритма, отмена на 8 шагов. |
-| 🥁 **Драм-машина** | 16 звуков, у каждого шага шанс, сила и дробь, у каждого звука своя длина петли. |
-| ⏺ **Запись** | Отсчёт и живая запись по кругу с наложением, пошаговый ввод. |
-| 🔌 **MIDI** | USB MIDI вход и выход, MIDI clock наружу, режимы DAW, омни-вход, TRS → USB. |
-| 🌙 **Живой экран** | Зомби в такт, ноты-искры, 4 заставки, экран «О системе». |
+| 🎛 **Sound** | 5 synth tracks + a drum kit. 8 engines: analog, FM, phase, wavetable, noise, percussion and **SAMPLE** (your WAVs). Filter, envelope, LFO, drive, delay, reverb, arpeggiator. |
+| 🎹 **128 presets** | Factory, **IDM** and **ZMB** banks: 808s, wobble basses, supersaws, synthwave, horror atmospheres. |
+| 🎼 **Sequencer** | Up to 64 steps per track, chords, scale and root, edit a held step with the knobs, Euclid and beat generator, 8-step undo. |
+| 🥁 **Drum machine** | 16 sounds; chance, velocity and roll on every step; its own loop length for every sound. |
+| ⏺ **Recording** | Count-in and a live overdub loop, step entry. |
+| 🔌 **MIDI** | USB MIDI in and out, MIDI clock out, DAW modes, omni input, TRS → USB. |
+| 🌙 **Living screen** | The zombie moves to the beat, notes fly off as sparks, 4 screensavers, an About screen. |
 
-## Экран
+## Screen
 
-<img src="previews/readme-screens.webp" width="100%" alt="Главная, пианоролл и драм-сетка">
+<img src="previews/readme-screens-en.webp" width="100%" alt="Home, piano roll and drum grid">
 
-Главная, пианоролл и драм-сетка. Это настоящие кадры прошивки, снятые в симуляторе на том же C-коде.
+Home, piano roll and drum grid. These are real firmware frames, captured in the simulator that runs the same C code.
 
-## Заставки
+## Screensavers
 
-<img src="previews/readme-savers.webp" width="100%" alt="Заставки: ночь, синтвейв, матрица, лого">
+<img src="previews/readme-savers.webp" width="100%" alt="Screensavers: night, synthwave, matrix, bounce">
 
-Через минуту без касаний включается заставка: **Ночь**, **Синтвейв**, **Матрица** или **Лого**. Все двигаются под музыку.
+After a minute untouched the screen turns into **Night**, **Synthwave**, **Matrix** or **Bounce**, all moving with the music.
 
-- На заставке **держи HOME**, чтобы включить следующую.
-- Любая кнопка будит экран и срабатывает как обычно.
-- Выбрать или выключить: GLO → страница 5 → K4.
+- On a screensaver, **hold HOME** for the next one.
+- Any button wakes the screen and still does its job.
+- Pick or switch off: GLO → page 5 → K4.
 
-## Вкладка «Система»
+## SYSTEM tab
 
-<img src="previews/readme-system.png" width="100%" alt="Вкладка Система: MIDI, синхронизация, ядра, панель">
+<img src="previews/readme-system-en.png" width="100%" alt="SYSTEM tab: MIDI, sync, cores, panel">
 
-**GLO три раза быстро**: MIDI (по каналам или омни, TRS → USB, приём Program Change и CC), синхронизация, второе ядро CPU1, подсветка и кривая силы нажатия.
+**GLO three times quickly** opens it:
 
-## Веб-редактор
+- **MIDI:** by channel or omni, TRS → USB, program change and CC in;
+- **Sync:** clock source and clock out;
+- **Cores:** the second core (CPU1);
+- **Panel:** key lights and the velocity curve.
 
-Всё можно делать с компьютера по USB, в Chrome или Edge, без установки программ. Без FM-1 редактор работает как синтезатор прямо в браузере.
+## Web editor
 
-<img src="previews/readme-editor.png" width="100%" alt="Пианоролл в редакторе">
+Everything works from a computer over USB in Chrome or Edge, with nothing to install. Without an FM-1 the editor plays as a synth right in the browser.
 
-**Пианоролл мышью:** клик ставит ноту, протягивание задаёт длину, правый клик удаляет, Shift добавляет в аккорд.
+<img src="previews/readme-editor-en.png" width="100%" alt="Piano roll in the editor">
 
-<img src="previews/readme-samples.png" width="100%" alt="Загрузка своих сэмплов">
+**Mouse piano roll:**
 
-**Свои сэмплы:** перетащи WAV, обрежь, послушай и отправь в слот USR1–USR4. Дорожки 1–5 играют его по нотам.
+- click to place a note;
+- drag right to set its length;
+- right-click to delete;
+- Shift to add a note to the chord.
 
-## Главное управление
+<img src="previews/readme-samples-en.png" width="100%" alt="Loading your own samples">
 
-| Действие | Как |
+**Your own samples:**
+
+1. Drop a WAV on the page.
+2. Trim it and listen.
+3. Send it to slot USR1–USR4.
+
+Tracks 1–5 play it by note.
+
+## Key controls
+
+| Action | How |
 |---|---|
-| Выбрать дорожку / темп | **ALGO** / **SELECT** |
-| Поставить шаги | **SEQ**, затем 16 белых клавиш |
-| Число шагов | держи **SEQ**, крути **K1** |
-| Правка шага | зажми шаг и крути **K1–K4** |
-| Живая запись | **REC** с главной: отсчёт, потом запись по кругу |
-| Отмена / повтор | **EDIT + OCT−** / **EDIT + OCT+** |
-| Сохранить проект | **SAVE** |
-| «О системе» | **HOME** дважды |
-| Вкладка «Система» | **GLO** три раза быстро |
-| Язык | **HOME + GLO** |
+| Track / tempo | **ALGO** / **SELECT** |
+| Place steps | **SEQ**, then the 16 white keys |
+| Step count | hold **SEQ**, turn **K1** |
+| Edit a step | hold the step, turn **K1–K4** |
+| Live recording | **REC** from home: count-in, then a recording loop |
+| Undo / redo | **EDIT + OCT−** / **EDIT + OCT+** |
+| Save the project | **SAVE** |
+| About | **HOME** twice |
+| SYSTEM tab | **GLO** three times quickly |
+| Language | **HOME + GLO** |
 
-## Установка
+## Install
 
-1. Открой [сайт](https://joolo09.github.io/zombie-fm1-web/) в **Chrome** или **Edge** на компьютере.
-2. Подключи FM-1 USB-кабелем **с передачей данных**.
-3. Нажми «Найти FM-1» и «Установить». Не закрывай вкладку, пока идёт запись.
+1. Open the [site](https://joolo09.github.io/zombie-fm1-web/) in **Chrome** or **Edge** on a computer.
+2. Connect the FM-1 with a USB **data** cable.
+3. Click Find FM-1, then Install. Keep the tab open while it writes.
 
-Перед установкой сохрани проекты: «Экспорт JSON» в редакторе. Если запись прервалась, а экран FM-1 чёрный, FM-1 не сломан: он ждёт в режиме загрузчика. Обнови страницу и установи снова.
+**Before installing:** save your projects with Export JSON in the editor.
 
-> Прошивка проверяется в эмуляторе на том же C-коде и автотестами. На физическом FM-1 версии перед публикацией не проверяются: сначала попробуй новую версию в [эмуляторе](https://joolo09.github.io/zombie-fm1-web/emulator/).
+**If writing stopped and the FM-1 screen is black:** the FM-1 is not broken, it is waiting in loader mode. Reload the page and install again.
 
-## Для разработчиков
+> The firmware is tested in the emulator, which runs the same C code, and by the automated test suite. Releases are not tried on a physical FM-1 before publishing, so try a new version in the [emulator](https://joolo09.github.io/zombie-fm1-web/emulator/) first.
+
+## For developers
 
 ```bash
-python -X utf8 source/build-groovebox-180.py                     # прошивка .fwsc, симулятор, WASM
-python -X utf8 tests/run_groovebox_audit.py --build --fuzz 200   # все проверки + фаззинг под ASan/UBSan
+python -X utf8 source/build-groovebox-180.py                     # firmware .fwsc, simulator, WASM
+python -X utf8 tests/run_groovebox_audit.py --build --fuzz 200   # every check + panel fuzzing under ASan/UBSan
 ```
 
-- Код прошивки: `source/editions/shared/`. Платформа FM-1: `source/platform-081/`.
-- Для сборки нужны тулчейн JieLi (`JIELI_TOOLCHAIN`), AC79 SDK (`AC79_SDK`) и `zig`.
-- Изменения по версиям: `source/GROOVEBOX-*-RU.md`.
+- Firmware code: `source/editions/shared/`.
+- FM-1 platform: `source/platform-081/`.
+- Building needs the JieLi toolchain (`JIELI_TOOLCHAIN`), the AC79 SDK (`AC79_SDK`) and `zig`.
+- Release notes (in Russian): `source/GROOVEBOX-*-RU.md`.
 
-## Лицензия
+## License
 
-Приложение, DSP, интерфейс и профили распространяются по **MIT**, платформа по **MPL-2.0**. Подробности в [`licenses/THIRD-PARTY.txt`](licenses/THIRD-PARTY.txt).
+- App, DSP, interface and profiles: **MIT**.
+- Platform: **MPL-2.0**.
 
----
-
-<sub>**English:** an alternative firmware for the M-VAVE FM-1: six tracks, 128 presets, a 16-sound drum machine, your own samples, a living screen with four screensavers and a SYSTEM tab. Install it from the browser at https://joolo09.github.io/zombie-fm1-web/ (Chrome or Edge, USB data cable). The site and the device both switch between Russian and English.</sub>
+Details in [`licenses/THIRD-PARTY.txt`](licenses/THIRD-PARTY.txt).
