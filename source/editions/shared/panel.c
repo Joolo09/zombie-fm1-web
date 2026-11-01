@@ -406,6 +406,9 @@ static void select_tempo(int d){
  else knob(U_BPM,d);
  redraw_at=0;
 }
+/* A knob turned while a section button is held opens that button's layer at once, as a key press does: holding SEQ
+ * and turning K1 straight away sets the step count instead of changing the page underneath (0.19.1). */
+static void layer_on_turn(uint32_t buttons){uint32_t s;if(active_layer>=0)return;for(s=0;s<Z_SECTIONS;s++){uint32_t b=section_button[s];if((buttons>>b&1)&&!button_used[b]){if(!Z_SAMPLER_EDITION&&s==Z_EDIT&&z_song.section==Z_SEQ)return;layer_open(s);return;}}}
 /* GLO three times opens SYSTEM; there GLO turns its pages, and another section button leaves it (and does its usual job) */
 static int sys_tap(uint32_t k,uint32_t now){
  if(sys_open){if(k==Z_GLO){sys_page=(uint8_t)((sys_page+1)%4);redraw_at=0;return 1;}sys_open=0;redraw_at=0;return 0;}
@@ -467,8 +470,8 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
  if(keys!=panel_keys_before)ui_input_from(1);if(buttons!=held_buttons)ui_input_from(2);
  d=plat_enc(EN_ALGO);if(d)ui_enc(EN_ALGO,d);if(d)panel_setting(7,(z_song.selected+6+d%6)%6);t=z_song.selected;
  d=plat_enc(EN_SELECT);if(d)ui_enc(EN_SELECT,d);if(d)select_tempo(d);
- d=plat_enc(EN_PRESET);if(d)ui_enc(EN_PRESET,d);if(d&&active_layer>=0){uint32_t count=active_layer==Z_EDIT?3:active_layer==Z_SEQ?4:page_count[active_layer<Z_SECTIONS?active_layer:0];layer_page=(uint8_t)(layer_page+count+d%(int)count)%count;}else if(d&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){panel_setting(3,(z_song.step_bank+4+d%4)%4);}else if(d&&sampler_open()){sampler_page=(sampler_page+3+d%3)%3;}else if(d&&z_sys.midi_mode==2){daw_touch_at=now;daw_values[t][5]=(uint8_t)clamp((int)daw_values[t][5]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,10,daw_values[t][5]);}else if(d)knob(U_PRESET,d);
- for(k=0;k<4;k++){d=plat_enc(EN_K1+k);if(d)ui_knob_touch(k,d);
+ d=plat_enc(EN_PRESET);if(d)ui_enc(EN_PRESET,d);if(d)layer_on_turn(buttons);if(d&&active_layer>=0){uint32_t count=active_layer==Z_EDIT?3:active_layer==Z_SEQ?4:page_count[active_layer<Z_SECTIONS?active_layer:0];layer_page=(uint8_t)(layer_page+count+d%(int)count)%count;}else if(d&&!Z_SAMPLER_EDITION&&z_song.section==Z_SEQ){panel_setting(3,(z_song.step_bank+4+d%4)%4);}else if(d&&sampler_open()){sampler_page=(sampler_page+3+d%3)%3;}else if(d&&z_sys.midi_mode==2){daw_touch_at=now;daw_values[t][5]=(uint8_t)clamp((int)daw_values[t][5]+d,0,127);midi_cc(z_get(t,Z_CHANNEL)-1,10,daw_values[t][5]);}else if(d)knob(U_PRESET,d);
+ for(k=0;k<4;k++){d=plat_enc(EN_K1+k);if(d)ui_knob_touch(k,d);if(d)layer_on_turn(buttons);
   if(d&&sys_open&&active_layer<0&&grid_hold.key<0){knob(sys_knob(k),d);redraw_at=0;continue;}
   /* a held step: K2 chance, K3 velocity, K4 roll of that step, on every SEQ page; the hit stays when let go */
   /* a held melodic step: K1 note, K2 velocity, K3 length, K4 gate of that step; one undo step for the whole hold */
