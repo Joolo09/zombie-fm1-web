@@ -105,6 +105,7 @@ Tracks 1–5 play it by note.
 | Step count | hold **SEQ**, turn **K1** |
 | Edit a step | hold the step, turn **K1–K4** |
 | Live recording | **REC** from home: count-in, then a recording loop |
+| Clear the track's pattern | on the SEQ page, hold **REC** for a second |
 | Undo / redo | **EDIT + OCT−** / **EDIT + OCT+** |
 | Save the project | **SAVE** |
 | About | **HOME** twice |

@@ -9,7 +9,7 @@ static uint8_t sys_open,sys_page,glo_taps,glo_sec0,glo_page0;static uint32_t glo
 static const char *word(const char *ru,const char *en){return z_song.language?en:ru;}
 static const uint8_t section_button[Z_SECTIONS]={B_HOME,B_FX,B_SEL,B_ENV,B_LFO,B_EDIT,B_GLO,B_ARP,B_SEQ};
 static uint8_t sampler_page,page_memory[Z_SECTIONS],layer_locked,roll_edit,roll_note_slot,eu_hits=4,eu_rot=0;   /* eu_*: the EUCLID tool's knobs */
-enum {SECTION_HOLD_MS=400};
+enum {SECTION_HOLD_MS=400,REC_CLEAR_MS=1000};
 static const uint8_t page_count[Z_SECTIONS]={2,3,2,Z_SAMPLER_EDITION?2:3,Z_SAMPLER_EDITION?2:4,Z_SAMPLER_EDITION?4:3,6,2,3};
 static const uint8_t pages[Z_SECTIONS][6][4]={
  {{U_PRESET,Z_CUTOFF,Z_RESONANCE,Z_LEVEL},{U_TRACK,U_OCT,U_LANGUAGE,Z_CHANNEL}},
@@ -466,6 +466,11 @@ static void input(void){uint32_t keys,buttons=plat_buttons(),k,t,now=plat_ms(),l
   else {(void)section;}
  }
  if(!(buttons>>B_REC&1)||(keys&~panel_keys_before))rec_press.active=0;   /* a released REC or a played note keeps what REC did */
+ /* 0.21.1: REC held alone for a second on the SEQ page takes its press back and clears the selected track's whole
+  * pattern (all 64 steps, chords, lengths; the kit on the drum track). One EDIT + OCT- brings it back. */
+ if(!Z_SAMPLER_EDITION&&rec_press.active&&rec_press.section==Z_SEQ&&buttons==(1u<<B_REC)&&!keys&&z_sys.midi_mode!=2&&now-button_since[B_REC]>=REC_CLEAR_MS){
+  rec_press_undo();if(z_song.recording)panel_setting(4,0);roll_edit=roll_note_slot=0;z_alloff(z_song.selected);z_erase(z_song.selected,0,2);
+  app_say(word("ПАТТЕРН ОЧИЩЕН / EDIT+OCT-: ОТМЕНА","PATTERN CLEARED / EDIT+OCT-: UNDO"),0);redraw_at=0;}
  /* A held section is a momentary control layer. Key combinations can enter it immediately. */
  if(active_layer<0){uint32_t section;for(section=0;section<Z_SECTIONS;section++){uint32_t b=section==Z_SECTIONS?B_REC:section_button[section];if((buttons>>b&1)&&!button_used[b]&&((now-button_since[b]>=SECTION_HOLD_MS)||(keys&~panel_keys_before))){if(!Z_SAMPLER_EDITION&&section==Z_EDIT&&z_song.section==Z_SEQ){button_used[B_EDIT]=1;roll_edit=1;}else layer_open(section);break;}}}
  if(active_layer>=0){uint32_t b=active_layer==Z_SECTIONS?B_REC:section_button[active_layer];if(!layer_locked&&!(buttons>>b&1))layer_close();}
