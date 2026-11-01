@@ -88,3 +88,8 @@ body.studio .side .tabs{gap:2px}
 body.studio .side .tabs button{padding:6px 12px}
 body.studio .side-device button{padding:7px 10px}
 body.studio .side-foot{gap:5px}
+/* track tiles name their sound; long names end in an ellipsis */
+body.studio #tracks button strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;grid-column:1/-1}
+body.studio #tracks button{grid-template-columns:minmax(0,1fr)}
+/* settings: the old FL Studio and HOLD notes are covered by the profiles and the README */
+body.studio h3:has(+ [data-i=flHelp]),body.studio [data-i=flHelp],body.studio h3:has(+ [data-i=holdHelp]),body.studio [data-i=holdHelp]{display:none}

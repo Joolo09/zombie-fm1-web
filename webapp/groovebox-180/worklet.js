@@ -1,4 +1,4 @@
-import {encodeDrums,decodeDrums} from './drum-state.js?v=201';
+import {encodeDrums,decodeDrums} from './drum-state.js?v=202';
 /* SPDX-License-Identifier: MIT */
 export class CoreDSP {
  constructor(module){this.w=new WebAssembly.Instance(module,{}).exports;this.w.z_init();this.ptr=this.w.z_buffer();this.audio=new Float32Array(this.w.memory.buffer,this.ptr,512);this.trim=100;this.limiter=1;this.at=256;this.lastRevision=this.w.z_revision();}
