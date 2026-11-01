@@ -48,6 +48,8 @@ class Fm1 extends AudioWorkletProcessor {
       this.sentWrites = this.ex.web_store_writes();
       this.ex.web_master(m.master ?? 2800);
       this.ex.web_boot();
+      /* a fresh emulator speaks the page's language (the firmware's own default is English): editor command 10 */
+      if (m.lang === 'ru' && !Object.keys(m.store || {}).length) { const b = [0x7d, 0x5a, 0x43, 1, 10, 0, 0, 0, 0]; new Uint8Array(this.mem.buffer, this.ex.web_sysex_buf(), b.length).set(b); this.ex.web_sysex(b.length); }
       this.port.postMessage({ type: "ready" });
     } else if (!this.ex) {
       return;

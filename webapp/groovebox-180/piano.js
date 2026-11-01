@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT — original 16-step, four-note piano roll. */
-import {DRUMS,drumIndex} from './drums.js';
+import {DRUMS,drumIndex} from './drums.js?v=201';
 export function drawPianoRoll(canvas,state,selected,bank,head=-1){
  if(state.selected===5)return drawDrumRoll(canvas,state,selected,bank,head);
  if(!canvas)return;const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,left=42,top=22,cw=(w-left-8)/16,rh=(h-top-6)/24,t=state.tracks[state.selected];
