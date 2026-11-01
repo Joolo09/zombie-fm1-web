@@ -1,8 +1,9 @@
-import {decodeDrums,validateDrums} from './drum-state.js?v=201';
+import {decodeDrums,validateDrums} from './drum-state.js?v=202';
 export const EDITION="groovebox";
 /* SPDX-License-Identifier: MIT - original editor state, wire protocol and audio adapter. */
 export const MODELS=['ANALOG','FM-2','PHASE','WAVETABLE','NOISE','KICK','SNARE','HAT','SAMPLE'];
-export {PRESETS} from './presets.js?v=201';
+import {PRESETS as PRESET_NAMES} from './presets.js?v=202';
+export {PRESETS} from './presets.js?v=202';
 export const SAMPLES=['MC Zombie','MC Hurt','MC Death','MC Creeper','MC Boom','MC XP','USR1','USR2','USR3','USR4','ZC Kick','ZC Snare','ZC Hat','ZC Clap'];
 export const STATE_BYTES=3452;
 export const LEGACY_STATE_BYTES=1872;
@@ -31,7 +32,7 @@ export function validateState(input,schema){
  const s=upgradeState(input),integer=(n,lo,hi)=>Number.isInteger(n)&&n>=lo&&n<=hi;
  if(!s||s.format!=='zombie-core/3'||!integer(s.bpm,30,300)||!integer(s.swing,0,60)||!integer(s.selected,0,5)||!integer(s.language,0,1)||!integer(s.external,0,1)||!Array.isArray(s.tracks)||s.tracks.length!==6)throw Error('Invalid project');
  for(const [i,t] of s.tracks.entries()){if(Array.isArray(t.p)&&((EDITION==='groovebox'&&t.p[0]>7&&(i===5||t.p[19]<6||t.p[19]>9))||(EDITION==='sampler'&&t.p[0]!==8)))throw Error('Project belongs to another edition');if(!Array.isArray(t.p)||t.p.length!==27||!Array.isArray(t.steps)||t.steps.length!==64)throw Error('Invalid track');t.p.forEach((p,i)=>{if(!integer(p,schema[i].min,schema[i].max))throw Error('Invalid parameter '+i);});for(const st of t.steps)if(!integer(st.note,0,127)||!integer(st.velocity,0,127)||!integer(st.chance,0,127)||!integer(st.gate,1,127))throw Error('Invalid step');}
- if(!integer(s.octave,-3,3)||!integer(s.section,0,8)||!integer(s.subpage,0,s.section===6?5:3)||!integer(s.bank,0,3)||!integer(s.recording,0,1)||!integer(s.stepEdit,0,63)||!Array.isArray(s.presets)||s.presets.length!==6||s.presets.some(p=>!integer(p,0,95)&&p!==255)||!Array.isArray(s.arp)||s.arp.length!==6)throw Error('Invalid performance settings');
+ if(!integer(s.octave,-3,3)||!integer(s.section,0,8)||!integer(s.subpage,0,s.section===6?5:3)||!integer(s.bank,0,3)||!integer(s.recording,0,1)||!integer(s.stepEdit,0,63)||!Array.isArray(s.presets)||s.presets.length!==6||s.presets.some(p=>!integer(p,0,PRESET_NAMES.length-1)&&p!==255)||!Array.isArray(s.arp)||s.arp.length!==6)throw Error('Invalid performance settings');
  for(const a of s.arp)if(!integer(a.mode,0,4)||!integer(a.rate,0,3)||!integer(a.octaves,1,3)||!integer(a.hold,0,1))throw Error('Invalid arpeggiator');
  for(const t of s.tracks)for(const st of t.steps)if(!integer(st.duration,0,63)||!Array.isArray(st.chord)||st.chord.length!==3||st.chord.some(n=>!integer(n,0,128)))throw Error('Invalid chord or duration');
  if(!integer(s.recMode,0,1)||!integer(s.recQuant,0,1)||!integer(s.metronome,0,1)||!integer(s.fxAmount,0,127)||!integer(s.fxRate,0,3))throw Error('Invalid live settings');
@@ -54,7 +55,7 @@ export class Link {
  async connect(input,output){if(this.input||this.output)this.close();const generation=this.generation,current=()=>generation===this.generation&&this.input===input&&this.output===output,check=()=>{if(!current())throw Error("MIDI connection cancelled");};this.input=input;this.output=output;try{
   await input.open();check();await output.open();check();input.onmidimessage=e=>{if(current())this.receive(e.data);};
   const version=new TextDecoder().decode(await this.command(1));check();this.version=version;
-  if(this.version!=='ZCORE/1/0.20.1/groovebox')throw Error('Открой редактор своей версии прошивки или установи 0.20.1');
+  if(this.version!=='ZCORE/1/0.20.2/groovebox')throw Error('Открой редактор своей версии прошивки или установи 0.20.2');
   this.edition=EDITION;this.sampler=false;this.daw=this.system=this.polish=this.live=this.modern=this.connected=true;this.lastRevision=-1;
   const state=await this.readState();check();return state;
  }catch(e){if(current())this.close();else{if(input!==this.input)Promise.resolve(input.close()).catch(()=>{});if(output!==this.output)Promise.resolve(output.close()).catch(()=>{});}throw e;}}
@@ -106,7 +107,7 @@ export class AudioEngine {
   this.starting=(async()=>{try{
    if(!this.context){this.context=new AudioContext({sampleRate:44100,latencyHint:'interactive'});
     if(this.context.sampleRate!==44100)throw Error('44.1 kHz audio required');
-    await this.context.audioWorklet.addModule(new URL('./worklet.js?v=201',import.meta.url));
+    await this.context.audioWorklet.addModule(new URL('./worklet.js?v=202',import.meta.url));
     this.node=new AudioWorkletNode(this.context,'zombie-core',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2],processorOptions:{module:this.module}});
     this.node.port.onmessage=e=>{const reply=e.data;if(reply.requestId){const r=this.requests.get(reply.requestId);if(r){clearTimeout(r.timer);this.requests.delete(reply.requestId);if(reply.error)r.reject(Error(reply.error));else r.resolve(reply);}return;}this.onMessage(reply);};
     this.gain=this.context.createGain();this.gain.gain.value=.7;this.node.connect(this.gain).connect(this.context.destination);
