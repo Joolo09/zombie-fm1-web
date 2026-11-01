@@ -6,87 +6,87 @@
     {
       "name": "groovebox-build",
       "passed": true,
-      "seconds": 10.488
+      "seconds": 8.063
     },
     {
       "name": "native-emulator-build",
       "passed": true,
-      "seconds": 8.433
+      "seconds": 5.79
     },
     {
       "name": "drum-operator-labels",
       "passed": true,
-      "seconds": 0.028
+      "seconds": 0.027
     },
     {
       "name": "drum-key-workflow",
       "passed": true,
-      "seconds": 0.282
+      "seconds": 0.271
     },
     {
       "name": "paired-project-application",
       "passed": true,
-      "seconds": 0.138
+      "seconds": 0.146
     },
     {
       "name": "full-panel",
       "passed": true,
-      "seconds": 1.045
+      "seconds": 1.078
     },
     {
       "name": "keyboard-roll",
       "passed": true,
-      "seconds": 0.144
+      "seconds": 0.157
     },
     {
       "name": "dsp-boundaries",
       "passed": true,
-      "seconds": 0.356
+      "seconds": 0.36
     },
     {
       "name": "live-edit-feedback",
       "passed": true,
-      "seconds": 0.128
+      "seconds": 0.166
     },
     {
       "name": "editor-link-sessions",
       "passed": true,
-      "seconds": 0.164
+      "seconds": 0.169
     },
     {
       "name": "editor-key-queue",
       "passed": true,
-      "seconds": 0.026
+      "seconds": 0.027
     },
     {
       "name": "protocol-clock",
       "passed": true,
-      "seconds": 0.146
+      "seconds": 0.174
     },
     {
       "name": "protocol-integrity",
       "passed": true,
-      "seconds": 1.669
+      "seconds": 1.771
     },
     {
       "name": "history-and-length",
       "passed": true,
-      "seconds": 0.137
+      "seconds": 0.163
     },
     {
       "name": "transition-regressions",
       "passed": true,
-      "seconds": 0.124
+      "seconds": 0.147
     },
     {
       "name": "followup-regressions",
       "passed": true,
-      "seconds": 0.144
+      "seconds": 0.148
     },
     {
       "name": "playback-lights-and-grid",
       "passed": true,
-      "seconds": 0.142
+      "seconds": 0.136
     },
     {
       "name": "idm-regressions",
@@ -96,77 +96,77 @@
     {
       "name": "native-performance",
       "passed": true,
-      "seconds": 0.138
+      "seconds": 0.126
     },
     {
       "name": "native-worklet",
       "passed": true,
-      "seconds": 0.086
+      "seconds": 0.088
     },
     {
       "name": "pattern-recording",
       "passed": true,
-      "seconds": 0.049
+      "seconds": 0.047
     },
     {
       "name": "synth-and-drums",
       "passed": true,
-      "seconds": 0.346
+      "seconds": 0.152
     },
     {
       "name": "audio-lifecycle",
       "passed": true,
-      "seconds": 0.027
+      "seconds": 0.026
     },
     {
       "name": "sound-quality",
       "passed": true,
-      "seconds": 0.129
+      "seconds": 0.133
     },
     {
       "name": "step-length",
       "passed": true,
-      "seconds": 0.161
+      "seconds": 0.14
     },
     {
       "name": "bugfix-151",
       "passed": true,
-      "seconds": 1.327
+      "seconds": 1.407
     },
     {
       "name": "recording-160",
       "passed": true,
-      "seconds": 0.196
+      "seconds": 0.197
     },
     {
       "name": "drums-160",
       "passed": true,
-      "seconds": 0.136
+      "seconds": 0.127
     },
     {
       "name": "scale-170",
       "passed": true,
-      "seconds": 0.174
+      "seconds": 0.155
     },
     {
       "name": "melody-hold-170",
       "passed": true,
-      "seconds": 0.179
+      "seconds": 0.134
     },
     {
       "name": "clock-170",
       "passed": true,
-      "seconds": 0.165
+      "seconds": 0.181
     },
     {
       "name": "tools-170",
       "passed": true,
-      "seconds": 0.195
+      "seconds": 0.199
     },
     {
       "name": "editor-system-170",
       "passed": true,
-      "seconds": 0.115
+      "seconds": 0.114
     },
     {
       "name": "history-170",
@@ -176,52 +176,57 @@
     {
       "name": "live-record-170",
       "passed": true,
-      "seconds": 0.223
+      "seconds": 0.226
     },
     {
       "name": "scene-180",
       "passed": true,
-      "seconds": 5.217
+      "seconds": 5.076
     },
     {
       "name": "system-190",
       "passed": true,
-      "seconds": 0.142
+      "seconds": 0.132
     },
     {
       "name": "step-191",
       "passed": true,
-      "seconds": 0.126
+      "seconds": 0.148
     },
     {
       "name": "samples-200",
       "passed": true,
-      "seconds": 0.113
+      "seconds": 0.145
     },
     {
       "name": "hold-undo-201",
       "passed": true,
-      "seconds": 0.137
+      "seconds": 0.158
+    },
+    {
+      "name": "gen-210",
+      "passed": true,
+      "seconds": 2.326
     },
     {
       "name": "web-installer",
       "passed": true,
-      "seconds": 4.999
+      "seconds": 5.021
     },
     {
       "name": "save-led",
       "passed": true,
-      "seconds": 0.041
+      "seconds": 0.046
     },
     {
       "name": "physical-pattern-controls",
       "passed": true,
-      "seconds": 0.016
+      "seconds": 0.021
     },
     {
       "name": "drum-save-reboot",
       "passed": true,
-      "seconds": 0.01
+      "seconds": 0.009
     },
     {
       "name": "project-migration-and-orphans",
@@ -231,7 +236,7 @@
     {
       "name": "journal-build",
       "passed": true,
-      "seconds": 0.535
+      "seconds": 0.176
     },
     {
       "name": "actual-nor-journal",
@@ -241,24 +246,19 @@
     {
       "name": "paired-journal-build",
       "passed": true,
-      "seconds": 0.447
+      "seconds": 0.333
     },
     {
       "name": "paired-project-journal",
       "passed": true,
-      "seconds": 0.174
+      "seconds": 0.18
     },
     {
       "name": "idm-sound-bank",
       "passed": true,
-      "seconds": 1.161
-    },
-    {
-      "name": "fuzz-panel-midi-editor",
-      "passed": true,
-      "seconds": 72.953
+      "seconds": 1.231
     }
   ],
-  "emulator_sha256": "6d67599603f67bd117d9089a35fe57dbdefe76a70ee2030cac3109e7ebc25b0d",
-  "firmware_sha256": "390900854de784b0fc6ec61ac0378a8c720beb47a582057fc9ec5d9b1c7e3f20"
+  "emulator_sha256": "ea7d8ddaed079f3ef37c0ace52f845c692831a3431ababe151454b09c58c6050",
+  "firmware_sha256": "2ee4c8b8d803b5a5aeab440859d032d5bb3aeefed0f0fbf7bc4d556667ebe3db"
 }

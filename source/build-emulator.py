@@ -10,7 +10,7 @@ def main():
  OUT.mkdir(parents=True,exist_ok=True)
  src=PLAT/'web/emu/emu_web.c'
  names=sorted(set(re.findall(r'\b(web_\w+)\s*\(',src.read_text()))-{'web_audio','web_said'})
- names+=['z_snapshot','z_state_size','z_track_hits','z_revision','z_playing','z_position','z_get','z_dm_data','z_dm_size','z_solo_state','z_live_state','z_voice_count','z_preset','z_dm_param','z_dm_common_length','z_dm_length','z_dm_position','z_tempo','z_countin_state']
+ names+=['z_snapshot','z_state_size','z_track_hits','z_revision','z_playing','z_position','z_get','z_dm_data','z_dm_size','z_solo_state','z_live_state','z_voice_count','z_preset','z_dm_param','z_dm_common_length','z_dm_length','z_dm_position','z_tempo','z_countin_state','z_set','z_history','z_x_get','z_x_set','z_x_size','z_x_data','z_x_apply','z_gen','z_gen_mutate','z_gen_all']
  zig=os.environ.get('ZIG',str(ROOT.parent/'.tooling/zig-windows-x86_64-0.13.0/zig.exe'))
  cmd=[zig,'cc','-target','wasm32-wasi','-mexec-model=reactor','-O2','-ffp-contract=off','-DPLAT_HOST','-DPLAT_WEB','-DAPP_VERSION="0.20.2"','-Wno-unused-function','-Wno-unused-variable']
  cmd+=['-I'+str(p) for p in [PLAT/'host',PLAT/'device',PLAT/'include',PLAT/'lib',APP,APP/'build/gen']]
