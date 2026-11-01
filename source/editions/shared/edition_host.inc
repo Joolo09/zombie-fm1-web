@@ -5,7 +5,7 @@ static void ed_checks(void){uint32_t t,p;int old;
  ed_check(z_sys.midi_mode==0&&midi_local,"startup is standalone with local sound");
  ed_check(!z_playing()&&!z_song.recording,"boot never auto-starts playback or recording");
  ed_check(z_sampler.tracks==(Z_SAMPLER_EDITION?63:0),"edition pad capabilities enforced");
- for(t=0;t<6;t++){old=z_get(t,Z_MODEL);z_set(t,Z_MODEL,Z_SAMPLER_EDITION?0:8);ed_check(z_get(t,Z_MODEL)==(Z_SAMPLER_EDITION?8:7),"foreign engine cannot enter this edition");z_set(t,Z_MODEL,old);}
+ for(t=0;t<6;t++){old=z_get(t,Z_MODEL);z_set(t,Z_MODEL,Z_SAMPLER_EDITION?0:8);ed_check(z_get(t,Z_MODEL)==(Z_SAMPLER_EDITION?8:t==5?7:8),"engine family: Sampler is PCM only; Groovebox tracks 1-5 may play USR samples, the drum track stays the kit");if(!Z_SAMPLER_EDITION&&t<5)ed_check(z_get(t,Z_SAMPLE)>=6&&z_get(t,Z_SAMPLE)<=9,"a Groovebox SAMPLE track plays a USR slot only");z_set(t,Z_MODEL,old);}
  for(p=0;p<Z_PRESETS;p++){z_preset(0,p);ed_check(Z_SAMPLER_EDITION?z_get(0,Z_MODEL)==8:z_get(0,Z_MODEL)<8,"factory preset uses the correct engine family");}
  if(Z_SAMPLER_EDITION){ed_check(z_sample_frames(10)>0&&z_sample_frames(0)>0,"factory drum and zombie PCM available");ed_check(!z_sampler_enable(0,0)&&z_sampler.tracks==63,"dedicated sampler cannot accidentally disable pads");z_song.track[0].p[Z_MODEL]=0;z_song.track[0].p[Z_SUSTAIN]=0;z_song.track[0].p[Z_ATTACK]=127;z_apply_state();ed_check(z_get(0,Z_MODEL)==8&&z_get(0,Z_SUSTAIN)==127&&z_get(0,Z_ATTACK)==0,"legacy synth project cannot mute sampler envelope");}
  else{ed_check(z_sample_frames(0)==0,"groovebox does not carry Minecraft PCM");ed_check(z_sampler_enable(0,1)==-1&&z_sampler.tracks==0,"groovebox cannot enable hidden sampler");}

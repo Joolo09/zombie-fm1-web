@@ -267,6 +267,9 @@ static void ui_vis_lfo(int16_t *p,uint16_t a,uint32_t now){uint8_t ys[224];int i
  ui_fill(8,224,ys,74,depth?a:UI_MUTED,ui_blend(UI_BG,depth?a:UI_GRID,22));if(!depth)z_text(66,16,&FONT_XS,word("LFO ВЫКЛ: K2 ГЛУБИНА","LFO OFF: K2 DEPTH"),UI_MUTED);}
 static float ui_shape(float ph,int wave){float u=ph-(int)ph;return wave==0?ui_sin(ph):wave==1?2*u-1:wave==2?(u<0.5f?0.8f:-0.8f):(u<0.5f?4*u-1:3-4*u);}
 static void ui_vis_osc(int16_t *p,uint16_t a,uint32_t t){uint8_t ys[224];int i,model=p[Z_MODEL],wave=p[Z_WAVE];uint32_t r=0x9e3779b9u;
+ /* a SAMPLE track: the WAV's outline, or how to load one */
+ if(model==8&&!z_drum_track(t)){uint32_t s=(uint32_t)p[Z_SAMPLE];cv_rect(8,36,224,1,UI_GRID);if(!z_sample_frames(s)){z_text(14,10,&FONT_XS,word("СЛОТ ПУСТ: ЗАГРУЗИ WAV","EMPTY SLOT: LOAD A WAV"),UI_TEXT);z_text(14,26,&FONT_XS,word("В ВЕБ-РЕДАКТОРЕ: СЭМПЛЫ","IN THE WEB EDITOR: SAMPLES"),UI_MUTED);return;}
+  for(i=0;i<112;i++){int h=(int)(z_sample_peak(s,(uint32_t)i,112)*32/32767);if(h<1)h=1;cv_rect(8+i*2,36-h,2,2*h,ui_blend(UI_BG,a,90+(uint32_t)(i&1)*30));}return;}
  for(i=0;i<224;i++){float ph=i/112.0f,x,u=ph-(int)ph;(void)u;
   if(z_drum_track(t))x=ui_sin(ph*3)*(1-i/224.0f);
   else if(model==0)x=ui_shape(ph,wave)*(1-p[Z_MIX]/254.0f)+ui_shape(ph*(1+p[Z_DETUNE]/400.0f),wave)*p[Z_MIX]/254.0f;

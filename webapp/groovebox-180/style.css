@@ -37,3 +37,12 @@ header{padding:14px 3vw}.brand strong{font-size:17px}.sigil{width:32px;height:34
 @media(max-width:440px){#pad-fields label>span{min-height:36px}}
 
 #keys.drum-keyboard{display:grid;grid-template-columns:repeat(4,1fr);height:auto;gap:8px;padding:8px}.drum-key{min-height:52px;touch-action:none}.drum-key.held{background:#648439;color:white}
+
+/* 0.20: Groovebox plays USR WAVs on tracks 1-5; the 32-pad sampler belongs to the Sampler firmware */
+#samples .pad-workstation{display:none}
+#wav-drop{margin-top:14px;border:2px dashed var(--line);border-radius:12px;padding:22px;text-align:center;color:var(--muted);transition:border-color .2s,background .2s}
+#samples.dragging #wav-drop,#wav-drop.hot{border-color:var(--accent);background:#b5e86b14;color:var(--accent)}
+#slot-status .pill{font-family:ui-monospace,monospace}
+
+/* a disabled accent button keeps a readable label */
+button.accent:disabled,button.primary:disabled{color:#9fb3a1!important;background:#1b2a20!important;border-color:#2a3d2f!important;opacity:.7}

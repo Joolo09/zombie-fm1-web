@@ -1,41 +1,24 @@
 {
   "format": "zombie-web/1",
-  "current": "FM-1_63001901",
+  "current": "FM-1_63002000",
   "releases": [
     {
-      "product": "FM-1_63001901",
-      "version": "0.19.1",
+      "product": "FM-1_63002000",
+      "version": "0.20.0",
       "label": {
-        "ru": "Groovebox 0.19.1 · вкладка «Система», 128 пресетов, 4 заставки",
-        "en": "Groovebox 0.19.1 · SYSTEM tab, 128 presets, 4 screensavers"
+        "ru": "Groovebox 0.20.0 · свои сэмплы, вкладка «Система», 128 пресетов",
+        "en": "Groovebox 0.20.0 · your own samples, SYSTEM tab, 128 presets"
       },
       "notes": {
-        "ru": "Исправлено: «держи SEQ и крути K1» сразу меняет число шагов (раньше быстрый поворот менял пресет). Вкладка «Система» (GLO три раза быстро): MIDI-вход по каналам или омни, TRS-вход → USB, приём Program Change и CC, CPU1 при запуске, синхронизация, панель. Английский по умолчанию, банк ZMB, живой экран, 4 заставки. Проверена в эмуляторе и автотестах, на FM-1 пока нет.",
-        "en": "Fixed: hold SEQ and turn K1 straight away sets the step count (a quick turn used to change the preset). SYSTEM tab (GLO three times quickly): MIDI in by channel or omni, TRS in to USB, program change and CC in, CPU1 at boot, sync, panel. English by default, ZMB bank, living screen, 4 screensavers. Tested in the emulator and test suite, not yet on a physical FM-1."
+        "ru": "Свои сэмплы (USR1–USR4) на дорожках 1–5, вкладка «Система», исправлены жесты SEQ + K1 и EDIT + ручка.",
+        "en": "Your own samples (USR1–USR4) on tracks 1–5, the SYSTEM tab, SEQ + K1 and EDIT + knob gesture fixes."
       },
       "channel": "recommended",
       "bytes": 610100,
-      "sha256": "bc26bdc6609f3cf9b7d1b3ca2d0f8bcf8a932a928d7462642beccd4cba45b2b6",
-      "file": "downloads/zombie-groovebox-0.19.1.fwsc",
+      "sha256": "9600d2399f87506930e0bd70784e50810d5170289ffa9555492646378399d894",
+      "file": "downloads/zombie-groovebox-0.20.0.fwsc",
       "editor": "webapp/groovebox-180/",
-      "source": "downloads/groovebox-source-0.19.1.zip"
-    },
-    {
-      "product": "FM-1_64000800",
-      "version": "0.8.0",
-      "label": {
-        "ru": "Sampler 0.8.0 · отдельная прошивка",
-        "en": "Sampler 0.8.0 · dedicated firmware"
-      },
-      "notes": {
-        "ru": "32 пэда, свои WAV, CHOP, reverse, GATE / LOOP. Standalone при запуске. Новая сборка: проверена в симуляторе, на железе пока нет.",
-        "en": "32 pads, user WAVs, CHOP, reverse, GATE / LOOP. Standalone at startup. New build: simulator-tested, not hardware-verified."
-      },
-      "bytes": 610108,
-      "sha256": "d1f15450be7de13dd449be1d8c43e811ad33b2fbb7c0070aab9fe379c2603248",
-      "file": "downloads/zombie-sampler-0.8.0.fwsc",
-      "editor": "webapp/sampler/",
-      "channel": "stable"
+      "source": "downloads/groovebox-source-0.20.0.zip"
     }
   ]
 }
